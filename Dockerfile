@@ -25,3 +25,5 @@ COPY install/scripts/*.sh /
 RUN chmod +x /*.sh \
  && chmod -R 755 /opt
 
+USER $USERNAME
+CMD ["/start.sh"]

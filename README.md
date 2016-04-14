@@ -5,12 +5,13 @@ is becoming unwiedly when one needs many arguments. Tries to be a thin wrapper a
 docerk CLI.
 
 Features:
+- By default, containers do not run as root, but have unique users
 - The image produces immutable containers, i.e. a container can be removed and re-created
   any time without loss of data, because data is stored on mounted volumes.
 - Configuration from a config file, building and running containers with the same script in
   different projects
 - Consistent image, container, user and network mapping for multiple containers
-- 
+- Data and config directories are mapped to the docker host, with consistent userids
 
 ## Build the docker image
 1. adapt conf.sh

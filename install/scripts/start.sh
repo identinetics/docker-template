@@ -1,11 +1,5 @@
 #!/bin/sh
-# entrypoint for pyffd (discovery and mdx service)
+# entrypoint for container
 
-/usr/bin/pyffd -a -f --proxy \
-    --log=$LOGDIR/pyffd.log \
-    --error-log=$LOGDIR/pyffd.error \
-    --loglevel=$LOGLEVEL \
-    --frequency=$FREQUENCY \
-    -H0.0.0.0 \
-    -p $PIDFILE \
-    $PIPELINEDAEMON
+echo "container started"
+tail -f /etc/hosts
