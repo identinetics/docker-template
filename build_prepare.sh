@@ -15,4 +15,14 @@ get_or_update_repo() {
     fi
 }
 
-# add commands to pull resources required for docker build here:
+# pull resources required for docker build
+# ----------------------------------------
+
+# get git repo yz/project1
+#repodir='install/opt/project1'
+#repourl='https://github.com/xyz/project1'
+#get_or_update_repo
+
+# get some other resource
+#[ -e $workdir/install/scripts/get-pip.py ] || \
+#    cd $workdir/install/scripts && wget https://bootstrap.pypa.io/get-pip.py
