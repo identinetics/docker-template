@@ -15,3 +15,4 @@ get_or_update_repo() {
     fi
 }
 
+# add commands to pull resources required for docker build here:
