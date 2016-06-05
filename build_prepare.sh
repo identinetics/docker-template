@@ -2,16 +2,54 @@
 
 # optional script to initialize and update the docker build environment
 
+while getopts ":hu" opt; do
+  case $opt in
+    u)
+      update_pkg="True"
+      ;;
+    *)
+      echo "usage: $0 [-h] [-i] [-n] [-p] [-r] [cmd]
+   -h  print this help text
+   -u  update packages in docker build context
+   "
+      exit 0
+      ;;
+  esac
+done
 
-cd $(dirname $BASH_SOURCE[0])
+shift $((OPTIND-1))
+
+
+workdir=$(cd $(dirname $BASH_SOURCE[0]) && pwd)
+cd $workdir
 source ./conf${config_nr}.sh
 
 get_or_update_repo() {
     if [ -e $repodir ] ; then
-        cd $repodir && git pull && cd -    # already cloned
+        [ "$update_pkg" ] \
+            && echo "updating $repodir" \
+            && cd $repodir && git pull && cd $OLDPWD
     else
+        echo "cloning $repodir" \
         mkdir -p $repodir
         git clone $repourl $repodir        # first time
     fi
 }
+
+get_from_tarball() {
+    if [ ! -e $pkgroot/$pkgdir ]; then \
+        echo "downloading $pkgdir into $pkgroot"
+        mkdir $pkgroot/$pkgdir
+        curl -L $pkgurl | tar -xz -C $pkgroot
+    fi
+}
+
+repodir='install/opt/pysaml2'
+repourl='https://github.com/rohe/pysaml2'
+get_or_update_repo
+
+pkgroot="$workdir/install/opt"
+pkgdir="sip-4.18"
+pkgurl='http://downloads.sourceforge.net/project/pyqt/sip/sip-4.18/sip-4.18.tar.gz'
+get_from_tarball
 

@@ -18,6 +18,7 @@ export ENVSETTINGS="
     -e LOGDIR=/var/log
     -e LOGLEVEL=INFO
 "
+
 export NETWORKSETTINGS="
     --net http_proxy
     --ip 10.1.1.${IMGID}mo
@@ -28,6 +29,23 @@ export VOLMAPPING="
     -v $VOLROOT/var/log:/var/log:Z
     -v $shareddata_root/www:/var/www:Z
 "
+
+# How to enable xclients in Docker containers: http://wiki.ros.org/docker/Tutorials/GUI
+#export ENVSETTINGS="$ENVSETTINGS
+#    -e DISPLAY=$DISPLAY
+#"
+#export VOLMAPPING="$VOLMAPPING
+#    -v /tmp/.X11-unix/:/tmp/.X11-unix:Z
+#"
+
+# enable Smartcard Reader in Docker
+# mounting var/lock/.., var/run to get around permission problems when starting non-root
+# --privileged mapping of usb devices allows a generic configreation without knowing the
+# USB device name. Alternativel, devices can be mapped using '--device'
+#export VOLMAPPING="$VOLMAPPING
+#    --privileged -v /dev/bus/usb:/dev/bus/usb
+#"
+
 export STARTCMD='/start.sh'
 
 # first start: create user/group/host directories

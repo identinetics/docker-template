@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-while getopts ":hn:pr" opt; do
+while getopts ":hn:pru" opt; do
   case $opt in
     n)
       config_nr=$OPTARG
@@ -15,6 +15,9 @@ while getopts ":hn:pr" opt; do
     r)
       remove_img="True"
       ;;
+    u)
+      update_pkg="-u"
+      ;;
     :)
       echo "Option -$OPTARG requires an argument"
       exit 1
@@ -25,6 +28,7 @@ while getopts ":hn:pr" opt; do
    -n  configuration number ('<NN>' in conf<NN>.sh)
    -p  print docker build command on stdout
    -r  remove existing image (-f)
+   -u  update packages in docker build context
    "
       exit 0
       ;;
@@ -36,7 +40,7 @@ shift $((OPTIND-1))
 cd $(dirname $BASH_SOURCE[0])
 source conf${config_nr}.sh
 
-[ -e build_prepare.sh ] && ./build_prepare.sh
+[ -e build_prepare.sh ] && ./build_prepare.sh $update_pkg
 
 if [ $(id -u) -ne 0 ]; then
     sudo="sudo"
