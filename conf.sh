@@ -49,17 +49,20 @@ export VOLMAPPING="
 export STARTCMD='/start.sh'
 
 # first start: create user/group/host directories
+if [ $(id -u) -ne 0 ]; then
+    sudo="sudo"
+fi
 if ! id -u $CONTAINERUSER &>/dev/null; then
-    groupadd -g $CONTAINERUID $CONTAINERUSER
-    adduser -M -g $CONTAINERUID -u $CONTAINERUID $CONTAINERUSER
+    $sudo groupadd -g $CONTAINERUID $CONTAINERUSER
+    $sudo adduser -M -g $CONTAINERUID -u $CONTAINERUID $CONTAINERUSER
 fi
 
 # create dir with given user if not existing, relative to $HOSTVOLROOT
 function chkdir {
     dir=$1
     user=$2
-    mkdir -p "$VOLROOT/$dir"
-    chown -R $user:$user "$VOLROOT/$dir"
+    $sudo mkdir -p "$VOLROOT/$dir"
+    $sudo chown -R $user:$user "$VOLROOT/$dir"
 }
 chkdir etc/pki $CONTAINERUSER
 chkdir var/log $CONTAINERUSER
