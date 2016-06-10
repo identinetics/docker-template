@@ -60,9 +60,6 @@ RUN yum -y swap -- remove systemd-container systemd-container-libs -- install sy
 RUN yum -y install icedtea-web pcsc-lite usbutils \
  && curl -O http://webstart.buergerkarte.at/mocca/webstart/mocca.jnlp
 
-
-
-
 # Application will run as a non-root user/group that must map to the docker host
 ARG USERNAME
 ARG UID
@@ -75,5 +72,15 @@ COPY install/scripts/*.sh /
 RUN chmod +x /*.sh \
  && chmod -R 755 /opt
 
+# For development/debugging - map port in config and start sshd with /start_sshd.sh
+#RUN yum -y install openssh-server \
+# && mkdir -p /opt/ssh/ && chown $USERNAME /opt/ssh \
+# && echo changeit | passwd -f --stdin $USERNAME \
+# && echo changeit | passwd -f --stdin root
+#VOLUME /etc/sshd
+#EXPOSE 2022
+
+
 USER $USERNAME
 CMD ["/start.sh"]
+

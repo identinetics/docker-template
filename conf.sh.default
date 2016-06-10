@@ -69,3 +69,7 @@ chkdir var/log $CONTAINERUSER
 
 mkdir -p $shareddata_root/www
 chown -R $CONTAINERUSER:$CONTAINERUSER $shareddata_root/www
+
+# add settigns to start sshd
+#export NETWORKSETTINGS="$NETWORKSETTINGS -p 2022:2022"
+#export VOLMAPPING="$VOLMAPPING -v $VOLROOT/opt/ssh:/opt/ssh:Z"

@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 
-while getopts ":hn:pru" opt; do
+EXECCMD=/bin/bash
+while getopts ":hin:pr" opt; do
   case $opt in
+    i)
+      runopt='-it'
+      ;;
     n)
       config_nr=$OPTARG
       re='^[0-9][0-9]?$'
@@ -13,10 +17,7 @@ while getopts ":hn:pru" opt; do
       print="True"
       ;;
     r)
-      remove_img="True"
-      ;;
-    u)
-      update_pkg="-u"
+      useropt='-u 0'
       ;;
     :)
       echo "Option -$OPTARG requires an argument"
@@ -25,10 +26,11 @@ while getopts ":hn:pru" opt; do
     *)
       echo "usage: $0 [-h] [-i] [-n] [-p] [-r] [cmd]
    -h  print this help text
+   -i  interactive (results in options -i -t for docker exec)
    -n  configuration number ('<NN>' in conf<NN>.sh)
-   -p  print docker build command on stdout
-   -r  remove existing image (-f)
-   -u  update packages in docker build context
+   -p  print docker exec command on stdout
+   -r  execute as root user
+   cmd shell command to be executed (default is $EXECCMD)
    unknow option $opt
    "
       exit 0
@@ -38,24 +40,20 @@ done
 
 shift $((OPTIND-1))
 
-cd $(dirname $BASH_SOURCE[0])
-source ./conf${config_nr}.sh
+SCRIPTDIR=$(cd $(dirname $BASH_SOURCE[0]) && pwd)
+source $SCRIPTDIR/conf${config_nr}.sh
 
-[ -e build_prepare.sh ] && ./build_prepare.sh $update_pkg
+if [ -z "$1" ]; then
+    cmd=$EXECCMD
+else
+    cmd=$@
+fi
+docker_exec="docker exec $runopt $useropt $CONTAINERNAME $cmd"
 
 if [ $(id -u) -ne 0 ]; then
     sudo="sudo"
 fi
-
-docker_build="docker build $BUILDARGS -t=$IMAGENAME ."
 if [ "$print" = "True" ]; then
-    echo $docker_build
+    echo $docker_exec
 fi
-
-if [ "remove_img" = "True" ]; then
-    ${sudo} docker rmi -f $IMAGENAME 2> /dev/null || true
-fi
-
-${sudo} $docker_build
-
-echo "image: $IMAGENAME"
+${sudo} $docker_exec

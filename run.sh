@@ -29,7 +29,8 @@ while getopts ":hin:pr" opt; do
    -n  configuration number ('<NN>' in conf<NN>.sh)
    -p  print docker run command on stdout
    -r  start command as root user (default is $CONTAINERUSER)
-   cmd shell command to be executed (default is $STARTCMD)"
+   cmd shell command to be executed (default is $STARTCMD)
+   unknow option $opt"
       exit 0
       ;;
   esac
