@@ -2,15 +2,23 @@
 
 # optional script to initialize and update the docker build environment
 
-while getopts ":hu" opt; do
+update_pkg="True"
+
+while getopts ":hnu" opt; do
   case $opt in
+    n)
+      update_pkg="False"
+      ;;
     u)
       update_pkg="True"
       ;;
     *)
       echo "usage: $0 [-h] [-i] [-n] [-p] [-r] [cmd]
    -h  print this help text
-   -u  update packages in docker build context
+   -n  do not update git repos in docker build context
+   -u  update git repos in docker build context (default)
+
+   To update packages delivered a tar-balls just delete them  from install/opt
    "
       exit 0
       ;;

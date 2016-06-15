@@ -79,6 +79,10 @@ RUN chmod +x /*.sh \
 # && echo changeit | passwd -f --stdin root
 #VOLUME /etc/sshd
 #EXPOSE 2022
+#USER $USERNAME
+#RUN /usr/bin/ssh-keygen -q -N '' -t rsa -f /opt/ssh/ssh_host_rsa_key \
+# && /usr/bin/ssh-keygen -q -N '' -t ecdsa -f /opt/ssh/ssh_host_ecdsa_key \
+# && /usr/bin/ssh-keygen -q -N '' -t ed25519 -f /opt/ssh/ssh_host_ed25519_key
 
 
 USER $USERNAME
