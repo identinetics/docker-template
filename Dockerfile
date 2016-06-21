@@ -2,7 +2,7 @@ FROM centos:centos7
 MAINTAINER Rainer Hörbe <r2h2@hoerbe.at>
 
 # useful tools
-RUN yum -y install curl git ip lsof net-tools openssl wget which
+RUN yum -y install curl git ip lsof net-tools openssl sudo wget which
 
 # more dev tools than just yum -y install gcc gcc-c++
 RUN yum -y groupinstall "Development Tools" --setopt=group_package_types=mandatory,default,optional
