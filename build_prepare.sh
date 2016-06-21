@@ -2,7 +2,7 @@
 
 # optional script to initialize and update the docker build environment
 
-update_pkg="True"
+update_pkg="False"
 
 while getopts ":hnu" opt; do
   case $opt in
@@ -13,12 +13,11 @@ while getopts ":hnu" opt; do
       update_pkg="True"
       ;;
     *)
-      echo "usage: $0 [-h] [-i] [-n] [-p] [-r] [cmd]
-   -h  print this help text
-   -n  do not update git repos in docker build context
-   -u  update git repos in docker build context (default)
+      echo "usage: $0 [-n] [-u]
+   -n  do not update git repos in docker build context (default)
+   -u  update git repos in docker build context
 
-   To update packages delivered a tar-balls just delete them  from install/opt
+   To update packages delivered as tar-balls just delete them from install/opt
    "
       exit 0
       ;;
@@ -46,18 +45,21 @@ get_or_update_repo() {
 
 get_from_tarball() {
     if [ ! -e $pkgroot/$pkgdir ]; then \
-        echo "downloading $pkgdir into $pkgroot"
-        mkdir $pkgroot/$pkgdir
-        curl -L $pkgurl | tar -xz -C $pkgroot
+        [ "$update_pkg" ] \
+            echo "downloading $pkgdir into $pkgroot" \
+            mkdir $pkgroot/$pkgdir \
+            curl -L $pkgurl | tar -xz -C $pkgroot
     fi
 }
 
-repodir='install/opt/pysaml2'
-repourl='https://github.com/rohe/pysaml2'
-get_or_update_repo
+# --- install software from github ---
+#repodir='install/opt/xyz'
+#repourl='https://github.com/abc/xyz'
+#get_or_update_repo
 
-pkgroot="$workdir/install/opt"
-pkgdir="sip-4.18"
-pkgurl='http://downloads.sourceforge.net/project/pyqt/sip/sip-4.18/sip-4.18.tar.gz'
-get_from_tarball
+# --- install software as tar ball ---
+#pkgroot="$workdir/install/opt"
+#pkgdir="pkg-123"
+#pkgurl='http://downloads.sourceforge.net/project/............tar.gz'
+#get_from_tarball
 
