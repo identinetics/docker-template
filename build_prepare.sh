@@ -52,6 +52,17 @@ get_from_tarball() {
     fi
 }
 
+get_from_ziparchive() {
+    if [ ! -e $pkgroot/$pkgdir ]; then
+        if [ "$update_pkg" == "True" ]; then
+            echo "downloading $pkgdir into $pkgroot"
+            mkdir $pkgroot/$pkgdir
+            wget -qO- -O tmp.zip $pkgurl && unzip tmp.zip && rm tmp.zip
+        fi
+    fi
+}
+
+
 # --- install software from github ---
 #repodir='install/opt/xyz'
 #repourl='https://github.com/abc/xyz'
