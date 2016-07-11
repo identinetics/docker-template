@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-while getopts ":hin:pr" opt; do
+while getopts ":hin:prR" opt; do
   case $opt in
     i)
       runopt='-it --rm'
@@ -18,6 +18,9 @@ while getopts ":hin:pr" opt; do
     r)
       useropt='-u 0'
       ;;
+    R)
+      remove='True'
+      ;;
     :)
       echo "Option -$OPTARG requires an argument"
       exit 1
@@ -29,6 +32,7 @@ while getopts ":hin:pr" opt; do
    -n  configuration number ('<NN>' in conf<NN>.sh)
    -p  print docker run command on stdout
    -r  start command as root user (default is $CONTAINERUSER)
+   -R  remove dangling container before start
    cmd shell command to be executed (default is $STARTCMD)
    unknow option $opt"
       exit 0
@@ -61,4 +65,9 @@ $sudo docker rm -f $CONTAINERNAME 2>/dev/null || true
 if [ "$print" = "True" ]; then
     echo $docker_run
 fi
+# remove dangling container
+if [ -e $remove ]; then
+    docker ps -a | grep $CONTAINERNAME) > /dev/null && docker rm $CONTAINERNAME
+fi
+
 $sudo $docker_run
