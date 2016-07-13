@@ -4,17 +4,24 @@
 
 update_pkg="False"
 
-while getopts ":hnu" opt; do
+while getopts ":hnuU" opt; do
   case $opt in
     n)
-      update_pkg="False"
+      config_nr=$OPTARG
+      re='^[0-9][0-9]?$'
+      if ! [[ $OPTARG =~ $re ]] ; then
+         echo "error: -n argument is not a number in the range from 2 .. 99" >&2; exit 1
+      fi
       ;;
     u)
       update_pkg="True"
       ;;
+    U)
+      update_pkg="False"
+      ;;
     *)
       echo "usage: $0 [-n] [-u]
-   -n  do not update git repos in docker build context (default)
+   -U  do not update git repos in docker build context (default)
    -u  update git repos in docker build context
 
    To update packages delivered as tar-balls just delete them from install/opt
@@ -33,22 +40,24 @@ source ./conf${config_nr}.sh
 
 get_or_update_repo() {
     if [ -e $repodir ] ; then
-        [ "$update_pkg" ] \
-            && echo "updating $repodir" \
-            && cd $repodir && git pull && cd $OLDPWD
+        if [ "$update_pkg" == "True" ]; then
+            echo "updating $repodir"
+            cd $repodir && git pull && cd $OLDPWD
+        fi
     else
         echo "cloning $repodir" \
         mkdir -p $repodir
-        git clone $repourl $repodir        # first time
+        git clone $repourl $repodir
     fi
 }
 
 get_from_tarball() {
     if [ ! -e $pkgroot/$pkgdir ]; then \
-        [ "$update_pkg" ] \
-            echo "downloading $pkgdir into $pkgroot" \
-            mkdir $pkgroot/$pkgdir \
+        if [ "$update_pkg" == "True" ]; then
+            echo "downloading $pkgdir into $pkgroot"
+            mkdir $pkgroot/$pkgdir
             curl -L $pkgurl | tar -xz -C $pkgroot
+        fi
     fi
 }
 

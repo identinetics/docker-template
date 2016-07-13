@@ -8,6 +8,7 @@ while getopts ":hn:pru" opt; do
       if ! [[ $OPTARG =~ $re ]] ; then
          echo "error: -n argument is not a number in the range frmom 2 .. 99" >&2; exit 1
       fi
+      config_opt="-n ${config_nr}"
       ;;
     p)
       print="True"
@@ -41,7 +42,7 @@ shift $((OPTIND-1))
 cd $(dirname $BASH_SOURCE[0])
 source ./conf${config_nr}.sh
 
-[ -e build_prepare.sh ] && ./build_prepare.sh $update_pkg
+[ -e build_prepare.sh ] && ./build_prepare.sh $config_opt $update_pkg
 
 if [ $(id -u) -ne 0 ]; then
     sudo="sudo"
