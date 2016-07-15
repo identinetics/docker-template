@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# rhoerbe/docker-template@github 2016-07-11
 
 while getopts ":hin:prR" opt; do
   case $opt in
@@ -67,7 +68,7 @@ if [ "$print" = "True" ]; then
 fi
 # remove dangling container
 if [ -e $remove ]; then
-    docker ps -a | grep $CONTAINERNAME) > /dev/null && docker rm $CONTAINERNAME
+    docker ps -a | grep $CONTAINERNAME > /dev/null && docker rm $CONTAINERNAME
 fi
 
 $sudo $docker_run
