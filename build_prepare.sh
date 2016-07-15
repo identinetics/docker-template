@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
+# rhoerbe/docker-template@github 2016-07-15
+set -x
 
-# optional script to initialize and update the docker build environment
+# Initialize and update the docker build environment
+# Providing resources before starting docker build provides better control about updates
+# and can speed up the build process.
 
 update_pkg="False"
 

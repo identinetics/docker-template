@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# rhoerbe/docker-template@github 2016-07-11
 
 EXECCMD=/bin/bash
 while getopts ":hin:pr" opt; do
