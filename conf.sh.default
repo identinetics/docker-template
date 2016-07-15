@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# rhoerbe/docker-template@github 2016-07-15
 
 # data shared between containers goes via these definitions:
 dockervol_root='/docker_volumes'
@@ -65,11 +66,12 @@ function chkdir {
     $sudo mkdir -p "$VOLROOT/$dir"
     $sudo chown -R $user:$user "$VOLROOT/$dir"
 }
+
 chkdir etc/pki $CONTAINERUSER
 chkdir var/log $CONTAINERUSER
 
-mkdir -p $shareddata_root/www
-chown -R $CONTAINERUSER:$CONTAINERUSER $shareddata_root/www
+$sudo mkdir -p $shareddata_root/www
+$sudo chown -R $CONTAINERUSER:$CONTAINERUSER $shareddata_root/www
 
 # add settigns to start sshd
 #export NETWORKSETTINGS="$NETWORKSETTINGS -p 2022:2022"
