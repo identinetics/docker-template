@@ -7,7 +7,7 @@ while getopts ":hn:pru" opt; do
       config_nr=$OPTARG
       re='^[0-9][0-9]$'
       if ! [[ $OPTARG =~ $re ]] ; then
-         echo "error: -n argument is not a number in the range frmom 02 .. 99" >&2; exit 1
+         echo "error: -n argument is not a number in the range from 02 .. 99" >&2; exit 1
       fi
       config_opt="-n ${config_nr}"
       ;;
@@ -25,7 +25,7 @@ while getopts ":hn:pru" opt; do
       exit 1
       ;;
     *)
-      echo "usage: $0 [-h] [-i] [-n] [-p] [-r] [cmd]
+      echo "usage: $0 [-h] [-n container-nr] [-p] [-r] [-u]
    -h  print this help text
    -n  configuration number ('<NN>' in conf<NN>.sh)
    -p  print docker build command on stdout

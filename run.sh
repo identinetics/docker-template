@@ -27,15 +27,14 @@ while getopts ":hin:prR" opt; do
       exit 1
       ;;
     *)
-      echo "usage: $0 [-h] [-i] [-p] [-r] [cmd]
+      echo "usage: $0 [-h] [-i] [-n container-nr ] [-p] [-r] -[R] [cmd]
    -h  print this help text
    -i  start in interactive mode and remove container afterwards
    -n  configuration number ('<NN>' in conf<NN>.sh)
    -p  print docker run command on stdout
    -r  start command as root user (default is $CONTAINERUSER)
    -R  remove dangling container before start
-   cmd shell command to be executed (default is $STARTCMD)
-   unknow option $opt"
+   cmd shell command to be executed (default is $STARTCMD)"
       exit 0
       ;;
   esac
