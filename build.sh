@@ -8,7 +8,7 @@ while getopts ":hn:pru" opt; do
       config_nr=$OPTARG
       re='^[0-9][0-9]$'
       if ! [[ $OPTARG =~ $re ]] ; then
-         echo "error: -n argument is not a number in the range from 02 .. 99" >&2; exit 1
+         echo "error: -n argument is not a number in the range frmom 02 .. 99" >&2; exit 1
       fi
       config_opt="-n ${config_nr}"
       ;;
@@ -26,7 +26,7 @@ while getopts ":hn:pru" opt; do
       exit 1
       ;;
     *)
-      echo "usage: $0 [-h] [-n container-nr] [-p] [-r] [-u]
+      echo "usage: $0 [-h] [-i] [-n] [-p] [-r] [cmd]
    -h  print this help text
    -n  configuration number ('<NN>' in conf<NN>.sh)
    -p  print docker build command on stdout
@@ -44,19 +44,22 @@ shift $((OPTIND-1))
 # determine config script (there may be more than one to run multiple containers)
 # if config_nr not given and there is only one file matching conf*.sh take this one
 SCRIPTDIR=$(cd $(dirname $BASH_SOURCE[0]) && pwd)
-confs=arr=(conf*.sh)
+PROJ_HOME=$(cd $(dirname $SCRIPTDIR) && pwd)
+confs=(conf*.sh)
 if [ ! -z ${config_nr} ]; then
     conf_script=conf${config_nr}.sh
-    if [ -e "$SCRIPTDIR/$conf_script" ]; then
-        echo "$SCRIPTDIR/$conf_script not found"
+    if [ -e "$PROJ_HOME/$conf_script" ]; then
+        echo "$PROJ_HOME/$conf_script not found"
         exit 1
     fi
-elif [ ${#arr[@]} -eq 1 ]; then
-    conf_script=${arr[0]}
+elif [ ${#confs[@]} -eq 1 ]; then
+    conf_script=${confs[0]}
 else
-    echo 'More than one conf*.sh: need to provide -n argument'
+    echo "No or more than one (${#confs[@]}) conf*.sh: need to provide -n argument:"
+    printf "%s\n" "${confs[@]}"
+    exit 1
 fi
-source $SCRIPTDIR/$conf_script.sh
+source $PROJ_HOME/$conf_script
 
 [ -e build_prepare.sh ] && ./build_prepare.sh $config_opt $update_pkg
 

@@ -42,7 +42,22 @@ done
 shift $((OPTIND-1))
 
 SCRIPTDIR=$(cd $(dirname $BASH_SOURCE[0]) && pwd)
-source $SCRIPTDIR/conf${config_nr}.sh
+PROJ_HOME=$(cd $(dirname $SCRIPTDIR) && pwd)
+confs=(conf*.sh)
+if [ ! -z ${config_nr} ]; then
+    conf_script=conf${config_nr}.sh
+    if [ -e "$PROJ_HOME/$conf_script" ]; then
+        echo "$PROJ_HOME/$conf_script not found"
+        exit 1
+    fi
+elif [ ${#confs[@]} -eq 1 ]; then
+    conf_script=${confs[0]}
+else
+    echo "No or more than one (${#confs[@]}) conf*.sh: need to provide -n argument:"
+    printf "%s\n" "${confs[@]}"
+    exit 1
+fi
+source $PROJ_HOME/$conf_script
 
 if [ -z "$runopt" ]; then
     runopt='-d --restart=unless-stopped'

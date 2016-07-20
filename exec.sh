@@ -44,20 +44,22 @@ shift $((OPTIND-1))
 # determine config script (there may be more than one to run multiple containers)
 # if config_nr not given and there is only one file matching conf*.sh take this one
 SCRIPTDIR=$(cd $(dirname $BASH_SOURCE[0]) && pwd)
-confs=arr=(conf*.sh)
+PROJ_HOME=$(cd $(dirname $SCRIPTDIR) && pwd)
+confs=(conf*.sh)
 if [ ! -z ${config_nr} ]; then
     conf_script=conf${config_nr}.sh
-    if [ -e "$SCRIPTDIR/$conf_script" ]; then
-        echo "$SCRIPTDIR/$conf_script not found"
+    if [ -e "$PROJ_HOME/$conf_script" ]; then
+        echo "$PROJ_HOME/$conf_script not found"
         exit 1
     fi
-elif [ ${#arr[@]} -eq 1 ]; then
-    conf_script=${arr[0]}
+elif [ ${#confs[@]} -eq 1 ]; then
+    conf_script=${confs[0]}
 else
-    echo 'More than one conf*.sh: need to provide -n argument'
+    echo "No or more than one (${#confs[@]}) conf*.sh: need to provide -n argument:"
+    printf "%s\n" "${confs[@]}"
+    exit 1
 fi
-
-source $SCRIPTDIR/$conf_script.sh
+source $PROJ_HOME/$conf_script
 
 if [ -z "$1" ]; then
     cmd=$EXECCMD
