@@ -40,8 +40,22 @@ done
 
 shift $((OPTIND-1))
 
-cd $(dirname $BASH_SOURCE[0])
-source ./conf${config_nr}.sh
+# determine config script (there may be more than one to run multiple containers)
+# if config_nr not given and there is only one file matching conf*.sh take this one
+SCRIPTDIR=$(cd $(dirname $BASH_SOURCE[0]) && pwd)
+confs=arr=(conf*.sh)
+if [ ! -z ${config_nr} ]; then
+    conf_script=conf${config_nr}.sh
+    if [ -e "$SCRIPTDIR/$conf_script" ]; then
+        echo "$SCRIPTDIR/$conf_script not found"
+        exit 1
+    fi
+elif [ ${#arr[@]} -eq 1 ]; then
+    conf_script=${arr[0]}
+else
+    echo 'More than one conf*.sh: need to provide -n argument'
+fi
+source $SCRIPTDIR/$conf_script.sh
 
 [ -e build_prepare.sh ] && ./build_prepare.sh $config_opt $update_pkg
 
