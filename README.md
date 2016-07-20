@@ -34,9 +34,9 @@ Features:
 
 ## Usage
 
-    build.sh [-h] [-i] [-n] [-p] [-r]
-    run-sh [-h] [-i] [-n container-nr] [-p] [-r] -[R] [cmd]
-    exec.sh [-h] [-i] [-n] [-p] [-r] [cmd]
+    dscript/build.sh [-h] [-i] [-n] [-p] [-r]
+    dscript/run-sh [-h] [-i] [-n container-nr] [-p] [-r] -[R] [cmd]
+    dscript/exec.sh [-h] [-i] [-n] [-p] [-r] [cmd]
     
    To run multiple XYZ containers on the same system you need to create separate 
    conf.sh files and build separate images:
