@@ -15,7 +15,7 @@ while getopts ":hin:pr" opt; do
       fi
       ;;
     p)
-      print="True"
+      print='True'
       ;;
     r)
       useropt='-u 0'
@@ -32,7 +32,6 @@ while getopts ":hin:pr" opt; do
    -p  print docker exec command on stdout
    -r  execute as root user
    cmd shell command to be executed (default is $EXECCMD)
-   unknow option $opt
    "
       exit 0
       ;;
@@ -69,9 +68,9 @@ fi
 docker_exec="docker exec $runopt $useropt $CONTAINERNAME $cmd"
 
 if [ $(id -u) -ne 0 ]; then
-    sudo="sudo"
+    sudo='sudo'
 fi
-if [ "$print" = "True" ]; then
+if [ "$print" = 'True' ]; then
     echo $docker_exec
 fi
 ${sudo} $docker_exec
