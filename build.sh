@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # rhoerbe/docker-template@github 2016-07-20
+set -e
 
 while getopts ":hn:pru" opt; do
   case $opt in
