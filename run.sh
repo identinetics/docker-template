@@ -82,7 +82,7 @@ if [ "$print" = "True" ]; then
 fi
 # remove dangling container
 if [ -e $remove ]; then
-    docker ps -a | grep $CONTAINERNAME > /dev/null && docker rm $CONTAINERNAME
+    $sudo docker ps -a | grep $CONTAINERNAME > /dev/null && docker rm $CONTAINERNAME
 fi
 
 $sudo $docker_run
