@@ -6,11 +6,11 @@ dockervol_root='/docker_volumes'
 shareddata_root="${dockervol_root}/1shared_data"
 
 # configure container
-export IMGID='99'  # range from 2 .. 99; must be unique
+export IMGID='99'  # range from 02 .. 99; must be unique
 export IMAGENAME="r2h2/template${IMGID}"
 export CONTAINERNAME="${IMGID}template"
 export CONTAINERUSER="user${IMGID}"   # group and user to run container
-export CONTAINERUID="800${IMGID}"     # gid and uid for CONTAINERUSER
+export CONTAINERUID="80${IMGID}"     # gid and uid for CONTAINERUSER
 export BUILDARGS="
     --build-arg "USERNAME=$CONTAINERUSER" \
     --build-arg "UID=$CONTAINERUID" \

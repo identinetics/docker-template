@@ -5,9 +5,9 @@ while getopts ":hn:pru" opt; do
   case $opt in
     n)
       config_nr=$OPTARG
-      re='^[0-9][0-9]?$'
+      re='^[0-9][0-9]$'
       if ! [[ $OPTARG =~ $re ]] ; then
-         echo "error: -n argument is not a number in the range frmom 2 .. 99" >&2; exit 1
+         echo "error: -n argument is not a number in the range frmom 02 .. 99" >&2; exit 1
       fi
       config_opt="-n ${config_nr}"
       ;;
