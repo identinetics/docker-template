@@ -46,7 +46,7 @@ PROJ_HOME=$(cd $(dirname $SCRIPTDIR) && pwd)
 confs=(conf*.sh)
 if [ ! -z ${config_nr} ]; then
     conf_script=conf${config_nr}.sh
-    if [ -e "$PROJ_HOME/$conf_script" ]; then
+    if [ ! -e "$PROJ_HOME/$conf_script" ]; then
         echo "$PROJ_HOME/$conf_script not found"
         exit 1
     fi
