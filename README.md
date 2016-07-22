@@ -22,6 +22,9 @@ Features:
     # when you clone your project, you need to execute:    
     git submodule init
     git submodule update
+    cd dscripts
+    cd git checkout master
+    cd ..
     
 2. From your project root copy default files:
 
