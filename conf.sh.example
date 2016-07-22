@@ -55,7 +55,7 @@ if [ $(id -u) -ne 0 ]; then
 fi
 if ! id -u $CONTAINERUSER &>/dev/null; then
     $sudo groupadd -g $CONTAINERUID $CONTAINERUSER
-    $sudo adduser -M --gid $CONTAINERUID -M --uid $CONTAINERUID $CONTAINERUSER  #CentOS
+    $sudo adduser --gid $CONTAINERUID -M --uid $CONTAINERUID $CONTAINERUSER  #CentOS
     #$sudo adduser --gid $CONTAINERUID --no-create-home --disabled-password --gecos "" --uid $CONTAINERUID $CONTAINERUSER #Debian
 fi
 
