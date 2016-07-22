@@ -61,7 +61,7 @@ else
 fi
 source $PROJ_HOME/$conf_script
 
-[ -e build_prepare.sh ] && ./build_prepare.sh $config_opt $update_pkg
+[ -e build_prepare.sh ] && $PROJ_HOME/build_prepare.sh $config_opt $update_pkg
 
 if [ $(id -u) -ne 0 ]; then
     sudo="sudo"
