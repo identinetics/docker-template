@@ -26,11 +26,14 @@ Features:
     cd git checkout master
     cd ..
     
-2. From your project root copy default files:
+2. From the dscript project copy default files into your project root:
 
     cp dscript/Dockerfile.default Dockerfile
     cp dscript/conf.sh.default confXX.sh  # set XX to a unique 2-digit number on your host
-    cp dscript/build_prepare.sh.default build_prepare.sh  # optional
+    # optional
+    cp dscript/build_prepare.sh.default build_prepare.sh 
+    cp dscript/.gitignore .
+    cp -r dscript/install .
     
     
 3. adapt Dockerfile, conf.sh and build_prepare.sh
