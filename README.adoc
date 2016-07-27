@@ -20,12 +20,9 @@ Features:
 
     git submodule add git@github.com:identinetics/dscripts.git
     git commit -m 'add submodule dscripts'
-    # when you clone your project, you need to execute:    
-    git submodule init
-    git submodule update
-    cd dscripts
-    cd git checkout master
-    cd ..
+    # later, when you clone your project, you need to execute:    
+    git submodule init && git submodule update
+    cd dscripts && git checkout master && cd ..
     
 2. From the dscript project copy default files into your project root:
 
