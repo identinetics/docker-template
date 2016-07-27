@@ -43,7 +43,9 @@ shift $((OPTIND-1))
 
 SCRIPTDIR=$(cd $(dirname $BASH_SOURCE[0]) && pwd)
 PROJ_HOME=$(cd $(dirname $SCRIPTDIR) && pwd)
-confs=(conf*.sh)
+
+cd $PROJ_HOME; confs=($PROJ_HOME/conf*.sh); cd $OLDPWD
+
 if [ ! -z ${config_nr} ]; then
     conf_script=conf${config_nr}.sh
     if [ ! -e "$PROJ_HOME/$conf_script" ]; then
