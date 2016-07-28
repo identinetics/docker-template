@@ -18,7 +18,7 @@ Features:
 
 1. Add this project to your docker project as a subdirectory or git submodule, e.g.
 
-    git submodule add git@github.com:identinetics/dscripts.git
+    git submodule add https://github.com/identinetics/dscripts.git
     git commit -m 'add submodule dscripts'
     # later, when you clone your project, you need to execute:    
     git submodule init && git submodule update
