@@ -3,7 +3,7 @@
 
 # data shared between containers goes via these definitions:
 dockervol_root='/docker_volumes'
-shareddata_root="${dockervol_root}/1shared_data"
+shareddata_root="${dockervol_root}/01shared_data"
 
 # configure container
 export IMGID='99'  # range from 02 .. 99; must be unique
@@ -11,6 +11,8 @@ export IMAGENAME="r2h2/template${IMGID}"
 export CONTAINERNAME="${IMGID}template"
 export CONTAINERUSER="user${IMGID}"   # group and user to run container
 export CONTAINERUID="80${IMGID}"     # gid and uid for CONTAINERUSER
+export SHARED_CONTAINERS_GROUP="sharedcont"   # group optionally shared by other containers
+export SHARED_CONTAINERS_GROUPID="8000"
 export BUILDARGS="
     --build-arg "USERNAME=$CONTAINERUSER" \
     --build-arg "UID=$CONTAINERUID" \
@@ -55,24 +57,35 @@ if [ $(id -u) -ne 0 ]; then
 fi
 if ! id -u $CONTAINERUSER &>/dev/null; then
     $sudo groupadd -g $CONTAINERUID $CONTAINERUSER
+    # $sudo groupadd -g $SHARED_CONTAINERS_GROUPID $SHARED_CONTAINERS_GROUP # optional
     $sudo adduser --gid $CONTAINERUID -M --uid $CONTAINERUID $CONTAINERUSER  #CentOS
     #$sudo adduser --gid $CONTAINERUID --no-create-home --disabled-password --gecos "" --uid $CONTAINERUID $CONTAINERUSER #Debian
 fi
 
-# create dir with given user if not existing, relative to $HOSTVOLROOT
-function chkdir {
-    dir=$1
-    user=$2
+# create dir with given user if not existing, relative to $HOSTVOLROOT; set/repair ownership
+function chk_own_dir() {
+    dir=$1; user=$2
     $sudo mkdir -p "$VOLROOT/$dir"
     $sudo chown -R $user:$user "$VOLROOT/$dir"
 }
 
-chkdir etc/pki $CONTAINERUSER
-chkdir var/log $CONTAINERUSER
+chk_own_dir etc/pki $CONTAINERUSER
+chk_own_dir var/log $CONTAINERUSER
 
 $sudo mkdir -p $shareddata_root/www
 $sudo chown -R $CONTAINERUSER:$CONTAINERUSER $shareddata_root/www
 
-# add settigns to start sshd
+# as above, but for shared dir
+function chk_shared_dir() {
+    dir=$1; user=$2; group=$3
+    $sudo mkdir -p "$shareddata_root/$dir"
+    $sudo chown -R $user:$group "$shareddata_root/$dir"
+}
+
+chk_shared_dir 'www' $CONTAINERUSER $SHARED_CONTAINERS_GROUP
+
+# add settings to start sshd (for remote debugging)
 #export NETWORKSETTINGS="$NETWORKSETTINGS -p 2022:2022"
 #export VOLMAPPING="$VOLMAPPING -v $VOLROOT/opt/ssh:/opt/ssh:Z"
+
+
