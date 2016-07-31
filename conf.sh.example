@@ -23,12 +23,13 @@ export ENVSETTINGS="
 "
 
 export NETWORKSETTINGS="
-    --net http_proxy
-    --ip 10.1.1.${IMGID}mo
+    --net dockernet
+    --ip 10.1.1.${IMGID}
+    -p 8080:8080
 "
 export VOLROOT="${dockervol_root}/$CONTAINERNAME"  # container volumes on docker host
 export VOLMAPPING="
-    -v $VOLROOT/etc/pki:/etc/pki:Z
+    -v $VOLROOT/etc/xyz:/etc/xyz:Z
     -v $VOLROOT/var/log:/var/log:Z
     -v $shareddata_root/www:/var/www:Z
 "
@@ -57,7 +58,6 @@ if [ $(id -u) -ne 0 ]; then
 fi
 if ! id -u $CONTAINERUSER &>/dev/null; then
     $sudo groupadd -g $CONTAINERUID $CONTAINERUSER
-    # $sudo groupadd -g $SHARED_CONTAINERS_GROUPID $SHARED_CONTAINERS_GROUP # optional
     $sudo adduser --gid $CONTAINERUID -M --uid $CONTAINERUID $CONTAINERUSER  #CentOS
     #$sudo adduser --gid $CONTAINERUID --no-create-home --disabled-password --gecos "" --uid $CONTAINERUID $CONTAINERUSER #Debian
 fi
@@ -69,7 +69,7 @@ function chk_own_dir() {
     $sudo chown -R $user:$user "$VOLROOT/$dir"
 }
 
-chk_own_dir etc/pki $CONTAINERUSER
+chk_own_dir etc/xyz $CONTAINERUSER
 chk_own_dir var/log $CONTAINERUSER
 
 $sudo mkdir -p $shareddata_root/www
