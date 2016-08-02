@@ -2,10 +2,11 @@
 # rhoerbe/docker-template@github 2016-07-20
 
 EXECCMD=/bin/bash
-while getopts ":hin:pr" opt; do
+runopt='-it'
+while getopts ":hiIn:pr" opt; do
   case $opt in
-    i)
-      runopt='-it'
+    I)
+      runopt=''
       ;;
     n)
       config_nr=$OPTARG
@@ -25,9 +26,10 @@ while getopts ":hin:pr" opt; do
       exit 1
       ;;
     *)
-      echo "usage: $0 [-h] [-i] [-n] [-p] [-r] [cmd]
+      echo "usage: $0 [-h] [-i] [-I] [-n <containernr>] [-p] [-r] [cmd]
    -h  print this help text
-   -i  interactive (results in options -i -t for docker exec)
+   -i  interactive (default; results in options -it for docker exec)
+   -I  non-interactive (no -it for docker exec)
    -n  configuration number ('<NN>' in conf<NN>.sh)
    -p  print docker exec command on stdout
    -r  execute as root user
