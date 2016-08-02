@@ -2,16 +2,18 @@
 # rhoerbe/docker-template@github 2016-07-15
 
 # data shared between containers goes via these definitions:
-dockervol_root='/docker_volumes'
-shareddata_root="${dockervol_root}/01shared_data"
+DOCKERVOL_ROOT='/docker_volumes'
+SHAREDDATA_ROOT="${DOCKERVOL_ROOT}/01shared_data"
 
 # configure container
 export IMGID='99'  # range from 02 .. 99; must be unique
-export IMAGENAME="r2h2/template${IMGID}"
-export CONTAINERNAME="${IMGID}template"
-export CONTAINERUSER="user${IMGID}"   # group and user to run container
+PROJSHORT='template'
+
+export IMAGENAME="r2h2/$PROJSHORT${IMGID}"
+export CONTAINERNAME="${IMGID}$PROJSHORT"
+export CONTAINERUSER="$PROJSHORT${IMGID}"   # group and user to run container
 export CONTAINERUID="80${IMGID}"     # gid and uid for CONTAINERUSER
-export SHARED_CONTAINERS_GROUP="sharedcont"   # group optionally shared by other containers
+export SHARED_CONTAINERS_GROUP="sharedcont"   # group shared by other containers
 export SHARED_CONTAINERS_GROUPID="8000"
 export BUILDARGS="
     --build-arg "USERNAME=$CONTAINERUSER" \
@@ -27,11 +29,11 @@ export NETWORKSETTINGS="
     --ip 10.1.1.${IMGID}
     -p 8080:8080
 "
-export VOLROOT="${dockervol_root}/$CONTAINERNAME"  # container volumes on docker host
+export VOLROOT="${DOCKERVOL_ROOT}/$CONTAINERNAME"  # container volumes on docker host
 export VOLMAPPING="
     -v $VOLROOT/etc/xyz:/etc/xyz:Z
     -v $VOLROOT/var/log:/var/log:Z
-    -v $shareddata_root/www:/var/www:Z
+    -v $SHAREDDATA_ROOT/www:/var/www:Z
 "
 
 # How to enable xclients in Docker containers: http://wiki.ros.org/docker/Tutorials/GUI
@@ -69,17 +71,18 @@ function chk_own_dir() {
     $sudo chown -R $user:$user "$VOLROOT/$dir"
 }
 
+# create if not existing and set owner for path on docker host relative to $VOLROOT
 chk_own_dir etc/xyz $CONTAINERUSER
 chk_own_dir var/log $CONTAINERUSER
 
-$sudo mkdir -p $shareddata_root/www
-$sudo chown -R $CONTAINERUSER:$CONTAINERUSER $shareddata_root/www
+$sudo mkdir -p $SHAREDDATA_ROOT/www
+$sudo chown -R $CONTAINERUSER:$CONTAINERUSER $SHAREDDATA_ROOT/www
 
-# as above, but for shared dir
+# create if not existing and set owner for path on docker host relative to $SHAREDDATA_ROOT
 function chk_shared_dir() {
     dir=$1; user=$2; group=$3
-    $sudo mkdir -p "$shareddata_root/$dir"
-    $sudo chown -R $user:$group "$shareddata_root/$dir"
+    $sudo mkdir -p "$SHAREDDATA_ROOT/$dir"
+    $sudo chown -R $user:$group "$SHAREDDATA_ROOT/$dir"
 }
 
 chk_shared_dir 'www' $CONTAINERUSER $SHARED_CONTAINERS_GROUP
