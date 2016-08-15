@@ -1,0 +1,8 @@
+FROM debian:jessie
+
+# Application will run as a non-root user/group that must map to the docker host
+ARG USERNAME
+ARG UID
+RUN groupadd -g $UID $USERNAME \
+ && useradd -r -d /var/lib/rabbitmq -m -g $USERNAME -u $UID $USERNAME \
+ && mkdir -p /opt && chmod 750 /opt

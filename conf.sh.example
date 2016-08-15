@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # rhoerbe/docker-template@github 2016-07-15
 
-# data shared between containers goes via these definitions:
 DOCKERVOL_ROOT='/docker_volumes'
+# data shared between containers:
 SHAREDDATA_ROOT="${DOCKERVOL_ROOT}/01shared_data"
 
 # configure container
