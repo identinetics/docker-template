@@ -53,6 +53,7 @@ export VOLMAPPING="
 #"
 
 export STARTCMD='/start.sh'
+export START_AS_ROOT=      # start as root (e.g. for apache to fall back to www user)
 
 # first start: create user/group/host directories
 if [ $(id -u) -ne 0 ]; then
@@ -64,28 +65,19 @@ if ! id -u $CONTAINERUSER &>/dev/null; then
     #$sudo adduser --gid $CONTAINERUID --no-create-home --disabled-password --gecos "" --uid $CONTAINERUID $CONTAINERUSER #Debian
 fi
 
-# create dir with given user if not existing, relative to $HOSTVOLROOT; set/repair ownership
-function chk_own_dir() {
-    dir=$1; user=$2
-    $sudo mkdir -p "$VOLROOT/$dir"
-    $sudo chown -R $user:$user "$VOLROOT/$dir"
+# create dir $1 with given user $2if not existing, relative to $4; set/repair ownership
+# arg 1: dir, arg 2: user; arg 3: group (defaults to user); arg 4: vol root (defaults to $VOLROOT)
+function chkdir() {
+    dir=$1; user=$2; group=${3:-$user}; volroot=${4:-$VOLROOT}
+    #echo "check $volroot/$dir owned by $user:$group"
+    $sudo mkdir -p "$volroot/$dir"
+    $sudo chown -R $user:$group "$volroot/$dir"
 }
 
 # create if not existing and set owner for path on docker host relative to $VOLROOT
-chk_own_dir etc/xyz $CONTAINERUSER
-chk_own_dir var/log $CONTAINERUSER
-
-$sudo mkdir -p $SHAREDDATA_ROOT/www
-$sudo chown -R $CONTAINERUSER:$CONTAINERUSER $SHAREDDATA_ROOT/www
-
-# create if not existing and set owner for path on docker host relative to $SHAREDDATA_ROOT
-function chk_shared_dir() {
-    dir=$1; user=$2; group=$3
-    $sudo mkdir -p "$SHAREDDATA_ROOT/$dir"
-    $sudo chown -R $user:$group "$SHAREDDATA_ROOT/$dir"
-}
-
-chk_shared_dir 'www' $CONTAINERUSER $SHARED_CONTAINERS_GROUP
+chkdir etc/xyz $CONTAINERUSER
+chkdir var/log $CONTAINERUSER
+chkdir 'www' $CONTAINERUSER $SHARED_CONTAINERS_GROUP $SHAREDDATA_ROOT
 
 # add settings to start sshd (for remote debugging)
 #export NETWORKSETTINGS="$NETWORKSETTINGS -p 2022:2022"

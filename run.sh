@@ -67,6 +67,9 @@ fi
 if [ -z "$useropt" ]; then
     useropt="-u $CONTAINERUSER"
 fi
+if [ -z "$START_AS_ROOT"]; then
+    useropt='-u 0'
+fi
 if [ -z "$1" ]; then
     cmd=$STARTCMD
 else
