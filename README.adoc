@@ -1,8 +1,8 @@
-# Docker project template 
+# Docker Scripts - a simple image and container management
 
-A docker image for running a XYZ instance. Has a few scripts around the docker commend that
-is becoming unwiedly when one needs many arguments. Tries to be a thin wrapper around the
-docerk CLI.
+A git subproject for docker projects. Provides scripts for docker build, exec and run commands that
+are becoming unwiedly when one needs many arguments. Tries to be a thin wrapper around the
+docker CLI similar to docker-compose, with a focus to control the mapping of uids to the docker host.
 
 Features:
 
@@ -12,7 +12,7 @@ Features:
 - Configuration from a config file, building and running containers with the same script in
   different projects
 - Consistent image, container, user and network mapping for multiple containers
-- Data and config directories are mapped to the docker host, with consistent userids
+- Download archives or clone github repos before `ocker build` to have better control on updates
 
 ## Configuration
 
@@ -48,3 +48,8 @@ Features:
    a) create a file conf3.sh, and set the IMGID=3; and
    b) build the container with the -n option, e.g. `build.sh -n 3`
    c) run the container with the -n option, e.g. `run.sh -n 3`
+
+## Alternatives
+
+- Do not map Volumes to the docker host, but use other docker storage options. Handle container
+  startup with docker-compose.

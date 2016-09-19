@@ -43,11 +43,9 @@ cd $workdir
 source ./conf${config_nr}.sh
 
 get_or_update_repo() {
-    if [ -e $repodir ] ; then
-        if [ "$update_pkg" == "True" ]; then
-            echo "updating $repodir"
-            cd $repodir && git pull && cd $OLDPWD
-        fi
+    if [ -e $repodir ] || [ "$update_pkg" == "True" ]; then
+        echo "updating $repodir"
+        cd $repodir && git pull && cd $OLDPWD
     else
         echo "cloning $repodir" \
         mkdir -p $repodir
@@ -56,22 +54,18 @@ get_or_update_repo() {
 }
 
 get_from_tarball() {
-    if [ ! -e $pkgroot/$pkgdir ]; then \
-        if [ "$update_pkg" == "True" ]; then
-            echo "downloading $pkgdir into $pkgroot"
-            mkdir $pkgroot/$pkgdir
-            curl -L $pkgurl | tar -xz -C $pkgroot
-        fi
+    if [ ! -e $pkgroot/$pkgdir ] || [ "$update_pkg" == "True" ]; then
+        echo "downloading $pkgdir into $pkgroot"
+        mkdir -p $pkgroot/$pkgdir
+        curl -L $pkgurl | tar -xz -C $pkgroot
     fi
 }
 
 get_from_ziparchive() {
-    if [ ! -e $pkgroot/$pkgdir ]; then
-        if [ "$update_pkg" == "True" ]; then
-            echo "downloading $pkgdir into $pkgroot"
-            mkdir $pkgroot/$pkgdir
-            wget -qO- -O tmp.zip $pkgurl && unzip tmp.zip && rm tmp.zip
-        fi
+    if [ ! -e $pkgroot/$pkgdir ] || [ "$update_pkg" == "True" ]; then
+        echo "downloading $pkgdir into $pkgroot"
+        mkdir -p $pkgroot
+        wget -qO- -O tmp.zip $pkgurl && unzip -d "$pkgroot" tmp.zip && rm tmp.zip
     fi
 }
 
@@ -86,4 +80,12 @@ get_from_ziparchive() {
 #pkgdir="pkg-123"
 #pkgurl='http://downloads.sourceforge.net/project/............tar.gz'
 #get_from_tarball
+
+# --- install software as zip archive ---
+#pkgroot='install/opt'
+#pkgdir='xmlsectool'
+#version='2.0.0'
+#pkgurl="https://shibboleth.net/downloads/tools/xmlsectool/${version}/xmlsectool-${version}-bin.zip"
+#get_from_ziparchive
+#cd $pkgroot && ln -s xmlsectool-${version} $pkgdir && cd $OLDPWD
 
