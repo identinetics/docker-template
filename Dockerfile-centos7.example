@@ -1,6 +1,9 @@
 FROM centos:centos7
 MAINTAINER Rainer Hörbe <r2h2@hoerbe.at>
 
+# allow build behind firewall
+ARG HTTPS_PROXY=''
+
 # useful tools
 RUN yum -y install bind-utils curl iproute lsof mlocate net-tools openssl telnet unzip wget which
 
