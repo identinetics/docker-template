@@ -80,9 +80,6 @@ if ! id -u $CONTAINERUSER &>/dev/null; then
     esac
 fi
 
-
-#    $sudo adduser --gid $CONTAINERUID --disabled-password --gecos "" --uid $CONTAINERUID $CONTAINERUSER #Debian
-
 function chkdir {
     dir=$1; user=$2
     $sudo mkdir -p "$VOLROOT/$dir"
