@@ -33,7 +33,7 @@ export VOLROOT="${DOCKERVOL_ROOT}/$CONTAINERNAME"  # container volumes on docker
 export VOLMAPPING="
     -v $VOLROOT/etc/xyz:/etc/xyz:Z
     -v $VOLROOT/var/log:/var/log:Z
-    -v $SHAREDDATA_ROOT/www:/var/www:Z
+    -v $SHAREDDATA_ROOT/$CONTAINERNAME/www:/var/www:Z
 "
 
 # How to enable xclients in Docker containers: http://wiki.ros.org/docker/Tutorials/GUI
@@ -60,24 +60,52 @@ if [ $(id -u) -ne 0 ]; then
     sudo="sudo"
 fi
 if ! id -u $CONTAINERUSER &>/dev/null; then
-    $sudo groupadd -g $CONTAINERUID $CONTAINERUSER
-    $sudo adduser --gid $CONTAINERUID -M --uid $CONTAINERUID $CONTAINERUSER  #CentOS
-    #$sudo adduser --gid $CONTAINERUID --no-create-home --disabled-password --gecos "" --uid $CONTAINERUID $CONTAINERUSER #Debian
+    case ${OSTYPE//[0-9.]/} in
+        darwin) # OSX
+            $sudo sudo dseditgroup -o create -i $CONTAINERUID $CONTAINERUSER
+            $sudo dscl . create /Users/$CONTAINERUSER UniqueID $CONTAINERUID
+            $sudo dscl . create /Users/$CONTAINERUSER PrimaryGroupID $CONTAINERUID
+            ;;
+        linux-gnu) #CentOs
+            $sudo groupadd -g $CONTAINERUID $CONTAINERUSER
+            $sudo adduser -M --gid $CONTAINERUID --comment "" --uid $CONTAINERUID $CONTAINERUSER
+            ;;
+        linux)  #Debian
+            $sudo groupadd -g $CONTAINERUID $CONTAINERUSER
+            $sudo adduser --gid $CONTAINERUID --no-create-home --disabled-password --gecos "" --uid $CONTAINERUID $CONTAINERUSER
+            ;;
+        *)
+            echo "do not know how to add user/group for OS ${OSTYPE}"
+            ;;
+    esac
 fi
 
-# create dir $1 with given user $2if not existing, relative to $4; set/repair ownership
-# arg 1: dir, arg 2: user; arg 3: group (defaults to user); arg 4: vol root (defaults to $VOLROOT)
-function chkdir() {
-    dir=$1; user=$2; group=${3:-$user}; volroot=${4:-$VOLROOT}
-    #echo "check $volroot/$dir owned by $user:$group"
-    $sudo mkdir -p "$volroot/$dir"
-    $sudo chown -R $user:$group "$volroot/$dir"
+
+#    $sudo adduser --gid $CONTAINERUID --disabled-password --gecos "" --uid $CONTAINERUID $CONTAINERUSER #Debian
+
+function chkdir {
+    dir=$1; user=$2
+    $sudo mkdir -p "$VOLROOT/$dir"
+    $sudo chown -R $user:$user "$VOLROOT/$dir"
 }
 
 # create if not existing and set owner for path on docker host relative to $VOLROOT
 chkdir etc/xyz $CONTAINERUSER
 chkdir var/log $CONTAINERUSER
-chkdir 'www' $CONTAINERUSER $SHARED_CONTAINERS_GROUP $SHAREDDATA_ROOT
+
+$sudo mkdir -p $SHAREDDATA_ROOT/$CONTAINERNAME/www/
+$sudo chown -R $CONTAINERUSER:$SHARED_CONTAINERS_GROUP $SHAREDDATA_ROOT/$CONTAINERNAME/www/
+
+# create dir $1 with given user $2if not existing, relative to $4; set/repair ownership
+# arg 1: dir, arg 2: user; arg 3: group (defaults to user); arg 4: vol root (defaults to $VOLROOT)
+#function chkdir_complex() {
+#    dir=$1; user=$2; group=${3:-$user}; volroot=${4:-$VOLROOT}
+#    #echo "check $volroot/$dir owned by $user:$group"
+#    $sudo mkdir -p "$volroot/$dir"
+#    $sudo chown -R $user:$group "$volroot/$dir"
+#}
+
+#chkdir_complex $CONTAINERNAME/www $CONTAINERUSER $SHARED_CONTAINERS_GROUP $SHAREDDATA_ROOT
 
 # add settings to start sshd (for remote debugging)
 #export NETWORKSETTINGS="$NETWORKSETTINGS -p 2022:2022"
