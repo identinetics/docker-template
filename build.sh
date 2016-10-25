@@ -2,8 +2,10 @@
 # rhoerbe/docker-template@github 2016-07-20
 set -e
 
-while getopts ":hn:pru" opt; do
+while getopts ":chn:pru" opt; do
   case $opt in
+    c)
+      CACHEOPT="--no-cache";;
     n)
       config_nr=$OPTARG
       re='^[0-9][0-9]$'
@@ -13,20 +15,17 @@ while getopts ":hn:pru" opt; do
       config_opt="-n ${config_nr}"
       ;;
     p)
-      print="True"
-      ;;
+      print="True";;
     r)
-      remove_img="True"
-      ;;
+      remove_img="True";;
     u)
-      update_pkg="-u"
-      ;;
+      update_pkg="-u";;
     :)
       echo "Option -$OPTARG requires an argument"
-      exit 1
-      ;;
+      exit 1;;
     *)
       echo "usage: $0 [-h] [-i] [-n] [-p] [-r] [cmd]
+   -c  do not use cache (build --no-cache)
    -h  print this help text
    -n  configuration number ('<NN>' in conf<NN>.sh)
    -p  print docker build command on stdout
@@ -34,8 +33,7 @@ while getopts ":hn:pru" opt; do
    -u  update packages in docker build context
    unknow option $opt
    "
-      exit 0
-      ;;
+      exit 0;;
   esac
 done
 
@@ -67,7 +65,7 @@ if [ $(id -u) -ne 0 ]; then
     sudo="sudo"
 fi
 
-docker_build="docker build $BUILDARGS -t=$IMAGENAME ."
+docker_build="docker build $BUILDARGS $CACHEOPT -t=$IMAGENAME ."
 if [ "$print" = "True" ]; then
     echo $docker_build
 fi
