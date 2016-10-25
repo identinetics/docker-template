@@ -3,6 +3,8 @@
 A git subproject for docker projects. Provides scripts for docker build, exec and run commands that
 are becoming unwiedly when one needs many arguments. Tries to be a thin wrapper around the
 docker CLI similar to docker-compose, with a focus to control the mapping of uids to the docker host.
+With the --userns-remap feature of dockerd (>= 1.10) the need for this feature will go away for
+containers running processes under a single uid.
 
 Features:
 
