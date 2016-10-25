@@ -67,8 +67,8 @@ if ! id -u $CONTAINERUSER &>/dev/null; then
             $sudo dscl . create /Users/$CONTAINERUSER PrimaryGroupID $CONTAINERUID
             ;;
         linux-gnu) #CentOs
-            $sudo groupadd -g $CONTAINERUID $CONTAINERUSER
-            $sudo adduser -M --gid $CONTAINERUID --comment "" --uid $CONTAINERUID $CONTAINERUSER
+            $sudo groupadd --non-unique -g $CONTAINERUID $CONTAINERUSER
+            $sudo adduser --non-unique -M --gid $CONTAINERUID --comment "" --uid $CONTAINERUID $CONTAINERUSER
             ;;
         linux)  #Debian
             $sudo groupadd -g $CONTAINERUID $CONTAINERUSER
