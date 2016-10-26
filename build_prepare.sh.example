@@ -43,20 +43,20 @@ cd $workdir
 source ./conf${config_nr}.sh
 
 get_or_update_repo() {
-    if [ -e $repodir ] || [ "$update_pkg" == "True" ]; then
-        echo "updating $repodir"
-        cd $repodir && git pull && cd $OLDPWD
-    else
+    if [ ! -e $repodir ]; then
         echo "cloning $repodir" \
         mkdir -p $repodir
         git clone $repourl $repodir
+    elif [ "$update_pkg" == "True" ]; then
+        echo "updating $repodir"
+        cd $repodir && git pull && cd $OLDPWD
     fi
 }
 
 get_from_tarball() {
     if [ ! -e $pkgroot/$pkgdir ] || [ "$update_pkg" == "True" ]; then
         echo "downloading $pkgdir into $pkgroot"
-        mkdir -p $pkgroot/$pkgdir && rm -rf $pkgroot/*
+        mkdir -p $pkgroot/$pkgdir && rm -rf $pkgroot/$pkgdir/*
         curl -L $pkgurl | tar -xz -C $pkgroot
     fi
 }
@@ -64,7 +64,7 @@ get_from_tarball() {
 get_from_ziparchive() {
     if [ ! -e $pkgroot/$pkgdir ] || [ "$update_pkg" == "True" ]; then
         echo "downloading $pkgdir into $pkgroot"
-        mkdir -p $pkgroot && rm -rf $pkgroot/*
+        mkdir -p $pkgroot && rm -rf $pkgroot/$pkgdir/*
         wget -qO- -O tmp.zip $pkgurl && unzip -d "$pkgroot" tmp.zip && rm tmp.zip
     fi
 }
