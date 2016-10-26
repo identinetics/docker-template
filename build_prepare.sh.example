@@ -56,7 +56,7 @@ get_or_update_repo() {
 get_from_tarball() {
     if [ ! -e $pkgroot/$pkgdir ] || [ "$update_pkg" == "True" ]; then
         echo "downloading $pkgdir into $pkgroot"
-        mkdir -p $pkgroot/$pkgdir
+        mkdir -p $pkgroot/$pkgdir && rm -rf $pkgroot/*
         curl -L $pkgurl | tar -xz -C $pkgroot
     fi
 }
@@ -64,7 +64,7 @@ get_from_tarball() {
 get_from_ziparchive() {
     if [ ! -e $pkgroot/$pkgdir ] || [ "$update_pkg" == "True" ]; then
         echo "downloading $pkgdir into $pkgroot"
-        mkdir -p $pkgroot
+        mkdir -p $pkgroot && rm -rf $pkgroot/*
         wget -qO- -O tmp.zip $pkgurl && unzip -d "$pkgroot" tmp.zip && rm tmp.zip
     fi
 }
