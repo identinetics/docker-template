@@ -24,31 +24,31 @@ RUN yum -y install python34-devel \
 # Install Python3 interpreter
 # while the SCL version of python 3.4 has the advantage of redhat's blessing, it is more
 # difficult to handle because it requires `scl enable`. For remote debugging with pycharm
-# the EPEL or IUS versions are preferred.
+# the EPEL or IUS versions are preferred. EPEL does not have tkinter.
 # SCL version
-RUN yum -y install centos-release-scl \
- && yum -y install rh-python34 rh-python34-python-tkinter rh-python34-python-pip
-RUN source /opt/rh/rh-python34/enable \
- && echo "source /opt/rh/rh-python34/enable" > /etc/profile.d/setpython \
- && echo "export PY3=python" >> /etc/profile.d/setpython
-ENV PIP3='source /opt/rh/rh-python34/enable && /opt/rh/rh-python34/root/usr/bin/pip'
-ENV PY3='scl enable rh-python34 -- python'
-# CentOS 7: (tkinter is not supplied)
+    RUN yum -y install centos-release-scl \
+     && yum -y install rh-python34 rh-python34-python-tkinter rh-python34-python-pip
+    RUN source /opt/rh/rh-python34/enable \
+     && echo "source /opt/rh/rh-python34/enable" > /etc/profile.d/setpython \
+     && echo "export PYTHON=python" >> /etc/profile.d/setpython
+    ENV PIP3='source /opt/rh/rh-python34/enable && /opt/rh/rh-python34/root/usr/bin/pip'
+    ENV PYTHON='scl enable rh-python34 -- python'
+# EPEL: 
     #RUN yum -y install python34-devel \
     # && curl https://bootstrap.pypa.io/get-pip.py | python3.4
-    #ENV PY3='python3.4'
+    #ENV PYTHON='python3.4'
     #ENV PIP='pip3.4'
-    #RUN echo "export PY3=$PY3" >> /etc/profile
-# IUS (both 3.4 and 3.5 available:
+    #RUN echo "export PYTHON=$PYTHON" >> /etc/profile
+# IUS (both 3.4 and 3.5 available):
     #RUN yum -y install https://centos7.iuscommunity.org/ius-release.rpm \
     # && yum -y install python35u python35u-setuptools python35u-devel python35u-pip python35u-tkinter
-    #ENV PY3='python3.5'
+    #ENV PYTHON='python3.5'
     #ENV PIP='pip3.5'
-    #RUN echo "export PY3=$PY3" >> /etc/profile
+    #RUN echo "export PYTHON=$PYTHON" >> /etc/profile
 
 RUN eval "$PIP3 install gitdb"
 #clone signxml ..
-RUN cd signxml && $PY3 setup.py install && cd ..
+RUN cd signxml && $PYTHON setup.py install && cd ..
 
 
 # OpenJDK
@@ -73,8 +73,8 @@ RUN yum -y install libffi-devel libxml2 libxslt-devel libxml2-devel openssl-deve
 # python virtual env (otherwise fails to find libxml/xmlversion.h
 RUN python3.4 -m pip install virtualenv \
  && mkdir /opt/virtualenv && cd /opt/virtualenv \
- && virtualenv py34 --python python3.4 --system-site-packages \
- && source py34/bin/activate
+ && virtualenv PYTHON4 --python python3.4 --system-site-packages \
+ && source PYTHON4/bin/activate
 
 # Smart Card support
 # Need dbus running for USB interface -> https://github.com/CentOS/sig-cloud-instance-images/issues/22
