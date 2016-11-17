@@ -26,14 +26,14 @@ Features:
     git submodule update --init
     cd dscripts && git checkout master && cd ..
     
-2. From the dscript project copy default files into your project root:
+2. From the dscript project copy template files into your project root:
 
-    cp dscript/Dockerfile.default Dockerfile
-    cp dscript/conf.sh.default confXX.sh  # set XX to a unique 2-digit number on your host
+    cp dscript/templates/Dockerfile-centos7.default Dockerfile
+    cp dscript/templates/conf.sh.example conf.sh  # if using more than 1 image instance name it confXX.sh and set XX to a unique 2-digit number on your host
     # optional
-    cp dscript/build_prepare.sh.default build_prepare.sh 
-    cp dscript/.gitignore .
-    cp -r dscript/install .
+    cp dscript/templates/build_prepare.sh.default build_prepare.sh
+    cp dscript/templates/.gitignore .
+    cp -r dscript/templates/install .
     
     
 3. adapt Dockerfile, conf.sh and build_prepare.sh
