@@ -60,24 +60,26 @@ if [ $(id -u) -ne 0 ]; then
     sudo="sudo"
 fi
 if ! id -u $CONTAINERUSER &>/dev/null; then
-    case ${OSTYPE//[0-9.]/} in
-        darwin) # OSX
+    if [[ ${OSTYPE//[0-9.]/} == 'darwin' ]]; then
             $sudo sudo dseditgroup -o create -i $CONTAINERUID $CONTAINERUSER
             $sudo dscl . create /Users/$CONTAINERUSER UniqueID $CONTAINERUID
             $sudo dscl . create /Users/$CONTAINERUSER PrimaryGroupID $CONTAINERUID
-            ;;
-        linux-gnu) #CentOs
+    else
+      source /etc/os-release
+      case $ID in
+        centos|fedora|rhel)
             $sudo groupadd --non-unique -g $CONTAINERUID $CONTAINERUSER
             $sudo adduser --non-unique -M --gid $CONTAINERUID --comment "" --uid $CONTAINERUID $CONTAINERUSER
             ;;
-        linux)  #Debian
+        debian|ubuntu)
             $sudo groupadd -g $CONTAINERUID $CONTAINERUSER
             $sudo adduser --gid $CONTAINERUID --no-create-home --disabled-password --gecos "" --uid $CONTAINERUID $CONTAINERUSER
             ;;
         *)
-            echo "do not know how to add user/group for OS ${OSTYPE}"
+            echo "do not know how to add user/group for OS ${OSTYPE} ${NAME}"
             ;;
-    esac
+      esac
+    fi
 fi
 
 function chkdir {
