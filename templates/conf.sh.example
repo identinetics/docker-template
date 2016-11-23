@@ -6,7 +6,7 @@ DOCKERVOL_ROOT='/docker_volumes'
 SHAREDDATA_ROOT="${DOCKERVOL_ROOT}/01shared_data"
 
 # configure container
-export IMGID='99'  # range from 02 .. 99; must be unique
+IMGID='99'  # range from 02 .. 99; must be unique
 PROJSHORT='template'
 
 export IMAGENAME="r2h2/$PROJSHORT${IMGID}"
@@ -68,7 +68,7 @@ if ! id -u $CONTAINERUSER &>/dev/null; then
       source /etc/os-release
       case $ID in
         centos|fedora|rhel)
-            $sudo groupadd --non-unique -g $CONTAINERUID $CONTAINERUSER
+            $sudo groupadd --non-unique -g $CONTAINERUID $CONTAINERUSER || true
             $sudo adduser --non-unique -M --gid $CONTAINERUID --comment "" --uid $CONTAINERUID $CONTAINERUSER
             ;;
         debian|ubuntu)
