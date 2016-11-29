@@ -21,6 +21,7 @@ Features:
 1. Add this project to your docker project as a subdirectory or git submodule, e.g.
 
     git submodule add https://github.com/identinetics/dscripts.git
+    git add dscripts
     git commit -m 'add submodule dscripts'
     # later, when you clone your project, you need to execute:    
     git submodule update --init
@@ -40,9 +41,9 @@ Features:
 
 ## Usage
 
-    dscript/build.sh [-h] [-n] [-p] [-r]
+    dscript/build.sh [-h] [-n container-nr] [-p] [-r]
     dscript/run.sh [-h] [-i] [-n container-nr] [-p] [-r] -[R] [cmd]
-    dscript/exec.sh [-h] [-i] [-n] [-p] [-r] [cmd]
+    dscript/exec.sh [-h] [-i] [-n container-nr] [-p] [-r] [cmd]
     
    To run multiple XYZ containers on the same system you need to create separate 
    conf.sh files and build separate images:

@@ -11,9 +11,8 @@ main() {
   set_run_args
   set_network
   set_vol_mapping
-  #set_x11_client
-  #set_pkcs11
-  create_containeruser
+  #enable_x11_client
+  #enablet_pkcs11
   #enable_sshd()     # usually used only for debugging - requires installed sshd in image
 }
 
@@ -63,10 +62,10 @@ set_run_args() {
 set_network() {
     # The docker0 bridge has dynamic addresses. whereas a custom bridge allows predictable addresses
     NETWORK=dockernet
-    docker network ls | awk '{print $2}' | grep $NETWORK > /dev/null
+    $sudo docker network ls | awk '{print $2}' | grep $NETWORK > /dev/null
     if (( $? == 1)); then
-        docker network create --driver bridge --subnet=10.1.1.0/24
-            -o com.docker.network.bridge.name=br-$NETWORK $NETWORK
+        $sudo docker network create --driver bridge --subnet=10.1.1.0/24 \
+                  -o com.docker.network.bridge.name=br-$NETWORK $NETWORK
     fi
     export NETWORKSETTINGS="
         --net $NETWORK
@@ -77,6 +76,8 @@ set_network() {
 
 
 set_vol_mapping() {
+    create_containeruser
+
     export VOLROOT="${DOCKERVOL_ROOT}/$CONTAINERNAME"  # container volumes on docker host
     export VOLMAPPING="
         -v $VOLROOT/etc/xyz:/etc/xyz:ro
@@ -88,14 +89,15 @@ set_vol_mapping() {
     chkdir etc/xyz
 
     # create if not existing; set owner for path on docker host relative to $VOLROOT
-    createdir var/log $CONTAINERUSER
+    createdir var/log $CONTAINERUID
 
     $sudo mkdir -p $SHAREDDATA_ROOT/$CONTAINERNAME/www/
     $sudo chown -R $CONTAINERUSER:$SHARED_CONTAINERS_GROUP $SHAREDDATA_ROOT/$CONTAINERNAME/www/
 }
 
+# In most cases there is no need to make changesfrom here on
 
-set_x11_client() {
+enable_x11_client() {
     # How to enable xclients in Docker containers: http://wiki.ros.org/docker/Tutorials/GUI
     export ENVSETTINGS="$ENVSETTINGS
         -e DISPLAY=$DISPLAY
@@ -106,7 +108,7 @@ set_x11_client() {
 }
 
 
-set_pkcs11() {
+enablet_pkcs11() {
     #enable Smartcard Reader in Docker
     # --privileged mapping of usb devices allows a generic configreation without knowing the
     # USB device name. Alternatively, devices can be mapped using '--device'
