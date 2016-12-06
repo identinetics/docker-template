@@ -3,17 +3,20 @@
 # settings for docker build, run and exec
 
 main() {
-  init_sudo
-  set_volume_root
-  set_image_and_container_name
-  set_users
-  set_buildargs
-  set_run_args
-  set_network
-  set_vol_mapping
-  #enable_x11_client
-  #enablet_pkcs11
-  #enable_sshd()     # usually used only for debugging - requires installed sshd in image
+    SCRIPTDIR=$(cd $(dirname $BASH_SOURCE[0]) && pwd)
+    $SCRIPTDIR/dscripts/conf_lib.sh  # load library functions
+
+    init_sudo
+    set_volume_root
+    set_image_and_container_name
+    set_users
+    set_buildargs
+    set_run_args
+    set_network
+    set_vol_mapping
+    #enable_x11_client
+    #enablet_pkcs11
+    #enable_sshd()     # usually used only for debugging - requires installed sshd in image
 }
 
 
@@ -84,7 +87,5 @@ set_vol_mapping() {
     map_volume "$VOLROOT/var/log/" '/var/log/' 'Z'
 }
 
-SCRIPTDIR=$(cd $(dirname $BASH_SOURCE[0]) && pwd)
-$SCRIPTDIR/dscripts/conf_lib.sh  # load library functions
 
 main
