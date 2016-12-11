@@ -42,12 +42,12 @@ shift $((OPTIND-1))
 # determine config script (there may be more than one to run multiple containers)
 # if config_nr not given and there is only one file matching conf*.sh take this one
 SCRIPTDIR=$(cd $(dirname $BASH_SOURCE[0]) && pwd)
-PROJ_HOME=$(cd $(dirname $SCRIPTDIR) && pwd)
-cd $PROJ_HOME; confs=(conf*.sh); cd $OLDPWD
+PROJROOT=$(cd $(dirname $SCRIPTDIR) && pwd)
+cd $PROJROOT; confs=(conf*.sh); cd $OLDPWD
 if [ ! -z ${config_nr} ]; then
     conf_script=conf${config_nr}.sh
-    if [ ! -e "$PROJ_HOME/$conf_script" ]; then
-        echo "$PROJ_HOME/$conf_script not found"
+    if [ ! -e "$PROJROOT/$conf_script" ]; then
+        echo "$PROJROOT/$conf_script not found"
         exit 1
     fi
 elif [ ${#confs[@]} -eq 1 ]; then
@@ -57,9 +57,9 @@ else
     printf "%s\n" "${confs[@]}"
     exit 1
 fi
-source $PROJ_HOME/$conf_script
+source $PROJROOT/$conf_script
 
-[ -e build_prepare.sh ] && $PROJ_HOME/build_prepare.sh $config_opt $update_pkg
+[ -e $PROJROOT/build_prepare.sh ] && $PROJROOT/build_prepare.sh $config_opt $update_pkg
 
 if [ $(id -u) -ne 0 ]; then
     sudo="sudo"

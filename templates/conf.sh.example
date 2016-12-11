@@ -4,7 +4,7 @@
 
 main() {
     SCRIPTDIR=$(cd $(dirname $BASH_SOURCE[0]) && pwd)
-    $SCRIPTDIR/dscripts/conf_lib.sh  # load library functions
+    source $SCRIPTDIR/dscripts/conf_lib.sh  # load library functions
 
     init_sudo
     set_volume_root
@@ -22,6 +22,7 @@ main() {
 
 set_volume_root() {
     DOCKERVOL_ROOT='/docker_volumes'
+    DOCKERLOG_ROOT='/dl'
     SHAREDDATA_ROOT="${DOCKERVOL_ROOT}/01shared_data"    # data shared between containers
 }
 
@@ -84,7 +85,7 @@ set_vol_mapping() {
 
     export VOLROOT="${DOCKERVOL_ROOT}/$CONTAINERNAME"  # container volumes on docker host
     map_volume "$VOLROOT/etc/pki/tls/" '/etc/pki/' 'ro'
-    map_volume "$VOLROOT/var/log/" '/var/log/' 'Z'
+    map_volume "$DOCKERLOG_ROOT/var/log/" '/var/log/' 'Z'
 }
 
 
