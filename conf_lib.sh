@@ -145,7 +145,7 @@ get_from_ziparchive_with_checksum() {
     #  PROD_DIR is defined in Dockerfile and should not contain a (minor) version number
     PROD_URL=$1; PROD_SHA256=$2; PROD_DIR=$3; PROD_VERSION=$4; WGET_OPTIONS=$5
 
-    DOWNLOAD_MARKER="$PROD_FILENAME-$PROD_VERSION.mark"
+    DOWNLOAD_MARKER="$PROD_DIR-$PROD_VERSION.mark"
     if [ ! -e "$DOWNLOAD_MARKER" ]; then
         wget $WGET_OPTIONS -O tmp.zip $PROD_URL
         echo "$PROD_SHA256 tmp.zip" | sha256sum -c -
