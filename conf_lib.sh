@@ -103,3 +103,58 @@ createdir() {
     $sudo chown -R $user:$user $dir
 }
 
+# --- functions for build_prepare.sh ---
+
+get_or_update_repo() {
+    if [ ! -e $repodir ]; then
+        echo "cloning $repodir" \
+        mkdir -p $repodir
+        git clone $repourl $repodir
+    elif [ "$update_pkg" == "True" ]; then
+        echo "updating $repodir"
+        cd $repodir && git pull && cd $OLDPWD
+    fi
+}
+
+get_from_tarball() {
+    if [ ! -e $pkgroot/$pkgdir ] || [ "$update_pkg" == "True" ]; then
+        echo "downloading $pkgdir into $pkgroot"
+        mkdir -p $pkgroot/$pkgdir && rm -rf $pkgroot/$pkgdir/*
+        curl -L $pkgurl | tar -xz -C $pkgroot
+    fi
+}
+
+get_from_ziparchive() {
+    if [ ! -e $pkgroot/$pkgdir ] || [ "$update_pkg" == "True" ]; then
+        echo "downloading $pkgdir into $pkgroot"
+        mkdir -p $pkgroot && rm -rf $pkgroot/$pkgdir/*
+        wget -O tmp.zip $pkgurl && unzip -d "$pkgroot" tmp.zip && rm tmp.zip
+    fi
+}
+
+
+get_from_ziparchive_with_checksum() {
+    # Download zip archive if a marker file for the version does not exist and link it to an unversioned directory
+    # Steps:
+    # - Download zip-file from URL (1) into tmp.zip,
+    # - Verify it with SHA2-Hash (2);
+    # - Extract the name of the top-level directory in the archive into INST_DIR
+    # - Extract the archive (creating INST_DIR)
+    # - Link INST_DIR to PROD_DIR
+    # - create marker file
+    #  PROD_DIR is defined in Dockerfile and should not contain a (minor) version number
+    PROD_URL=$1; PROD_SHA256=$2; PROD_DIR=$3; PROD_VERSION=$4; WGET_OPTIONS=$5
+
+    DOWNLOAD_MARKER="$PROD_FILENAME-$PROD_VERSION.mark"
+    if [ ! -e "$DOWNLOAD_MARKER" ]; then
+        wget $WGET_OPTIONS -O tmp.zip $PROD_URL
+        echo "$PROD_SHA256 tmp.zip" | sha256sum -c -
+        INST_DIR=$(unzip -l tmp.zip | head -4 | tail -1 | awk '{print $4}' | cut -d "/" -f1)
+        rm -rf $INST_DIR $PROD_DIR
+        unzip tmp.zip
+        rm -f tmp.zip
+        ln -sf $INST_DIR $PROD_DIR
+        touch $DOWNLOAD_MARKER
+    fi
+}
+

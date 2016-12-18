@@ -32,7 +32,7 @@ set_image_and_container_name() {
     # processes on the docker host etc.
     IMGID='99'  # range from 02 .. 99; must be unique per node
     PROJSHORT='template'
-    export IMAGENAME="r2h2/$PROJSHORT${IMGID}"
+    export IMAGENAME="r2h2/$PROJSHORT${IMGID}"  # [a-z_0-9]
     export CONTAINERNAME="${IMGID}$PROJSHORT"
 }
 

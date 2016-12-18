@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-# rhoerbe/docker-template@github 2016-07-15
-set -x
 
 # Initialize and update the docker build environment
 # Providing resources before starting docker build provides better control about updates
@@ -8,13 +6,13 @@ set -x
 
 update_pkg="False"
 
-while getopts ":hnuU" opt; do
+while getopts ":hn:uU" opt; do
   case $opt in
     n)
       config_nr=$OPTARG
       re='^[0-9][0-9]?$'
       if ! [[ $OPTARG =~ $re ]] ; then
-         echo "error: -n argument is not a number in the range from 2 .. 99" >&2; exit 1
+         echo "error: -n argument is not a number in the range from 02 .. 99" >&2; exit 1
       fi
       ;;
     u)
@@ -40,35 +38,8 @@ shift $((OPTIND-1))
 
 workdir=$(cd $(dirname $BASH_SOURCE[0]) && pwd)
 cd $workdir
+[ ! -e ./conf${config_nr}.sh ] && echo 'missing conf.sh or config-nr' && exit 1
 source ./conf${config_nr}.sh
-
-get_or_update_repo() {
-    if [ ! -e $repodir ]; then
-        echo "cloning $repodir" \
-        mkdir -p $repodir
-        git clone $repourl $repodir
-    elif [ "$update_pkg" == "True" ]; then
-        echo "updating $repodir"
-        cd $repodir && git pull && cd $OLDPWD
-    fi
-}
-
-get_from_tarball() {
-    if [ ! -e $pkgroot/$pkgdir ] || [ "$update_pkg" == "True" ]; then
-        echo "downloading $pkgdir into $pkgroot"
-        mkdir -p $pkgroot/$pkgdir && rm -rf $pkgroot/$pkgdir/*
-        curl -L $pkgurl | tar -xz -C $pkgroot
-    fi
-}
-
-get_from_ziparchive() {
-    if [ ! -e $pkgroot/$pkgdir ] || [ "$update_pkg" == "True" ]; then
-        echo "downloading $pkgdir into $pkgroot"
-        mkdir -p $pkgroot && rm -rf $pkgroot/$pkgdir/*
-        wget -qO- -O tmp.zip $pkgurl && unzip -d "$pkgroot" tmp.zip && rm tmp.zip
-    fi
-}
-
 
 # --- install software from github ---
 #repodir='install/opt/xyz'
@@ -89,3 +60,9 @@ get_from_ziparchive() {
 #get_from_ziparchive
 #cd $pkgroot && ln -s xmlsectool-${version} $pkgdir && cd $OLDPWD
 
+# --- Download software with checksum ---
+PROD_VERSION='3.3.0'
+PROD_URL="https://shibboleth.net/downloads/identity-provider/latest/shibboleth-identity-provider-$PROD_VERSION.zip"
+PROD_DIR='shibboleth-idp-distribution' # this is the reference from Dockerfile
+PROD_SHA256='a0dd96ad8770539b6f1249f7cea98b944cff846b4831892e8deee62b91b60277'
+get_from_ziparchive_with_checksum $PROD_URL $PROD_SHA256 $PROD_DIR $PROD_VERSION
