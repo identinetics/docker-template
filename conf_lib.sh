@@ -5,7 +5,15 @@
 # In most cases there is no need to make changes to these functions. If needed then
 # overwrite them in conf.sh
 
-map_volume() {
+map_docker_volume() {
+    # map a volume create with `docker volume create` to container path
+    VOL_NAME=$1; CONTAINERPATH=$2; MOUNT_OPTION=$3
+    export VOLMAPPING="$VOLMAPPING -v $VOL_NAME:$CONTAINERPATH:$MOUNT_OPTION"
+}
+
+
+map_host_directory() {
+    # map a host to a container path
     HOSTPATH=$1; CONTAINERPATH=$2; MOUNT_OPTION=$3
     export VOLMAPPING="$VOLMAPPING -v $HOSTPATH:$CONTAINERPATH:$MOUNT_OPTION"
     if [[ $MOUNT_OPTION == "ro" ]]; then
@@ -27,7 +35,7 @@ enable_x11_client() {
 }
 
 
-enablet_pkcs11() {
+enable_pkcs11() {
     #enable Smartcard Reader in Docker
     # --privileged mapping of usb devices allows a generic configreation without knowing the
     # USB device name. Alternatively, devices can be mapped using '--device'

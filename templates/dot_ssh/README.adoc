@@ -1,0 +1,11 @@
+= Setup github access using deploy keys
+
+    # config github access
+    cp dscripts/templates/dot_ssh ./.ssh
+    # create a strong password and store it in your local key ring
+    openssl rand -base64 20|perl -ne 's/\G....\K/-/sg; chop; chop; print "$_\n"'
+    # create key pair and add to repo
+    ssh-keygen -t ed25519 -f ./id_ed25519
+    git add ./id_ed25519*
+    git commit -m 'added keys'
+    # add PASSPHRASE env variable in travis-ci
