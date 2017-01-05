@@ -1,0 +1,31 @@
+# Assigned UID numbers for docker containers
+
+Container users should not run as root, but user namespace mapping is not stable as of Jan 2017,
+and support in RHEL is experimental. OTOH container users need unique uids per node. Besides
+starting containers with -u (and possible massaging /etc/passwd), a temporary fix is to assign
+a unqiue userid to a set of containers. For the github repos rhoerbe/* and identinetics/* this
+file coordinates the assigned numbers:
+
+|===
+|343002|nginx
+|343003|pyff
+|343004|samlschtron
+|343005|shibsp
+|343006|lapd
+|343007|shibidp
+|343009|rabbitmq
+|343011|pvzdfe
+|343012|weblog
+|343015|rabbi-cl
+|343016|rabbitmq
+|343017|es
+|343018|logstash
+|343021|gitlab
+|343022|gitlabsp
+|343023|ssp
+|343024|mariadb
+|343025|drupal
+|343027|drupal7
+|343028|kibana
+|343029|pvzdbepep
+|===
