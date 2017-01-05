@@ -44,6 +44,8 @@ shift $((OPTIND-1))
 SCRIPTDIR=$(cd $(dirname $BASH_SOURCE[0]) && pwd)
 PROJROOT=$(cd $(dirname $SCRIPTDIR) && pwd)
 cd $PROJROOT; confs=(conf*.sh); cd $OLDPWD
+source $SCRIPTDIR/dscripts/conf_lib.sh  # load library functions
+
 if [ ! -z ${config_nr} ]; then
     conf_script=conf${config_nr}.sh
     if [ ! -e "$PROJROOT/$conf_script" ]; then
