@@ -2,15 +2,17 @@
 
 # Common functions for conf.sh
 
-# In most cases there is no need to make changes to these functions. If needed then
+# In most cases there is no need to replace these functions. If needed then
 # overwrite them in conf.sh
+
+SCRIPTDIR=$(dirname $(realpath $0))
 
 map_docker_volume() {
     # Create volume if it does not exist, append to VOLMAPPiNG and create symlink
     VOL_NAME=$1; CONTAINERPATH=$2; MOUNT_OPTION=$3; PREFIX=${4+/dv}
     docker volume create --name $VOL_NAME
     export VOLMAPPING="$VOLMAPPING -v $VOL_NAME:$CONTAINERPATH:$MOUNT_OPTION"
-    docker_vol_mount.py --prefix $PREFIX --symlink --volume $VOL_NAME
+    $SCRIPTDIR/docker_vol_mount.py --prefix $PREFIX --symlink --volume $VOL_NAME
 }
 
 
