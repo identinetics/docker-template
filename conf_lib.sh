@@ -8,10 +8,14 @@
 SCRIPTDIR=$(dirname $(realpath $0))
 
 map_docker_volume() {
-    # Create volume if it does not exist, append to VOLMAPPiNG and create symlink
-    VOL_NAME=$1; CONTAINERPATH=$2; MOUNT_OPTION=$3; PREFIX=${4+/dv}
+    # Create volume if it does not exist, append to VOLMAPPING and create symlink in PREFIX
+    VOL_NAME=$1; CONTAINERPATH=$2; MOUNT_OPTION=$3; PREFIX=$4
+    if [ -z ${PREFIX+x} ]; then
+        echo "conf_lib.sh/map_docker_volume(): All 4 arguments need to be set; found: $@" && exit 1;
+    fi
     docker volume create --name $VOL_NAME
     export VOLMAPPING="$VOLMAPPING -v $VOL_NAME:$CONTAINERPATH:$MOUNT_OPTION"
+    mkdir -p $PREFIX
     $SCRIPTDIR/dscripts/docker_vol_mount.py --prefix $PREFIX --symlink --volume $VOL_NAME
 }
 
