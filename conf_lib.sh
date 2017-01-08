@@ -13,7 +13,7 @@ map_docker_volume() {
     if [ -z ${PREFIX+x} ]; then
         echo "conf_lib.sh/map_docker_volume(): All 4 arguments need to be set; found: $@" && exit 1;
     fi
-    docker volume create --name $VOL_NAME
+    docker volume create --name $VOL_NAME >/dev/null
     export VOLMAPPING="$VOLMAPPING -v $VOL_NAME:$CONTAINERPATH:$MOUNT_OPTION"
     mkdir -p $PREFIX
     $SCRIPTDIR/dscripts/docker_vol_mount.py --prefix $PREFIX --symlink --volume $VOL_NAME

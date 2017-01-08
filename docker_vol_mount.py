@@ -13,7 +13,8 @@ from subprocess import check_output, CalledProcessError
 parser = argparse.ArgumentParser(description='Show Docker volume mount')
 parser.add_argument('-p', '--prefix', dest='prefix', default='/dv', help='Path prefix for symlink')
 parser.add_argument('-s', '--symlink', dest='symlink', action="store_true", help='Create symlink at path prefix')
-parser.add_argument('-v', '--volume', dest='volume', required=True, help='Name of Docker volume')
+parser.add_argument('-v', '--verbose', dest='verbose', action="store_true")
+parser.add_argument('-V', '--volume', dest='volume', required=True, help='Name of Docker volume')
 args = parser.parse_args()
 
 try:
@@ -24,7 +25,8 @@ except CalledProcessError as e:
 
 container = json.loads(in_str)
 linkto_path = container[0]['Mountpoint']
-print(container[0]['Name'] + ': ' + linkto_path)
+if args.verbose:
+    print(container[0]['Name'] + ': ' + linkto_path)
 
 if args.symlink:
     linkfrom_path = os.path.join(args.prefix, args.volume)
@@ -33,5 +35,6 @@ if args.symlink:
     except OSError:
         pass
     os.symlink(linkto_path, linkfrom_path)
-    print("created symlink %s -> %s" % (linkfrom_path, linkto_path))
+    if args.verbose:
+        print("created symlink %s -> %s" % (linkfrom_path, linkto_path))
 
