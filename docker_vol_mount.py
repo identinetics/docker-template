@@ -1,16 +1,19 @@
 #!/usr/bin/env python
 
-# script to make container volume mounts available with a user-friedly path
-# output to be executed in shell
+# script to make container show volume mount path with options
+#   (a) link to an admin-friedly path
+#   (b) add g+w DAC privilege to root path
 
 __author__ = 'r2h2'
 
 import argparse
 import json
 import os
+import stat
 from subprocess import check_output, CalledProcessError
 
 parser = argparse.ArgumentParser(description='Show Docker volume mount')
+parser.add_argument('-g', '--groupwrite', dest='groupwrite', help='Execute `chmod g+w` on mountpoint')
 parser.add_argument('-p', '--prefix', dest='prefix', default='/dv', help='Path prefix for symlink')
 parser.add_argument('-s', '--symlink', dest='symlink', action="store_true", help='Create symlink at path prefix')
 parser.add_argument('-v', '--verbose', dest='verbose', action="store_true")
@@ -27,6 +30,10 @@ container = json.loads(in_str)
 linkto_path = container[0]['Mountpoint']
 if args.verbose:
     print(container[0]['Name'] + ': ' + linkto_path)
+
+if args.groupwrite:
+    privs = os.stat(linkto_path)
+    os.chmod(linkto_path, st.st_mode | stat.S_IWGRP)  # add g+w
 
 if args.symlink:
     linkfrom_path = os.path.join(args.prefix, args.volume)

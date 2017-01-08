@@ -8,7 +8,10 @@
 SCRIPTDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
 map_docker_volume() {
-    # Create volume if it does not exist, append to VOLMAPPING and create symlink in PREFIX
+    # Map container directory to Docker volume
+    # - Create volume if it does not exist
+    # - Append to VOLMAPPING
+    # - chgrp g+w and create symlink in PREFIX
     VOL_NAME=$1; CONTAINERPATH=$2; MOUNT_OPTION=$3; PREFIX=$4
     if [ -z ${PREFIX+x} ]; then
         echo "conf_lib.sh/map_docker_volume(): All 4 arguments need to be set; found: $@" && exit 1;
@@ -16,7 +19,7 @@ map_docker_volume() {
     docker volume create --name $VOL_NAME >/dev/null
     export VOLMAPPING="$VOLMAPPING -v $VOL_NAME:$CONTAINERPATH:$MOUNT_OPTION"
     mkdir -p $PREFIX
-    $SCRIPTDIR/docker_vol_mount.py --prefix $PREFIX --symlink --volume $VOL_NAME
+    $SCRIPTDIR/docker_vol_mount.py --prefix $PREFIX --symlink --groupwrite --volume $VOL_NAME
 }
 
 
