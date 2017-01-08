@@ -12,7 +12,7 @@ map_docker_volume() {
     VOL_NAME=$1; CONTAINERPATH=$2; MOUNT_OPTION=$3; PREFIX=${4+/dv}
     docker volume create --name $VOL_NAME
     export VOLMAPPING="$VOLMAPPING -v $VOL_NAME:$CONTAINERPATH:$MOUNT_OPTION"
-    $SCRIPTDIR/docker_vol_mount.py --prefix $PREFIX --symlink --volume $VOL_NAME
+    $SCRIPTDIR/dscripts/docker_vol_mount.py --prefix $PREFIX --symlink --volume $VOL_NAME
 }
 
 
