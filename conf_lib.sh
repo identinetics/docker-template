@@ -6,9 +6,11 @@
 # overwrite them in conf.sh
 
 map_docker_volume() {
-    # map a volume create with `docker volume create` to container path
-    VOL_NAME=$1; CONTAINERPATH=$2; MOUNT_OPTION=$3
+    # Create volume if it does not exist, append to VOLMAPPiNG and create symlink
+    VOL_NAME=$1; CONTAINERPATH=$2; MOUNT_OPTION=$3; PREFIX=${4+/dv}
+    docker volume create --name $VOL_NAME
     export VOLMAPPING="$VOLMAPPING -v $VOL_NAME:$CONTAINERPATH:$MOUNT_OPTION"
+    docker_vol_mount.py --prefix $PREFIX --symlink --volume $VOL_NAME
 }
 
 
