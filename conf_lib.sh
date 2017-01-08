@@ -19,7 +19,8 @@ map_docker_volume() {
     docker volume create --name $VOL_NAME >/dev/null
     export VOLMAPPING="$VOLMAPPING -v $VOL_NAME:$CONTAINERPATH:$MOUNT_OPTION"
     mkdir -p $PREFIX
-    $SCRIPTDIR/docker_vol_mount.py --prefix $PREFIX --symlink --groupwrite --volume $VOL_NAME
+    $SCRIPTDIR/docker_vol_mount.py --prefix $PREFIX --symlink --groupwrite \
+        --selinux-type svirt_sandbox_file_t --volume $VOL_NAME
 }
 
 

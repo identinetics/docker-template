@@ -10,12 +10,15 @@ import argparse
 import json
 import os
 import stat
-from subprocess import check_output, CalledProcessError
+from subprocess import call, check_output, CalledProcessError
 
 parser = argparse.ArgumentParser(description='Show Docker volume mount')
-parser.add_argument('-g', '--groupwrite', dest='groupwrite', help='Execute `chmod g+w` on mountpoint')
+parser.add_argument('-g', '--groupwrite', dest='groupwrite', action="store_true",
+                    help='Execute `chmod g+w` on mountpoint')
 parser.add_argument('-p', '--prefix', dest='prefix', default='/dv', help='Path prefix for symlink')
-parser.add_argument('-s', '--symlink', dest='symlink', action="store_true", help='Create symlink at path prefix')
+parser.add_argument('-s', '--symlink', dest='symlink', action="store_true",
+                    help='Create symlink at path prefix')
+parser.add_argument('-t', '--selinux-type', dest='type', help='Execute `chcon -Rt <type>`')
 parser.add_argument('-v', '--verbose', dest='verbose', action="store_true")
 parser.add_argument('-V', '--volume', dest='volume', required=True, help='Name of Docker volume')
 args = parser.parse_args()
@@ -32,7 +35,7 @@ if args.verbose:
     print(container[0]['Name'] + ': ' + linkto_path)
 
 if args.groupwrite:
-    privs = os.stat(linkto_path)
+    st = os.stat(linkto_path)
     os.chmod(linkto_path, st.st_mode | stat.S_IWGRP)  # add g+w
 
 if args.symlink:
@@ -45,3 +48,7 @@ if args.symlink:
     if args.verbose:
         print("created symlink %s -> %s" % (linkfrom_path, linkto_path))
 
+if args.type:
+    call(["chcon", "-Rt", args.type, linkto_path])
+    if args.verbose:
+        print("set lebel %s on %s" % (args.type, linkto_path))

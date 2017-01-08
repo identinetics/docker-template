@@ -64,8 +64,8 @@ source $PROJ_HOME/$conf_script
 if [ -z "$runopt" ]; then
     runopt='-d --restart=unless-stopped'
 fi
-if [ -z "$useropt" ] && [ ! -z $CONTAINERUSER ]; then
-    useropt="-u $CONTAINERUSER"
+if [ -z "$useropt" ] && [ ! -z $CONTAINERUID ]; then
+    useropt="-u $CONTAINERUID"
 fi
 if [ -n "$START_AS_ROOT" ]; then
     useropt='-u 0'
