@@ -16,7 +16,7 @@ main() {
     set_vol_mapping
     #enable_x11_client
     #enable_pkcs11
-    #enable_sshd()     # usually used only for debugging - requires installed sshd in image
+    #enable_sshd     # usually used only for debugging - requires installed sshd in image
 }
 
 

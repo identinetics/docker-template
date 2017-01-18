@@ -62,6 +62,8 @@ enable_sshd() {
     export NETWORKSETTINGS="$NETWORKSETTINGS -p 2022:2022"
     export VOLMAPPING="$VOLMAPPING -v $VOLROOT/opt/ssh:/opt/ssh:Z"
     export STARTCMD='/start_sshd.sh'  # need to have this script installed in image
+    export BUILDARGS="$BUILDARGS --build-arg SSHD_ROOTPW=$SSHD_ROOTPW"
+
 }
 
 
