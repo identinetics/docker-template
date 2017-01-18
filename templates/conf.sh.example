@@ -81,15 +81,14 @@ set_network() {
 
 
 set_vol_mapping() {
-    create_user $CONTAINERUSER $CONTAINERUID
+    map_docker_volume "${CONTAINERNAME}.db" '/var/db' 'Z' $DOCKERVOL_ROOT
+    map_docker_volume "${CONTAINERNAME}.log" '/var/log' 'Z' $DOCKERLOG_ROOT
 
-    export VOLROOT="${DOCKERVOL_ROOT}/$CONTAINERNAME"  # container volumes on docker host
-    map_host_directory "$VOLROOT/etc/pki/tls/" '/etc/pki/' 'ro'
-    map_host_directory "$DOCKERLOG_ROOT/var/log/" '/var/log/' 'Z'
-
-    docker volume create --name myserver.db
-    map_docker_volume "myserver.db" '/var/db' 'Z'
-
+    #create_user $CONTAINERUSER $CONTAINERUID
+    #export VOLROOT="${DOCKERVOL_ROOT}/$CONTAINERNAME"  # container volumes on docker host
+    #map_host_directory "$VOLROOT/etc/pki/" '/etc/pki/' 'ro'
+    #map_host_directory "$VOLROOT/var/db/" '/var/db/' 'Z'
+    #map_host_directory "$DOCKERLOG_ROOT/var/log/" '/var/log/' 'Z'
 }
 
 
