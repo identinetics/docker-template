@@ -27,6 +27,7 @@ file coordinates the assigned numbers:
 |343025|drupal
 |343027|drupal7
 |343028|kibana
-|343029|pvzdbepep
+|343029|pvzdbe-pep
 |343030|eventfetcher
+|343031|pvzdclient
 |===
