@@ -180,3 +180,23 @@ get_from_ziparchive_with_checksum() {
     fi
 }
 
+set_staging_env() {
+    # read current git branch and export STAGING_ENV to following values:
+    #  master -> 'pr'
+    #  qa -> 'qa'
+    #  dev -> 'dev'
+    #  any other -> ''
+    if [ "$TRAVIS" == "true" ]; then
+        GIT_BRANCH=$TRAVIS_BRANCH
+    else
+        GIT_BRANCH=$(git symbolic-ref --short -q HEAD)
+    fi
+    export STAGING_ENV=''
+    if [ "$GIT_BRANCH" == "master" ]; then
+        export STAGING_ENV='pr'
+    elif [ "$GIT_BRANCH" == "qa" ]; then
+        export STAGING_ENV='qa'
+    elif [ "$GIT_BRANCH" == "dev" ]; then
+        export STAGING_ENV='dev'
+    fi
+}
