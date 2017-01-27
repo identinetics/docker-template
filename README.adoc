@@ -14,7 +14,12 @@ Features:
 - Configuration from a config file, building and running containers with the same script in
   different projects
 - Consistent image, container, user and network mapping for multiple containers
-- Download archives or clone github repos before `ocker build` to have better control on updates
+- Pre-build hook: Allow script to modify the build env or Dockerfile before build. This can be used
+  to:
+  ** Download archives or clone github repos before `docker build` to have better control on updates, or
+  ** add staging support for images: e.g., it allows an image to reference myimage-qa or
+     myimage-prod in FROM.
+  It is implemented by adding a build_prepare.sh script to in the same directory as conf.sh
 
 ## Configuration
 
