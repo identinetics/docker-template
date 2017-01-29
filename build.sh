@@ -79,3 +79,5 @@ fi
 ${sudo} $docker_build
 
 echo "image: $IMAGENAME"
+echo "List git repositories and their current branch"
+show_git_branches

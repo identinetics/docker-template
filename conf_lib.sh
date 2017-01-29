@@ -200,3 +200,18 @@ set_staging_env() {
         export STAGING_ENV='-dev'
     fi
 }
+
+
+show_git_branches() {
+# Show branches of all git repos in path
+    find . -name '.git' | while read file; do
+        repodir=$(dirname $file)
+        echo -n $repodir | sed -e 's/^\.\///' | tr -d '\n'
+        echo -n '::'
+        cd $repodir
+        git symbolic-ref --short -q HEAD | tr -d '\n'
+        [ -e 'VERSION' ] && echo -n '::' && cat VERSION | tr -d '\n'
+        echo
+        cd $OLDPWD
+    done
+}
