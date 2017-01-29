@@ -202,6 +202,34 @@ set_staging_env() {
 }
 
 
+echo_commit_status() {
+# output ahead/behind upstream status
+    branch=`git rev-parse --abbrev-ref HEAD`
+    git for-each-ref --format='%(refname:short) %(upstream:short)' refs/heads | \
+    while read local upstream; do
+        # Use master if upstream branch is empty
+        [ -z $upstream ] && upstream=master
+
+        ahead=`git rev-list ${upstream}..${local} --count`
+        behind=`git rev-list ${local}..${upstream} --count`
+
+        if [[ $local == $branch ]]; then
+            # Does this branch is ahead or behind upstream branch?
+            if [[ $ahead -ne 0 && $behind -ne 0 ]]; then
+                echo -n " ($ahead ahead and $behind behind $upstream)"
+            elif [[ $ahead -ne 0 ]]; then
+                echo -n " ($ahead ahead $upstream)"
+            elif [[ $behind -ne 0 ]]; then
+                echo -n " ($behind behind $upstream)"
+            fi
+            # Any locally modified files?
+            count=$(git status -s | wc -l)
+            [ "$lines" -ge 0 ] && echo -n " ($count file(s) locally modified)"
+        fi
+    done;
+}
+
+
 show_git_branches() {
 # Show branches of all git repos in path
     find . -name '.git' | while read file; do
@@ -211,6 +239,7 @@ show_git_branches() {
         cd $repodir
         git symbolic-ref --short -q HEAD | tr -d '\n'
         [ -e 'VERSION' ] && echo -n '::' && cat VERSION | tr -d '\n'
+        echo_commit_status
         echo
         cd $OLDPWD
     done
