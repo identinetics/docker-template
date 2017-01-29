@@ -19,8 +19,9 @@ map_docker_volume() {
     $sudo docker volume create --name $VOL_NAME >/dev/null
     export VOLMAPPING="$VOLMAPPING -v $VOL_NAME:$CONTAINERPATH:$MOUNT_OPTION"
     mkdir -p $PREFIX
+    [ "$TRAVIS" == "true" ] || chcon_opt='--selinux-type svirt_sandbox_file_t'
     $sudo $SCRIPTDIR/docker_vol_mount.py --prefix $PREFIX --symlink --groupwrite \
-        --selinux-type svirt_sandbox_file_t --volume $VOL_NAME
+        $chcon_opt --volume $VOL_NAME
 }
 
 
