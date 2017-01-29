@@ -223,8 +223,8 @@ echo_commit_status() {
                 echo -n " ($behind behind $upstream)"
             fi
             # Any locally modified files?
-            count=$(git status -s | wc -l)
-            [ "$lines" -ge 0 ] && echo -n " ($count file(s) locally modified)"
+            count=$(git status -suno | wc -l)
+            (( "$count" > "0" )) && echo -n " ($count file(s) locally modified)"
         fi
     done;
 }
