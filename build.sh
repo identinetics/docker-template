@@ -87,7 +87,7 @@ if (( $buildstatus == 0 )); then
         ${sudo} $SCRIPTDIR/push.sh
     fi
 else
-    echo '\E[33;31m'"\033[1mError\033[0m Docker build failed"
+    echo -e '\E[33;31m'"\033[1mError\033[0m Docker build failed"
 fi
 
 echo "List git repositories and their current branch"
