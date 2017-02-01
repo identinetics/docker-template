@@ -79,9 +79,8 @@ if [ "remove_img" == "True" ]; then
     ${sudo} docker rmi -f $IMAGENAME 2> /dev/null || true
 fi
 
-${sudo} $docker_build && buildstatus=$?
-
-if (( $buildstatus == 0 )); then
+${sudo} $docker_build
+if (( $? == 0 )); then
     echo "image: $IMAGENAME built."
     if [ "$push" == "True" ]; then
         ${sudo} $SCRIPTDIR/push.sh
