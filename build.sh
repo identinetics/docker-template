@@ -82,7 +82,7 @@ fi
 ${sudo} $docker_build && buildstatus=$?
 
 if [ "$push" == "True" ]; then
-    if (( $buildstatus == 0 )): then
+    if (( $buildstatus == 0 )); then
         ${sudo} $SCRIPTDIR/push.sh
     fi
 fi
