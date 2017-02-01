@@ -2,7 +2,7 @@
 # rhoerbe/docker-template@github 2016-07-20
 set -e
 
-while getopts ":chn:pru" opt; do
+while getopts ":chn:pPru" opt; do
   case $opt in
     c)
       CACHEOPT="--no-cache";;
@@ -16,6 +16,8 @@ while getopts ":chn:pru" opt; do
       ;;
     p)
       print="True";;
+    P)
+      push="True";;
     r)
       remove_img="True";;
     u)
@@ -24,11 +26,12 @@ while getopts ":chn:pru" opt; do
       echo "Option -$OPTARG requires an argument"
       exit 1;;
     *)
-      echo "usage: $0 [-h] [-i] [-n] [-p] [-r] [cmd]
+      echo "usage: $0 [-h] [-i] [-n] [-p] [-P] [-r] [cmd]
    -c  do not use cache (build --no-cache)
    -h  print this help text
    -n  configuration number ('<NN>' in conf<NN>.sh)
    -p  print docker build command on stdout
+   -P  push after build
    -r  remove existing image (-f)
    -u  update packages in docker build context
    unknow option $opt
@@ -68,15 +71,21 @@ if [ $(id -u) -ne 0 ]; then
 fi
 
 docker_build="docker build $BUILDARGS $CACHEOPT -t=$IMAGENAME ."
-if [ "$print" = "True" ]; then
+if [ "$print" == "True" ]; then
     echo $docker_build
 fi
 
-if [ "remove_img" = "True" ]; then
+if [ "remove_img" == "True" ]; then
     ${sudo} docker rmi -f $IMAGENAME 2> /dev/null || true
 fi
 
-${sudo} $docker_build
+${sudo} $docker_build && buildstatus=$?
+
+if [ "$push" == "True" ]; then
+    if (( $buildstatus == 0 )): then
+        ${sudo} $SCRIPTDIR/push.sh
+    fi
+fi
 
 echo "image: $IMAGENAME"
 echo "List git repositories and their current branch"
