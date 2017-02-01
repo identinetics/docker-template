@@ -81,12 +81,14 @@ fi
 
 ${sudo} $docker_build && buildstatus=$?
 
-if [ "$push" == "True" ]; then
-    if (( $buildstatus == 0 )); then
+if (( $buildstatus == 0 )); then
+    echo "image: $IMAGENAME built."
+    if [ "$push" == "True" ]; then
         ${sudo} $SCRIPTDIR/push.sh
     fi
+else
+    echo "\033[31mERROR\e[0m docker build failed"
 fi
 
-echo "image: $IMAGENAME"
 echo "List git repositories and their current branch"
 $SCRIPTDIR/show_repo_branches.sh
