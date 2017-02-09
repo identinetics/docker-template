@@ -60,6 +60,9 @@ set_run_args() {
         -e LOGDIR=/var/log
         -e LOGLEVEL=INFO
     "
+    # by default, remove all capabilities. You may need to add particular ones, such as:
+    #  --cap-add=setuid --cap-add=setgid --cap-add=chown --cap-add=net_bind_service
+    export CAPABILITIES='--cap-drop=all'
     export STARTCMD='/start.sh'  # unset or blank to use image default
 }
 

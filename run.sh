@@ -76,7 +76,7 @@ else
     cmd=$@
 fi
 docker_run="docker run $runopt $useropt --hostname=$CONTAINERNAME --name=$CONTAINERNAME
-    $ENVSETTINGS $NETWORKSETTINGS $VOLMAPPING $IMAGENAME $cmd"
+    $CAPABILITIES $ENVSETTINGS $NETWORKSETTINGS $VOLMAPPING $IMAGENAME $cmd"
 
 if [ $(id -u) -ne 0 ]; then
     sudo="sudo"

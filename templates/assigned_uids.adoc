@@ -30,4 +30,5 @@ file coordinates the assigned numbers:
 |343029|pvzdbe-pep
 |343030|eventfetcher
 |343031|pvzdclient
+|343032|getbpk
 |===
