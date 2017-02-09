@@ -98,7 +98,7 @@ create_user() {
 
 get_capabilities() {
     # Extract capabilites for docker run defined with the label "capabilites" in the Dockerfile
-    export CAPABILITIES=$($sudo docker inspect $IMAGENAME | $SCRIPTDIR/get_capabilites.py)
+    export CAPABILITIES=$($sudo docker inspect $IMAGENAME | $SCRIPTDIR/get_capabilities.py)
 }
 
 
