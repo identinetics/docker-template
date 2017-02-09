@@ -3,6 +3,8 @@
 import json
 import sys
 
-with open(sys.stdin) as fd:
-    metadata = json.loads(fd.read())
+metadata = json.loads(sys.stdin.read())
+try:
     print(metadata[0]['ContainerConfig']['Labels']['capabilites'])
+except KeyError:
+    pass
