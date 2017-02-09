@@ -96,11 +96,18 @@ create_user() {
 }
 
 
+get_capabilities() {
+    # Extract capabilites for docker run defined with the label "capabilites" in the Dockerfile
+    export CAPABILITIES=$($sudo docker inspect $IMAGENAME | $SCRIPTDIR/get_capabilites.py)
+}
+
+
 init_sudo() {
     if [ $(id -u) -ne 0 ]; then
         sudo="sudo"
     fi
 }
+
 
 chkdir() {
     if [[ "${1:0:1}" == / ]]; then
@@ -139,6 +146,7 @@ get_or_update_repo() {
     fi
 }
 
+
 get_from_tarball() {
     if [ ! -e $pkgroot/$pkgdir ] || [ "$update_pkg" == "True" ]; then
         echo "downloading $pkgdir into $pkgroot"
@@ -146,6 +154,7 @@ get_from_tarball() {
         curl -L $pkgurl | tar -xz -C $pkgroot
     fi
 }
+
 
 get_from_ziparchive() {
     if [ ! -e $pkgroot/$pkgdir ] || [ "$update_pkg" == "True" ]; then

@@ -1,6 +1,9 @@
 FROM centos:centos7
-LABEL maintainer "Rainer Hörbe <r2h2@hoerbe.at>" \
-      version "0.0.0"
+LABEL maintainer="Rainer Hörbe <r2h2@hoerbe.at>" \
+      version="0.0.0" \
+      # by default, remove all capabilities. You may need to add particular ones, such as:
+      #   --cap-add=setuid --cap-add=setgid --cap-add=chown --cap-add=net_bind_service
+      capabilites='--cap-drop=all'
 
 # allow build behind firewall
 ARG HTTPS_PROXY=''
