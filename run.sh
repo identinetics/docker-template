@@ -75,6 +75,7 @@ if [ -z "$1" ]; then
 else
     cmd=$@
 fi
+get_capabilities
 docker_run="docker run $runopt $useropt --hostname=$CONTAINERNAME --name=$CONTAINERNAME
     $CAPABILITIES $ENVSETTINGS $NETWORKSETTINGS $VOLMAPPING $IMAGENAME $cmd"
 
@@ -82,7 +83,6 @@ if [ $(id -u) -ne 0 ]; then
     sudo="sudo"
 fi
 
-get_capabilities
 $sudo docker rm -f $CONTAINERNAME 2>/dev/null || true
 if [ "$print" = "True" ]; then
     echo $docker_run
