@@ -81,6 +81,8 @@ docker_run="docker run $runopt $useropt --hostname=$CONTAINERNAME --name=$CONTAI
 if [ $(id -u) -ne 0 ]; then
     sudo="sudo"
 fi
+
+get_capabilities
 $sudo docker rm -f $CONTAINERNAME 2>/dev/null || true
 if [ "$print" = "True" ]; then
     echo $docker_run

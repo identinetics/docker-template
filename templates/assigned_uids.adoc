@@ -10,8 +10,8 @@ file coordinates the assigned numbers:
 |343002|nginx
 |343003|pyff
 |343004|samlschtron
-|343005|shibsp
-|343006|lapd
+|343005|shibsp (344005 for httpd)
+|343006|openldap
 |343007|shibidp
 |343009|rabbitmq
 |343011|pvzdfe
