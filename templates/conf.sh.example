@@ -23,14 +23,18 @@ main() {
 set_volume_root() {
     DOCKERVOL_ROOT='/docker_volumes'
     DOCKERLOG_ROOT='/dl'
-    SHAREDDATA_ROOT="${DOCKERVOL_ROOT}/01shared_data"    # data shared between containers
+    DOCKERLOG_ROOT='/dl'
+    if [ "$TRAVIS" == "true" ]; then
+        DOCKERVOL_ROOT='./dv';
+        DOCKERLOG_ROOT='./dl';
+    fi
 }
 
 
 set_image_and_container_name() {
     # This IMGID qualifies image, container, user and IP adddress; this is helpful for managing
     # processes on the docker host etc.
-    IMGID='99'  # range from 02 .. 99; must be unique per node
+    IMGID='99'  # range from 02 .. 99; must be unique per node (registered in github.com/identinetics/dscripts/templates/assigned-uids.adoc)
     PROJSHORT='template'
     export IMAGENAME="r2h2/$PROJSHORT${IMGID}"  # [a-z_0-9]
     export CONTAINERNAME="${IMGID}$PROJSHORT"
@@ -41,8 +45,6 @@ set_image_and_container_name() {
 set_users() {
     export CONTAINERUSER="$PROJSHORT${IMGID}"   # group and user to run container
     export CONTAINERUID="3430${IMGID}"     # gid and uid for CONTAINERUSER
-    export SHARED_CONTAINERS_GROUP="sharedcont"   # group shared by other containers
-    export SHARED_CONTAINERS_GROUPID="8000"
     export START_AS_ROOT=      # 'True' (e.g. for apache to fall back to www user)
 }
 
@@ -83,10 +85,12 @@ set_network() {
 
 
 set_vol_mapping() {
+    create_user $CONTAINERUSER $CONTAINERUID
+
+    # it is good practice to map each VOLUME from the Dockerfile
     map_docker_volume "${CONTAINERNAME}.db" '/var/db' 'Z' $DOCKERVOL_ROOT
     map_docker_volume "${CONTAINERNAME}.log" '/var/log' 'Z' $DOCKERLOG_ROOT
 
-    #create_user $CONTAINERUSER $CONTAINERUID
     #export VOLROOT="${DOCKERVOL_ROOT}/$CONTAINERNAME"  # container volumes on docker host
     #map_host_directory "$VOLROOT/etc/pki/" '/etc/pki/' 'ro'
     #map_host_directory "$VOLROOT/var/db/" '/var/db/' 'Z'

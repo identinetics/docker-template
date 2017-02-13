@@ -6,15 +6,8 @@
 
 update_pkg="False"
 
-while getopts ":hn:uU" opt; do
+while getopts ":huU" opt; do
   case $opt in
-    n)
-      config_nr=$OPTARG
-      re='^[0-9][0-9]?$'
-      if ! [[ $OPTARG =~ $re ]] ; then
-         echo "error: -n argument is not a number in the range from 02 .. 99" >&2; exit 1
-      fi
-      ;;
     u)
       update_pkg="True"
       ;;
@@ -22,9 +15,9 @@ while getopts ":hn:uU" opt; do
       update_pkg="False"
       ;;
     *)
-      echo "usage: $0 [-n] [-u]
-   -U  do not update git repos in docker build context (default)
+      echo "usage: $0 [-u] [-U]
    -u  update git repos in docker build context
+   -U  do not update git repos in docker build context (default)
 
    To update packages delivered as tar-balls just delete them from install/opt
    "
@@ -36,10 +29,28 @@ done
 shift $((OPTIND-1))
 
 
-workdir=$(cd $(dirname $BASH_SOURCE[0]) && pwd)
-cd $workdir
-[ ! -e ./conf${config_nr}.sh ] && echo 'missing conf.sh or config-nr' && exit 1
-source ./conf${config_nr}.sh
+# --- determine config script (there may be more than one to run multiple containers)
+# if config_nr not given and there is only one file matching conf*.sh take this one
+SCRIPTDIR=$(cd $(dirname $BASH_SOURCE[0]) && pwd)
+PROJROOT=$(cd $(dirname $SCRIPTDIR) && pwd)
+cd $PROJROOT; confs=(conf*.sh); cd $OLDPWD
+source $SCRIPTDIR/conf_lib.sh  # load library functions
+
+if [ ! -z ${config_nr} ]; then
+    conf_script=conf${config_nr}.sh
+    if [ ! -e "$PROJROOT/$conf_script" ]; then
+        echo "$PROJROOT/$conf_script not found"
+        exit 1
+    fi
+elif [ ${#confs[@]} -eq 1 ]; then
+    conf_script=${confs[0]}
+else
+    echo "No or more than one (${#confs[@]}) conf*.sh: need to provide -n argument:"
+    printf "%s\n" "${confs[@]}"
+    exit 1
+fi
+source $PROJROOT/$conf_script
+
 
 # --- install software from github ---
 #repodir='install/opt/xyz'

@@ -64,7 +64,7 @@ else
 fi
 source $PROJROOT/$conf_script
 
-[ -e $PROJROOT/build_prepare.sh ] && $PROJROOT/build_prepare.sh $config_opt $update_pkg
+[ -e $PROJROOT/build_prepare.sh ] && $PROJROOT/build_prepare.sh $update_pkg
 
 if [ $(id -u) -ne 0 ]; then
     sudo="sudo"
