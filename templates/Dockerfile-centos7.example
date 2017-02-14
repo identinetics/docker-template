@@ -92,8 +92,8 @@ RUN yum -y install icedtea-web pcsc-lite usbutils \
  && curl -O http://webstart.buergerkarte.at/mocca/webstart/mocca.jnlp
 
 # Application will run as a non-root user/group that must map to the docker host
-ARG USERNAME
-ARG UID
+ARG USERNAME=user
+ARG UID=3430xx
 RUN groupadd -g $UID $USERNAME \
  && adduser -g $UID -u $UID $USERNAME \
  && mkdir -p /opt && chmod 750 /opt

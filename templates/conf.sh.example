@@ -21,7 +21,7 @@ main() {
 
 
 set_volume_root() {
-    DOCKERVOL_ROOT='/docker_volumes'
+    DOCKERVOL_ROOT='/dv'
     DOCKERLOG_ROOT='/dl'
     DOCKERLOG_ROOT='/dl'
     if [ "$TRAVIS" == "true" ]; then
@@ -85,11 +85,12 @@ set_network() {
 
 
 set_vol_mapping() {
+    # create container user on docker host
     create_user $CONTAINERUSER $CONTAINERUID
 
     # it is good practice to map each VOLUME from the Dockerfile
-    map_docker_volume "${CONTAINERNAME}.db" '/var/db' 'Z' $DOCKERVOL_ROOT
-    map_docker_volume "${CONTAINERNAME}.log" '/var/log' 'Z' $DOCKERLOG_ROOT
+    map_docker_volume "${CONTAINERNAME}.var_db" '/var/db' 'Z' $DOCKERVOL_ROOT
+    map_docker_volume "${CONTAINERNAME}.var_log" '/var/log' 'Z' $DOCKERLOG_ROOT
 
     #export VOLROOT="${DOCKERVOL_ROOT}/$CONTAINERNAME"  # container volumes on docker host
     #map_host_directory "$VOLROOT/etc/pki/" '/etc/pki/' 'ro'
