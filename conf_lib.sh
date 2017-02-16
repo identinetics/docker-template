@@ -203,11 +203,11 @@ set_staging_env() {
     fi
     export STAGING_ENV=''
     if [ "$GIT_BRANCH" == "master" ]; then
-        export STAGING_ENV='-pr'
+        export STAGING_ENV='pr'
     elif [ "$GIT_BRANCH" == "qa" ]; then
-        export STAGING_ENV='-qa'
+        export STAGING_ENV='qa'
     elif [ "$GIT_BRANCH" == "dev" ]; then
-        export STAGING_ENV='-dev'
+        export STAGING_ENV='dev'
     fi
 }
 
