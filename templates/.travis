@@ -1,0 +1,21 @@
+language: c
+branches:
+  only:
+    - master
+    - qa
+install: true
+sudo: required
+services:
+  - docker
+
+before_script:
+  - cp conf.sh.default conf.sh
+  - cd dscripts && git checkout master && git pull && cd -
+  - ./dscripts/build.sh -u
+
+script:
+  - ./dscripts/run.sh -ip /test_all.sh -v
+
+after_success:
+  - ./dscripts/push.sh -p
+  - echo "pushed $IMAGENAME"
