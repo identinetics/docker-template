@@ -27,14 +27,14 @@ while getopts ":hiIn:pr" opt; do
       ;;
     *)
       echo "usage: $0 [-h] [-i] [-I] [-n <containernr>] [-p] [-r] [cmd]
-   -h  print this help text
-   -i  interactive (default; results in options -it for docker exec)
-   -I  non-interactive (no -it for docker exec)
-   -n  configuration number ('<NN>' in conf<NN>.sh)
-   -p  print docker exec command on stdout
-   -r  execute as root user
-   cmd shell command to be executed (default is $EXECCMD)
-   "
+           -h  print this help text
+           -i  interactive (default; results in options -it for docker exec)
+           -I  non-interactive (no -it for docker exec)
+           -n  configuration number ('<NN>' in conf<NN>.sh)
+           -p  print docker exec command on stdout
+           -r  execute as root user
+           cmd shell command to be executed (default is $EXECCMD)
+           "
       exit 0
       ;;
   esac
