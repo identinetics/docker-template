@@ -13,6 +13,8 @@ Features:
   any time without loss of data, because data is stored on mounted volumes.
 - Configuration from a config file, building and running containers with the same script in
   different projects
+- Containers have a fixed IP-address baed on the container number. This allows load balancer
+  config without dependency on the container to have a dockerd-DNS entry (when not running).
 - Consistent image, container, user and network mapping for multiple containers
 - Pre-build hook: Allow script to modify the build env or Dockerfile before build. This can be used
   to:

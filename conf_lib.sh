@@ -1,38 +1,71 @@
 #!/usr/bin/env bash
+set -eu -o pipefail
 
-# Common functions for conf.sh
-
-# In most cases there is no need to replace these functions. If needed then
-# overwrite them in conf.sh
+# Common functions
+# In most cases there is no need to replace these functions.
+# However, if needed, then overwrite them in conf.sh
 
 SCRIPTDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
-map_docker_volume() {
-    # Map container directory to Docker volume
-    # - Create volume if it does not exist
-    # - Append to VOLMAPPING
-    # - chmod g+w and create symlink in PREFIX
-    VOL_NAME=$1; CONTAINERPATH=$2; MOUNT_OPTION=$3; PREFIX=$4
-    if [ -z ${PREFIX+x} ]; then
-        echo "conf_lib.sh/map_docker_volume(): All 4 arguments need to be set; found: $@" && exit 1;
+# ------------------------- functions for conf*.sh --------------------------
+
+chkdir() {
+    if [[ "${1:0:1}" == / ]]; then
+        dir=$1  # absolute path
+    else   # deprecated
+        [ -z $VOLROOT ] && echo 'VOLROOT not defined' && exit 1
+        dir=$VOLROOT/$1
     fi
-    $sudo docker volume create --name $VOL_NAME >/dev/null
-    export VOLMAPPING="$VOLMAPPING -v $VOL_NAME:$CONTAINERPATH:$MOUNT_OPTION"
-    mkdir -p $PREFIX
-    [ "$TRAVIS" == "true" ] || chcon_opt='--selinux-type svirt_sandbox_file_t'
-    $sudo $SCRIPTDIR/docker_vol_mount.py --prefix $PREFIX --symlink --groupwrite \
-        $chcon_opt --volume $VOL_NAME
+    if [ ! -e "$dir" ]; then
+        echo "$0: Missing directory: $dir"
+        exit 1
+    fi
 }
 
 
-map_host_directory() {
-    # map a host to a container path
-    HOSTPATH=$1; CONTAINERPATH=$2; MOUNT_OPTION=$3
-    export VOLMAPPING="$VOLMAPPING -v $HOSTPATH:$CONTAINERPATH:$MOUNT_OPTION"
-    if [[ $MOUNT_OPTION == "ro" ]]; then
-        chkdir $HOSTPATH
+create_chown_dir() {
+    # args: path user [group]
+    if [[ "${1:0:1}" == / ]]; then
+        dir=$1  # absolute path
+    else  # deprecated
+        [ -z $VOLROOT ] && echo 'VOLROOT not defined' && exit 1
+        dir=$VOLROOT/$1
+    fi
+    user=$2
+    if [ -z $3 ]; then
+        group=$user
     else
-        createdir $HOSTPATH $CONTAINERUID
+        group=$3
+    fi
+    $sudo mkdir -p $dir
+    $sudo chown -R $user:$group $dir
+}
+
+
+create_user() {
+    A_USERNAME=$1;A_UID=$2
+    # first start: create user/group/host directories
+    if ! id -u $A_USERNAME &>/dev/null; then
+        if [[ ${OSTYPE//[0-9.]/} == 'darwin' ]]; then  # OSX
+                $sudo sudo dseditgroup -o create -i $A_UID $A_USERNAME
+                $sudo dscl . create /Users/$A_USERNAME UniqueID $A_UID
+                $sudo dscl . create /Users/$A_USERNAME PrimaryGroupID $A_UID
+        else  # Linux
+          source /etc/os-release
+          case $ID in
+            centos|fedora|rhel)
+                $sudo groupadd --non-unique -g $A_UID $A_USERNAME || true
+                $sudo adduser --non-unique -M --gid $A_UID --comment "" --uid $A_UID $A_USERNAME
+                ;;
+            debian|ubuntu)
+                $sudo groupadd -g $A_UID $A_USERNAME
+                $sudo adduser --gid $A_UID --no-create-home --disabled-password --gecos "" --uid $A_UID $A_USERNAME
+                ;;
+            *)
+                echo "do not know how to add user/group for OS ${OSTYPE} ${NAME}"
+                ;;
+          esac
+        fi
     fi
 }
 
@@ -68,34 +101,6 @@ enable_sshd() {
 }
 
 
-create_user() {
-    A_USERNAME=$1;A_UID=$2
-    # first start: create user/group/host directories
-    if ! id -u $A_USERNAME &>/dev/null; then
-        if [[ ${OSTYPE//[0-9.]/} == 'darwin' ]]; then  # OSX
-                $sudo sudo dseditgroup -o create -i $A_UID $A_USERNAME
-                $sudo dscl . create /Users/$A_USERNAME UniqueID $A_UID
-                $sudo dscl . create /Users/$A_USERNAME PrimaryGroupID $A_UID
-        else  # Linux
-          source /etc/os-release
-          case $ID in
-            centos|fedora|rhel)
-                $sudo groupadd --non-unique -g $A_UID $A_USERNAME || true
-                $sudo adduser --non-unique -M --gid $A_UID --comment "" --uid $A_UID $A_USERNAME
-                ;;
-            debian|ubuntu)
-                $sudo groupadd -g $A_UID $A_USERNAME
-                $sudo adduser --gid $A_UID --no-create-home --disabled-password --gecos "" --uid $A_UID $A_USERNAME
-                ;;
-            *)
-                echo "do not know how to add user/group for OS ${OSTYPE} ${NAME}"
-                ;;
-          esac
-        fi
-    fi
-}
-
-
 get_capabilities() {
     # Extract capabilites for docker run defined with the label "capabilites" in the Dockerfile
     export CAPABILITIES=$($sudo docker inspect $IMAGENAME  2>/dev/null | $SCRIPTDIR/get_capabilities.py )
@@ -109,31 +114,37 @@ init_sudo() {
 }
 
 
-chkdir() {
-    if [[ "${1:0:1}" == / ]]; then
-        dir=$1  # absolute path
-    else
-        dir=$VOLROOT/$1
+map_docker_volume() {
+    # Map container directory to Docker volume
+    # - Create volume if it does not exist
+    # - Append to VOLMAPPING
+    # - chmod g+w and create symlink in PREFIX
+    VOL_NAME=$1; CONTAINERPATH=$2; MOUNT_OPTION=$3; PREFIX=$4
+    if [ -z ${PREFIX+x} ]; then
+        echo "conf_lib.sh/map_docker_volume(): All 4 arguments need to be set; found: $@" && exit 1;
     fi
-    if [ ! -e "$dir" ]; then
-        echo "$0: Missing directory: $dir"
-        exit 1
+    $sudo docker volume create --name $VOL_NAME >/dev/null
+    export VOLMAPPING="$VOLMAPPING -v $VOL_NAME:$CONTAINERPATH:$MOUNT_OPTION"
+    mkdir -p $PREFIX
+    [ "$TRAVIS" == "true" ] || chcon_opt='--selinux-type svirt_sandbox_file_t'
+    $sudo $SCRIPTDIR/docker_vol_mount.py --prefix $PREFIX --symlink --groupwrite \
+        $chcon_opt --volume $VOL_NAME
+}
+
+
+map_host_directory() {
+    # map a host to a container path
+    HOSTPATH=$1; CONTAINERPATH=$2; MOUNT_OPTION=$3
+    export VOLMAPPING="$VOLMAPPING -v $HOSTPATH:$CONTAINERPATH:$MOUNT_OPTION"
+    if [[ $MOUNT_OPTION == "ro" ]]; then
+        chkdir $HOSTPATH
+    else
+        create_chown_dir $HOSTPATH $CONTAINERUID
     fi
 }
 
 
-createdir() {
-    if [[ "${1:0:1}" == / ]]; then
-        dir=$1  # absolute path
-    else
-        dir=$VOLROOT/$1
-    fi
-    user=$2
-    $sudo mkdir -p $dir
-    $sudo chown -R $user:$user $dir
-}
-
-# --- functions for build_prepare.sh ---
+# ------------------------- functions for build_prepare.sh --------------------------
 
 get_or_update_repo() {
     if [ ! -e $repodir ]; then
