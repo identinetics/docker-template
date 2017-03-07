@@ -5,6 +5,9 @@ LABEL maintainer="Rainer Hörbe <r2h2@hoerbe.at>" \
       #   --cap-add=setuid --cap-add=setgid --cap-add=chown --cap-add=net_bind_service
       capabilites='--cap-drop=all'
 
+
+HEALTHCHECK --interval=5m --timeout=5s CMD curl -f http://localhost:8080/ || exit 1
+
 # allow build behind firewall
 ARG HTTPS_PROXY=''
 

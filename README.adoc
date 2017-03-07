@@ -52,12 +52,12 @@ Features:
     dscript/run.sh [-h] [-i] [-n container-nr] [-p] [-r] -[R] [cmd]
     dscript/exec.sh [-h] [-i] [-n container-nr] [-p] [-r] [cmd]
     
-   To run multiple XYZ containers on the same system you need to create separate 
-   conf.sh files and build separate images:
-   E.g. to create XYZ container instance 3:
-   a) create a file conf3.sh, and set the IMGID=3; and
-   b) build the container with the -n option, e.g. `build.sh -n 3`
-   c) run the container with the -n option, e.g. `run.sh -n 3`
+    To run multiple XYZ containers on the same system you need to create separate
+    conf.sh files and build separate images:
+    E.g. to create XYZ container instance 3:
+    a) create a file conf3.sh, and set the IMGID=3; and
+    b) build the container with the -n option, e.g. `build.sh -n 3`
+    c) run the container with the -n option, e.g. `run.sh -n 3`
 
 ## Alternatives
 
