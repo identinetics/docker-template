@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# rhoerbe/docker-template@github 2016-07-20
+set -e -o pipefail
 
 EXECCMD=/bin/bash
 runopt='-it'
