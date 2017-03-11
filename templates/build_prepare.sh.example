@@ -5,56 +5,75 @@ set -e -o pipefail
 # Providing resources before starting docker build provides better control about updates
 # and can speed up the build process.
 
-update_pkg="False"
-
-while getopts ":huU" opt; do
-  case $opt in
-    u)
-      update_pkg="True"
-      ;;
-    U)
-      update_pkg="False"
-      ;;
-    *)
-      echo "usage: $0 [-u] [-U]
-   -u  update git repos in docker build context
-   -U  do not update git repos in docker build context (default)
-
-   To update packages delivered as tar-balls just delete them from install/opt
-   "
-      exit 0
-      ;;
-  esac
-done
-shift $((OPTIND-1))
-
-BUILDDIR=$(cd $(dirname $BASH_SOURCE[0]) && pwd)
-source $BUILDDIR/dscripts/conf_lib.sh  # load library functions
-cd $BUILDDIR
+main() {
+    get_commandline_opts
+    load_config
+    #get_or_update_xyz_from_github
+    #get_tar_pkg-123
+    #get_zip_xmlsectool
+    #get_zip_withchecksum_shibidp
+}
 
 
-# --- install software from github ---
-#repodir='install/opt/xyz'
-#repourl='https://github.com/abc/xyz'
-#get_or_update_repo
+get_commandline_opts() {
+    update_pkg="False"
+    while getopts ":huU" opt; do
+      case $opt in
+        u) update_pkg="True";;
+        U) update_pkg="False";;
+        *) echo "usage: $0 [-u] [-U]
+           -u  update git repos in docker build context
+           -U  do not update git repos in docker build context (default)
+           To update packages delivered as tar-balls just delete them from install/opt
+           "; exit 0;;
+      esac
+    done
+    shift $((OPTIND-1))
+}
 
-# --- install software as tar ball ---
-#pkgroot="$workdir/install/opt"
-#pkgdir="pkg-123"
-#pkgurl='http://downloads.sourceforge.net/project/............tar.gz'
-#get_from_tarball
+load_config() {
+    BUILDDIR=$(cd $(dirname $BASH_SOURCE[0]) && pwd)
+    source $BUILDDIR/dscripts/conf_lib.sh  # load library functions
+    cd $BUILDDIR
+}
 
-# --- install software as zip archive ---
-#pkgroot='install/opt'
-#pkgdir='xmlsectool'
-#version='2.0.0'
-#pkgurl="https://shibboleth.net/downloads/tools/xmlsectool/${version}/xmlsectool-${version}-bin.zip"
-#get_from_ziparchive
-#cd $pkgroot && ln -s xmlsectool-${version} $pkgdir && cd $OLDPWD
 
-# --- Download software with checksum ---
-PROD_VERSION='3.3.0'
-PROD_URL="https://shibboleth.net/downloads/identity-provider/latest/shibboleth-identity-provider-$PROD_VERSION.zip"
-PROD_DIR='shibboleth-idp-distribution' # this is the reference from Dockerfile
-PROD_SHA256='a0dd96ad8770539b6f1249f7cea98b944cff846b4831892e8deee62b91b60277'
-get_from_ziparchive_with_checksum $PROD_URL $PROD_SHA256 $PROD_DIR $PROD_VERSION
+get_or_update_xyz_from_github() {
+    # get repo from github
+    repodir='install/opt/xyz'
+    repourl='https://github.com/abc/xyz'
+    get_or_update_repo
+}
+
+
+get_tar_pkg-123() {
+    # --- get tar ball ---
+    pkgroot="$workdir/install/opt"
+    pkgdir="pkg-123"
+    pkgurl='http://downloads.sourceforge.net/project/............tar.gz'
+    get_from_tarball
+}
+
+
+get_zip_xmlsectool() {
+    # --- get zip archive ---
+    pkgroot='install/opt'
+    pkgdir='xmlsectool'
+    version='2.0.0'
+    pkgurl="https://shibboleth.net/downloads/tools/xmlsectool/${version}/xmlsectool-${version}-bin.zip"
+    get_from_ziparchive
+    cd $pkgroot && ln -s xmlsectool-${version} $pkgdir && cd $OLDPWD
+}
+
+
+get_zip_withchecksum_shibidp() {
+    # --- Download software with checksum ---
+    PROD_VERSION='3.3.0'
+    PROD_URL="https://shibboleth.net/downloads/identity-provider/latest/shibboleth-identity-provider-$PROD_VERSION.zip"
+    PROD_DIR='shibboleth-idp-distribution' # this is the reference from Dockerfile
+    PROD_SHA256='a0dd96ad8770539b6f1249f7cea98b944cff846b4831892e8deee62b91b60277'
+    get_from_ziparchive_with_checksum $PROD_URL $PROD_SHA256 $PROD_DIR $PROD_VERSION
+}
+
+
+main

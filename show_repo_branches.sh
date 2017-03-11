@@ -4,4 +4,5 @@
 
 SCRIPTDIR=$(cd $(dirname $BASH_SOURCE[0]) && pwd)
 source $SCRIPTDIR/conf_lib.sh  # load library functions
+
 show_git_branches

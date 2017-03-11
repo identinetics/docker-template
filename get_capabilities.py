@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+# Return value from Dockerfile LABEL 'capabilities'
+
 import json
 import sys
 

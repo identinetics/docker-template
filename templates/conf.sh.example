@@ -64,6 +64,7 @@ set_buildargs() {
 set_run_args() {
     export ENVSETTINGS="
         -e LOGDIR=/var/log
+        -e LOGPURGEFILES='/var/log/httpd/* /var/log/shibboleth/*'
         -e LOGLEVEL=INFO
     "
     get_capabilities
