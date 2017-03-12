@@ -68,7 +68,9 @@ load_config() {
 
 
 prepare_docker_build_env() {
-    [ -e $PROJROOT/build_prepare.sh ] && $PROJROOT/build_prepare.sh $update_pkg
+    if [ -e $PROJROOT/build_prepare.sh ]; then
+       $PROJROOT/build_prepare.sh $update_pkg
+    fi
 }
 
 
