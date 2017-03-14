@@ -6,7 +6,7 @@ set -e -o pipefail
 # and can speed up the build process.
 
 main() {
-    get_commandline_opts
+    get_commandline_opts $@
     load_config
     #get_or_update_xyz_from_github
     #get_tar_pkg-123
@@ -76,4 +76,4 @@ get_zip_withchecksum_shibidp() {
 }
 
 
-main
+main $@

@@ -2,7 +2,7 @@
 set -e -o pipefail
 
 main() {
-    get_commandline_opts
+    get_commandline_opts $@
     load_config
     prepare_command
     init_sudo
@@ -98,4 +98,4 @@ run_command() {
 }
 
 
-main
+main $@

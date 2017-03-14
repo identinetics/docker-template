@@ -3,7 +3,7 @@
 set -e
 
 main() {
-    get_options
+    get_options $@
     load_lib_and_config
     docker_login_and_push
 }
@@ -63,4 +63,4 @@ docker_login_and_push() {
 }
 
 
-main
+main $@

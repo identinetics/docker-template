@@ -2,7 +2,7 @@
 set -e -o pipefail
 
 main() {
-    get_commandline_opts
+    get_commandline_opts  $@
     load_config
     prepare_command
     init_sudo
@@ -47,7 +47,7 @@ load_config() {
     if [ ! -z ${config_nr} ]; then
         conf_script=conf${config_nr}.sh
         if [ ! -e "$PROJ_HOME/$conf_script" ]; then
-            echo "$PROJ_HOME/$conf_script not found"
+            e cho "$PROJ_HOME/$conf_script not found"
             exit 1
         fi
     elif [ ${#confs[@]} -eq 1 ]; then
@@ -103,4 +103,4 @@ run_command() {
 }
 
 
-main
+main $@

@@ -2,7 +2,7 @@
 set -e -o pipefail
 
 main() {
-    get_commandline_opts
+    get_commandline_opts $@
     load_config
     prepare_docker_build_env
     init_sudo
@@ -115,4 +115,4 @@ list_repo_branches() {
 }
 
 
-main
+main $@
