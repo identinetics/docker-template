@@ -73,7 +73,7 @@ load_config() {
 }
 
 
-prepare_command() |{
+prepare_command() {
     if [ -z "$1" ]; then
         cmd=$EXECCMD
     else
@@ -83,7 +83,7 @@ prepare_command() |{
 }
 
 
-init_sudo() {
+init_sudo() {
     if [ $(id -u) -ne 0 ]; then
         sudo='sudo'
     fi

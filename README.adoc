@@ -23,6 +23,8 @@ Features:
      myimage-prod in FROM.
   It is implemented by adding a build_prepare.sh script to in the same directory as conf.sh
 
+Requirements:
+- SELinux must be enabled (permissive or enforcing)
 ## Configuration
 
 1. Add this project to your docker project as a subdirectory or git submodule, e.g.
