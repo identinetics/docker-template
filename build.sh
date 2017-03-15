@@ -63,7 +63,7 @@ load_config() {
         printf "%s\n" "${confs[@]}"
         exit 1
     fi
-    source $PROJROOT/$conf_script
+    source $PROJROOT/$conf_script --build
 }
 
 

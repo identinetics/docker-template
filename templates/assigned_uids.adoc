@@ -31,4 +31,6 @@ file coordinates the assigned numbers:
 |343030|eventfetcher
 |343031|pvzdclient
 |343032|getbpk
+|343033|rocket.chat
+|343034|mongo
 |===
