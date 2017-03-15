@@ -6,7 +6,7 @@ set -e -o pipefail
 main() {
     SCRIPTDIR=$(cd $(dirname $BASH_SOURCE[0]) && pwd)
     source $SCRIPTDIR/dscripts/conf_lib.sh  # load library functions
-
+    # do_not_build $@
     init_sudo
     set_volume_root
     set_image_and_container_name
@@ -110,4 +110,4 @@ set_enable_sshd() {
 }
 
 
-main
+main $@

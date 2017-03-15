@@ -265,3 +265,10 @@ show_git_branches() {
         cd $OLDPWD
     done
 }
+
+do_not_build() {
+    if [ "$1" == "--build" ]; then
+         echo "Do not build this image locally - get it from repo"
+         exit 1
+    fi
+}
