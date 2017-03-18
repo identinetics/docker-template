@@ -5,6 +5,7 @@ set -e
 main() {
     get_options $@
     load_lib_and_config
+    init_sudo
     docker_login_and_push
 }
 
@@ -48,7 +49,6 @@ load_lib_and_config() {
 
 
 exec_docker_cmd() {
-    [ $(id -u) -ne 0 ] && sudo="sudo"
     [ "$print" = "True" ] && echo $1
     ${sudo} $1
 }

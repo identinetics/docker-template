@@ -74,13 +74,6 @@ prepare_docker_build_env() {
 }
 
 
-init_sudo() {
-    if [ $(id -u) -ne 0 ]; then
-        sudo="sudo"
-    fi
-}
-
-
 remove_previous_image() {
     if [ "remove_img" == "True" ]; then
         ${sudo} docker rmi -f $IMAGENAME 2> /dev/null || true

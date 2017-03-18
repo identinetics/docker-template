@@ -83,13 +83,6 @@ prepare_command() {
 }
 
 
-init_sudo() {
-    if [ $(id -u) -ne 0 ]; then
-        sudo='sudo'
-    fi
-}
-
-
 run_command() {
     if [ "$print" = 'True' ]; then
         echo $docker_exec

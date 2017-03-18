@@ -82,13 +82,6 @@ prepare_command() {
 }
 
 
-init_sudo() {
-    if [ $(id -u) -ne 0 ]; then
-        sudo="sudo"
-    fi
-}
-
-
 run_command() {
     $sudo docker rm -f $CONTAINERNAME 2>/dev/null || true
     if [ "$print" = "True" ]; then
