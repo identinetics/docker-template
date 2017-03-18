@@ -3,6 +3,7 @@ set -e -o pipefail
 
 main() {
     get_commandline_opts  $@
+    load_library_functions
     load_config
     prepare_command
     init_sudo
@@ -43,26 +44,10 @@ get_commandline_opts() {
 }
 
 
-load_config() {
+load_library_functions() {
     SCRIPTDIR=$(cd $(dirname $BASH_SOURCE[0]) && pwd)
     PROJ_HOME=$(cd $(dirname $SCRIPTDIR) && pwd)
-
-    cd $PROJ_HOME; confs=(conf*.sh); cd $OLDPWD
-
-    if [ ! -z ${config_nr} ]; then
-        conf_script=conf${config_nr}.sh
-        if [ ! -e "$PROJ_HOME/$conf_script" ]; then
-            e cho "$PROJ_HOME/$conf_script not found"
-            exit 1
-        fi
-    elif [ ${#confs[@]} -eq 1 ]; then
-        conf_script=${confs[0]}
-    else
-        echo "No or more than one (${#confs[@]}) conf*.sh: need to provide -n argument:"
-        printf "%s\n" "${confs[@]}"
-        exit 1
-    fi
-    source $PROJ_HOME/$conf_script
+    source $PROJ_HOME/dscripts/conf_lib.sh
 }
 
 

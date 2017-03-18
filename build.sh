@@ -3,6 +3,7 @@ set -e -o pipefail
 
 main() {
     get_commandline_opts $@
+    load_library_functions
     load_config
     prepare_docker_build_env
     init_sudo
@@ -42,28 +43,10 @@ get_commandline_opts() {
 }
 
 
-load_config() {
-    # determine config script (there may be more than one to run multiple containers)
-    # if config_nr not given and there is only one file matching conf*.sh take this one
+load_library_functions() {
     SCRIPTDIR=$(cd $(dirname $BASH_SOURCE[0]) && pwd)
-    PROJROOT=$(cd $(dirname $SCRIPTDIR) && pwd)
-    cd $PROJROOT; confs=(conf*.sh); cd $OLDPWD
-    source $SCRIPTDIR/conf_lib.sh  # load library functions
-
-    if [ ! -z ${config_nr} ]; then
-        conf_script=conf${config_nr}.sh
-        if [ ! -e "$PROJROOT/$conf_script" ]; then
-            echo "$PROJROOT/$conf_script not found"
-            exit 1
-        fi
-    elif [ ${#confs[@]} -eq 1 ]; then
-        conf_script=${confs[0]}
-    else
-        echo "No or more than one (${#confs[@]}) conf*.sh: need to provide -n argument:"
-        printf "%s\n" "${confs[@]}"
-        exit 1
-    fi
-    source $PROJROOT/$conf_script --build
+    PROJ_HOME=$(cd $(dirname $SCRIPTDIR) && pwd)
+    source $PROJ_HOME/dscripts/conf_lib.sh
 }
 
 
