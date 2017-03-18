@@ -7,6 +7,28 @@ set -e -o pipefail
 
 SCRIPTDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
+load_config() {
+    # determine config script (there may be more than one to run multiple containers)
+    # if config_nr not given and there is only one file matching conf*.sh take this one
+    PROJ_HOME=$(cd $(dirname $SCRIPTDIR) && pwd)
+    cd $PROJ_HOME; confs=(conf*.sh); cd $OLDPWD
+    if [ ! -z ${config_nr} ]; then
+        conf_script=conf${config_nr}.sh
+        if [ ! -e "$PROJ_HOME/$conf_script" ]; then
+            echo "$PROJ_HOME/$conf_script not found"
+            exit 1
+        fi
+    elif [ ${#confs[@]} -eq 1 ]; then
+        conf_script=${confs[0]}
+    else
+        echo "No or more than one (${#confs[@]}) conf*.sh: need to provide -n argument:"
+        printf "%s\n" "${confs[@]}"
+        exit 1
+    fi
+    source $PROJ_HOME/$conf_script
+}
+
+
 # ------------------------- functions for conf*.sh --------------------------
 
 chkdir() {
