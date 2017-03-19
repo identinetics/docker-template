@@ -46,9 +46,11 @@ Prerequisites: The signer can create signatures
 
 The developer creates a PGP-signed DIDI file using the create_didi.sh script. Each image version has
 a separate file, allowing to verify multiple versions in parallel. To activate image signing for
-an image the conf.sh script must define the signer's PGP uid in the DIDI_SIGNER variable, e.g.
+an image the conf.sh script must define the signer's PGP uid in the DIDI_SIGNER variable and
+the default key in GPG_SIGN_OPTIONS, e.g.
 
     export DIDI_SIGNER='tester@testinetics.at'
+    export GPG_SIGN_OPTIONS='--default-key <key-id>'
 
 The DIDI file must be made available at an URL that the signature verifier can access, e.g. in Github. The URL must
 be put into a label in the Dockerfile, where the URL points to the directory that will hold one or more DIDI files for

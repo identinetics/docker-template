@@ -48,9 +48,8 @@ def write_json(didi, repo_digests):
     digest_short = regex_result.group(1)[0:16]
     didi_filename = digest_short + '.json'
     didi_filepath = os.path.join('didi', didi_filename)
-    if not os.path.isdir('didi'):
-        os.makedirs('didi')
-    os.remove(didi_filepath)
+    os.remove(didi_filepath) if os.path.exists(didi_filepath) else None
+    os.makedirs('didi') if not os.path.isdir('didi') else None
     with open(didi_filepath, 'w') as fd:
         fd.write(json.dumps(didi, indent=4))
     print(didi_filename)
