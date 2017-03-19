@@ -75,8 +75,7 @@ fetch_remote_didi() {
 
 
 get_didi_dir() {
-    key='didi_dir'
-    DIDIDIR=$($SCRIPTDIR/get_metadata.py $IMAGENAME $key)
+    DIDIDIR=$(docker inspect --format='{{.Config.Labels.didi_dir}}' $IMAGENAME)
 }
 
 compare_local_with_remote_didi() {
