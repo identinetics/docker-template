@@ -25,7 +25,7 @@ generate_didi() {
 
 
 sign_didi() {
-    gpg2 --detach-sig $GPG_SIGN_OPTIONS --local-user $DIDI_SIGNER --output "didi/${DIDI_FILENAME}.sig" "didi/${DIDI_FILENAME}"
+    gpg2 --detach-sig $GPG_SIGN_OPTIONS -a --local-user $DIDI_SIGNER --output "didi/${DIDI_FILENAME}.sig" "didi/${DIDI_FILENAME}"
     echo "publish the didi file signature, e.g.:"
     echo "git add didi/${DIDI_FILENAME}* && git commit -m 'add' && git push"
 }
