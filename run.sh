@@ -2,9 +2,10 @@
 set -e -o pipefail
 
 main() {
-    get_commandline_opts  $@
+    get_commandline_opts $@
     load_library_functions
     load_config
+    verify_signature $@
     prepare_command
     init_sudo
     run_command
@@ -48,6 +49,13 @@ load_library_functions() {
     SCRIPTDIR=$(cd $(dirname $BASH_SOURCE[0]) && pwd)
     PROJ_HOME=$(cd $(dirname $SCRIPTDIR) && pwd)
     source $PROJ_HOME/dscripts/conf_lib.sh
+}
+
+
+verify_signature() {
+    if [ ! -z "$DIDI_SIGNER" ]; then
+        dscripts/verify.sh $@
+    fi
 }
 
 

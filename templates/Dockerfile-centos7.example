@@ -1,9 +1,10 @@
 FROM centos:centos7
 LABEL maintainer="Rainer Hörbe <r2h2@hoerbe.at>" \
       version="0.0.0" \
+      didi_dir="https://raw.githubusercontent.com/repoowner/project/master/didi" \
       # by default, remove all capabilities. You may need to add particular ones, such as:
       #   --cap-add=setuid --cap-add=setgid --cap-add=chown --cap-add=net_bind_service
-      capabilites='--cap-drop=all'
+      capabilities='--cap-drop=all'
 
 
 HEALTHCHECK --interval=5m --timeout=5s CMD curl -f http://localhost:8080/ || exit 1
@@ -12,20 +13,26 @@ HEALTHCHECK --interval=5m --timeout=5s CMD curl -f http://localhost:8080/ || exi
 ARG HTTPS_PROXY=''
 
 # useful tools
-RUN yum -y install bind-utils curl iproute lsof mlocate net-tools openssl telnet unzip wget which
+RUN yum -y install bind-utils curl iproute lsof mlocate net-tools openssl telnet unzip wget which \
+ && && yum clean all
 
 # more dev tools than just yum -y install gcc gcc-c++
-RUN yum -y groupinstall "Development Tools" --setopt=group_package_types=mandatory,default,optional
+RUN yum -y groupinstall "Development Tools" --setopt=group_package_types=mandatory,default,optional \
+ && yum clean all
+
 
 # EPEL
-RUN yum -y install epel-release
+RUN yum -y install epel-release \
+ && yum clean all
 
 # GNOME
-RUN yum -y groups install "GNOME Desktop"
+RUN yum -y groups install "GNOME Desktop" \
+ && yum clean all
 
 # Python34: EPEL does contain pyhton 3.4, but it fails to install PIP -> extra download
 RUN yum -y install python34-devel \
- && curl https://bootstrap.pypa.io/get-pip.py | python3.4
+ && curl https://bootstrap.pypa.io/get-pip.py | python3.4 \
+ && yum clean all
 # PYTHON="/usr/bin/python3.4" PIP="/usr/bin/python3.4 -m pip"
 
 # Install Python3 interpreter
@@ -34,7 +41,8 @@ RUN yum -y install python34-devel \
 # the EPEL or IUS versions are preferred. EPEL does not have tkinter.
 # SCL version
     RUN yum -y install centos-release-scl \
-     && yum -y install rh-python34 rh-python34-python-tkinter rh-python34-python-pip
+     && yum -y install rh-python34 rh-python34-python-tkinter rh-python34-python-pip \
+ && yum clean all
     RUN source /opt/rh/rh-python34/enable \
      && echo "source /opt/rh/rh-python34/enable" > /etc/profile.d/setpython \
      && echo "export PYTHON=python" >> /etc/profile.d/setpython
@@ -42,13 +50,15 @@ RUN yum -y install python34-devel \
     ENV PYTHON='scl enable rh-python34 -- python'
 # EPEL: 
     #RUN yum -y install python34-devel \
-    # && curl https://bootstrap.pypa.io/get-pip.py | python3.4
+    # && curl https://bootstrap.pypa.io/get-pip.py | python3.4 \
+    # && yum clean all
     #ENV PYTHON='python3.4'
     #ENV PIP='pip3.4'
     #RUN echo "export PYTHON=$PYTHON" >> /etc/profile
 # IUS (both 3.4 and 3.5 available):
     #RUN yum -y install https://centos7.iuscommunity.org/ius-release.rpm \
-    # && yum -y install python35u python35u-setuptools python35u-devel python35u-pip python35u-tkinter
+    # && yum -y install python35u python35u-setuptools python35u-devel python35u-pip python35u-tkinter \
+    # && yum clean all
     #ENV PYTHON='python3.5'
     #ENV PIP='pip3.5'
     #RUN echo "export PYTHON=$PYTHON" >> /etc/profile
@@ -60,7 +70,8 @@ RUN cd signxml && $PYTHON setup.py install && cd ..
 
 # OpenJDK
 #RUN yum -y install java-1.8.0-openjdk.x86_64  # JRE only
-RUN yum -y install java-1.8.0-openjdk-devel.x86_64
+RUN yum -y install java-1.8.0-openjdk-devel.x86_64 \
+ && yum clean all
 ENV JAVA_HOME=/etc/alternatives/java_sdk_1.8.0
 
 # Python Javabridge
@@ -75,7 +86,8 @@ RUN cd pyjnius && python3.4 setup.py install && cd .. \
 
 # More python libs
 RUN yum -y install libffi-devel libxml2 libxslt-devel libxml2-devel openssl-devel \
- && python3.4 -m pip install cffi cython future gitdb GitPython pyOpenSSL pytz requests
+ && python3.4 -m pip install cffi cython future gitdb GitPython pyOpenSSL pytz requests \
+ && yum clean all
 
 # python virtual env (otherwise fails to find libxml/xmlversion.h
 RUN python3.4 -m pip install virtualenv \
@@ -88,11 +100,13 @@ RUN python3.4 -m pip install virtualenv \
 ENV container docker
 RUN yum -y swap -- remove systemd-container systemd-container-libs -- install systemd systemd-libs \
  && yum -y opensc pcsc-lite usbutils \
- && systemctl enable  pcscd.service
+ && systemctl enable  pcscd.service \
+ && yum clean all
 # install MOCCA (+Jaba Webstart, pcsc)
 
 RUN yum -y install icedtea-web pcsc-lite usbutils \
- && curl -O http://webstart.buergerkarte.at/mocca/webstart/mocca.jnlp
+ && curl -O http://webstart.buergerkarte.at/mocca/webstart/mocca.jnlp \
+ && yum clean all
 
 # Application will run as a non-root user/group that must map to the docker host
 ARG USERNAME=user

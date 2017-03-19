@@ -1,0 +1,5 @@
+= Docker Image Digest Indicator
+
+This directory contains DIDI files that are used to vouch for the integrity and authenticity of
+images pulled from repositories using PGP signatures and a pre-shared public key. Each file name
+starts with the first 16 characters of the digest of an image version.

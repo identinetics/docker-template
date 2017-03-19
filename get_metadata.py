@@ -3,26 +3,30 @@
 # Return value from Dockerfile LABEL
 
 import json
+import subprocess
 import sys
 
 def main():
     check_commandline_arg()
-    load_container_metadata()
-    return_value_metadata_key()
+    metadata = load_image_metadata()
+    return_value_metadata_key(metadata)
 
 
 def check_commandline_arg():
-    print (len(sys.argv))
-    if len(sys.argv) != 2:
-        raise Exception('get_metadata.py needs exactly 1 argument (key of LABEL statement)')
+    if len(sys.argv) != 3:
+        raise Exception('get_metadata.py needs exactly 2 argumenta (imagename, key of LABEL)')
 
-def load_container_metadata():
-    metadata = json.loads(sys.stdin.read())
 
-def return_value_metadata_key():
+def load_image_metadata():
+    img_metadata = subprocess.check_output(['docker', 'inspect', sys.argv[1]])
+    return json.loads(img_metadata)
+
+
+def return_value_metadata_key(metadata):
     try:
-        print(metadata[0]['ContainerConfig']['Labels'][sys.argv[0]])
+        print(metadata[0]['ContainerConfig']['Labels'][sys.argv[2]])
     except (KeyError, IndexError):
-        pass
+        raise KeyError("LABEL key %s not found" % sys.argv[2])
+
 
 main()

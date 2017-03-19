@@ -33,6 +33,8 @@ def extract_metadata(metadata):
 def format_didi(repo_tags, repo_digests):
     if len(repo_digests) > 1:
         raise Exception('Cannot handle more than on image digest')
+    if len(repo_digests) == 0:
+        raise Exception('No image digest; you need to push image to a registry')
     didi =  {
         "FormatVersion": 1,
         "RepoTags": repo_tags,

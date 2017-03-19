@@ -46,6 +46,11 @@ set_image_and_container_name() {
 }
 
 
+verify_image_signature() {
+    export DIDI_SIGNER='tester@testinetics.at'  # PGP uid  - no verification if empty
+    export GPG_SIGN_OPTIONS='--default-key B5341047'
+}
+
 set_users() {
     export CONTAINERUSER="$PROJSHORT${IMGID}"   # group and user to run container
     export CONTAINERUID="3430${IMGID}"     # gid and uid for CONTAINERUSER

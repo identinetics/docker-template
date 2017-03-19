@@ -19,14 +19,15 @@ load_library_functions() {
 
 
 generate_didi() {
-    DIDI_FILENAME=$(dscripts/create_didi.py $IMAGENAME)
+    DIDI_FILENAME=$($sudo dscripts/create_didi.py $IMAGENAME)
 }
 
 
 
 sign_didi() {
-    gpg2 --clearsign --local-user $DIDI_SIGNER "didi/${DIDI_FILENAME}"
-    echo "publish the signed didi file, e.g. `git add didi/${DIDI_FILENAME} && git commit -m 'add'"
+    gpg2 --detach-sig $GPG_SIGN_OPTIONS --local-user $DIDI_SIGNER --output "didi/${DIDI_FILENAME}.sig" "didi/${DIDI_FILENAME}"
+    echo "publish the didi file signature, e.g.:"
+    echo "git add didi/${DIDI_FILENAME}* && git commit -m 'add' && git push"
 }
 
 
