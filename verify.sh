@@ -71,6 +71,7 @@ fetch_remote_didi() {
     [ "$verbose" == 'True' ] && echo "GET $DIDIFILE.sig"
     wget -q $DIDIFILE.sig
     (( $? > 0)) && echo "$DIDIFILE.sig missing, image verfication failed" && exit 1
+    :  # remedy for strange bug where bash exited in the previous line without obvious reason
 }
 
 
