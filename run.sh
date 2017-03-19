@@ -5,9 +5,10 @@ main() {
     get_commandline_opts $@
     load_library_functions
     load_config
-    verify_signature $@
-    prepare_command
     init_sudo
+    remove_existing_container
+    verify_signature $@
+    prepare_run_command
     run_command
 }
 
@@ -51,15 +52,29 @@ load_library_functions() {
     source $PROJ_HOME/dscripts/conf_lib.sh
 }
 
-
-verify_signature() {
-    if [ ! -z "$DIDI_SIGNER" ]; then
-        dscripts/verify.sh $@
+remove_existing_container() {
+    if [ -e $remove ]; then
+        $sudo docker ps -a | grep $CONTAINERNAME > /dev/null && docker rm $CONTAINERNAME
     fi
 }
 
 
-prepare_command() {
+verify_signature() {
+    if [ ! -z "$DIDI_SIGNER" ]; then
+        if [ ! -z "$config_nr" ]; then
+            verifyconf="-n $config_nr"
+        fi
+        [ "$PRINT" == 'True' ] || VERIFY_VERBOSE='-V'
+        dscripts/verify.sh $VERIFY_VERBOSE $verifyconf
+        if (( $? > 0)); then
+            echo "Image verfication failed, container not started."
+            exit 1
+        fi
+    fi
+}
+
+
+prepare_run_command() {
     if [ -z "$runopt" ]; then
         runopt='-d --restart=unless-stopped'
     fi
@@ -80,11 +95,6 @@ run_command() {
     if [ "$print" = "True" ]; then
         echo $docker_run
     fi
-    # remove dangling container
-    if [ -e $remove ]; then
-        $sudo docker ps -a | grep $CONTAINERNAME > /dev/null && docker rm $CONTAINERNAME
-    fi
-
     $sudo $docker_run
 }
 

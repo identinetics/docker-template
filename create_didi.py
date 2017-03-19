@@ -50,6 +50,7 @@ def write_json(didi, repo_digests):
     didi_filepath = os.path.join('didi', didi_filename)
     if not os.path.isdir('didi'):
         os.makedirs('didi')
+    os.remove(didi_filepath)
     with open(didi_filepath, 'w') as fd:
         fd.write(json.dumps(didi, indent=4))
     print(didi_filename)

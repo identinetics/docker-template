@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#set -e -o pipefail
+set -e -o pipefail
 
 main() {
     get_commandline_opts  $@
@@ -11,7 +11,8 @@ main() {
 
 
 get_commandline_opts() {
-    while getopts ":hin:prRv" opt; do   # same args as run.sh - ignore unused ones
+    verbose='True'
+    while getopts ":hin:prRvV" opt; do   # same args as run.sh - ignore unused ones
       case $opt in
         n) re='^[0-9][0-9]$'
            if ! [[ $OPTARG =~ $re ]] ; then
@@ -19,10 +20,13 @@ get_commandline_opts() {
            fi
            config_nr=$OPTARG;;
         v) verbose='True';;
+        V) verbose='False';;
         :) echo "Option -$OPTARG requires an argument"; exit 1;;
-        *) echo "usage: $0 [-h] [-n container-nr ]
+        *) echo "usage: $0 [-h] [-n container-nr ] -v -V
            -h  print this help text
-           -n  configuration number ('<NN>' in conf<NN>.sh)"; exit 0;;
+           -n  configuration number ('<NN>' in conf<NN>.sh)
+           -v  verbose
+           -V  not verbose"; exit 0;;
       esac
     done
     shift $((OPTIND-1))
@@ -47,7 +51,7 @@ verify_image() {
 
 
 generate_local_didi() {
-    DIDI_FILENAME=$(dscripts/create_didi.py $IMAGENAME)
+    DIDI_FILENAME=$($SCRIPTDIR/create_didi.py $IMAGENAME)
     [ "$verbose" == 'True' ] && echo "generated didi/$DIDI_FILENAME"
 }
 
@@ -59,18 +63,25 @@ make_tempdir() {
 
 fetch_remote_didi() {
     cd $TEMPDIR
-    DIDIDIR=$(get_metadata 'didi_dir')
+    get_didi_dir
     DIDIFILE="${DIDIDIR}/${DIDI_FILENAME}"
     [ "$verbose" == 'True' ] && echo "GET $DIDIFILE"
-    wget $DIDIFILE
+    wget -q $DIDIFILE
+    (( $? > 0)) && echo "$DIDIFILE missing, image verfication failed" && exit 1
     [ "$verbose" == 'True' ] && echo "GET $DIDIFILE.sig"
-    wget $DIDIFILE.sig
+    wget -q $DIDIFILE.sig
+    (( $? > 0)) && echo "$DIDIFILE.sig missing, image verfication failed" && exit 1
 }
 
 
+get_didi_dir() {
+    key='didi_dir'
+    DIDIDIR=$($SCRIPTDIR/get_metadata.py $IMAGENAME $key)
+}
+
 compare_local_with_remote_didi() {
     diff -q $DIDI_FILENAME $TEMPDIR/$DIDI_FILENAME
-    if ( $? > 0 ); then
+    if (( $? > 0)); then
         echo "Local ($DIDI_FILENAME) and remote ($DIDIFILE) DIDI files are different."
         echo "Image verfication failed"
         exit 1
@@ -81,12 +92,15 @@ compare_local_with_remote_didi() {
 
 
 verify_signature() {
-    gpg2 --verify $TEMPDIR/$DIDI_FILENAME.sig $TEMPDIR/$DIDI_FILENAME
-    if ( $? > 0 ); then
+    [ "$verbose" == 'True' ] || GPG_QUIET='--quiet'
+    gpg2 --verify $GPG_QUIET $TEMPDIR/$DIDI_FILENAME.sig $TEMPDIR/$DIDI_FILENAME > $TEMPDIR/gpg2.log 2>&1
+    gpg2_rc=$?
+    [ "$verbose" == 'True' ] && cat $TEMPDIR/gpg2.log
+    if (($gpg2_rc > 0)); then
         echo "Signature of DIDI broken. Image verfication failed."
         exit 1
     else
-        echo "Signature of DIDI valid. Image verfication passed."
+        [ "$verbose" == 'True' ] && echo "Signature of DIDI valid. Image verfication passed."
     fi
 }
 
