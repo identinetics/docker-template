@@ -14,8 +14,8 @@ import sys
 
 def main():
     metadata = load_image_metadata()
-    (repo_tags, repo_digests) = extract_metadata(metadata)
-    didi = format_didi(repo_tags, repo_digests)
+    (repo_tags, repo_digests, created) = extract_metadata(metadata)
+    didi = format_didi(repo_tags, repo_digests, created)
     write_json(didi, repo_digests)
 
 
@@ -27,16 +27,18 @@ def load_image_metadata():
 def extract_metadata(metadata):
     repo_tags = metadata[0]['RepoTags']
     repo_digests = metadata[0]['RepoDigests']
-    return (repo_tags, repo_digests)
+    created = metadata[0]['Created']
+    return (repo_tags, repo_digests, created)
 
 
-def format_didi(repo_tags, repo_digests):
+def format_didi(repo_tags, repo_digests, created):
     if len(repo_digests) > 1:
         raise Exception('Cannot handle more than on image digest')
     if len(repo_digests) == 0:
         raise Exception('No image digest; you need to push image to a registry')
     didi =  {
         "FormatVersion": 1,
+        "Created": created,
         "RepoTags": repo_tags,
         "RepoDigests": repo_digests,
     }

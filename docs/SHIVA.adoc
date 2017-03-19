@@ -90,3 +90,6 @@ Target system verifies the signature if DIDI_SIGNER is set by performing followi
 
     dscripts/validate.sh # explicit
     dscripts/run  # implicit
+
+The message "WARNING: This key is not certified with a trusted signature!" can be removed by
+signing the key; however, the critical trust decision is to trust the pre-shared key.
