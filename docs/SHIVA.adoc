@@ -1,0 +1,58 @@
+= SHIVA (Simple Hack for Image Verification and Admission)
+
+SHIVA verifies the authenticity and integrity of Docker images using sigital signatures.
+The goal of image verification is to make sure that the image downloaded from the registry is the
+same as that created by the developer. While Docker offers Docker Content Trust, this LiveCD chose
+to use a simple and explicit GPG-signature scheme instead, which is easier to understand and to audit.
+
+
+=== Docker Image Digest
+
+Docker Images feature a content digest, which will appear on `docker push`and `docker images --digests`. It can be
+obtained on the command line with
+
+    docker inspect --format='{{.RepoDigests}}' <image id|name>
+
+=== Docker Image Digest Indicator ('DIDI')
+
+The content digest and the image name are extracted into a json-formatted signature claim for cryptographic verification,
+e.g.:
+
+{
+    "FormatVersion": 1,
+    "RepoTags": [
+        "rhoerbe/keymgmt-safenetac:latest"
+    ],
+    "RepoDigests": [
+        "rhoerbe/keymgmt-safenetac@sha256:2b381f1e1848eb889516a7b432cefec001904f9a603ac9bb3b3a6c2352efd6e0"
+    ],
+}
+
+The filename for the signature claim is produced by concatenating the first 16 characters of the digest with '.json'.
+
+== Docker Image Digest Indicator (DIDI)
+
+This directory contains DIDI files that are used to vouch for the integrity and authenticity of
+images pulled from repositories using PGP signatures and a pre-shared public key. Each file name
+starts with the first 16 characters of the digest of an image version.
+
+
+== Usage
+
+=== Signature Creation
+
+The developer creates a PGP-signed DIDI file using the create_didi.sh script. Each image version has a separate file,
+allowing to verify multiple versions in parallel.
+
+The DIDI file must made available at an URL that is available to the signature verifier, e.g. in Github. The URL must
+be put into a label in the Dockerfile, where the URL points to the directory that will hold one or more DIDI files for
+the image.
+
+
+=== Signature Verification
+The LiveCD's startapp script verifies the signature by performing following steps:
+
+- get DIDI directory URL from the image
+- get image digest from the image
+- extracting the signature claim and comparing it to the validated file.
+
