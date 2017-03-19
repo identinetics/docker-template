@@ -88,6 +88,7 @@ exec_build_command() {
 list_repo_branches() {
     echo "List git repositories and their current branch"
     $SCRIPTDIR/show_repo_branches.sh
+    echo
 }
 
 
