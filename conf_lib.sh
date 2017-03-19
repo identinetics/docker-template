@@ -125,14 +125,14 @@ enable_sshd() {
 
 get_capabilities() {
     # Extract capabilites for docker run defined with the label "capabilites" in the Dockerfile
-    export CAPABILITIES=$($SCRIPTDIR/get_metadata.py $IMAGENAME $label capabilities)
+    export CAPABILITIES=$(docker inspect --format='{{.Config.Labels.capabilities}}' $IMAGENAME)
 }
 
 
 get_metadata() {
     # Extract metadata for docker run defined with 'LABEL' in the Dockerfile
     key=$1
-    value=$($SCRIPTDIR/get_metadata.py $IMAGENAME $key)
+    value=$(docker inspect --format='{{.Config.Labels.${key}}}' $IMAGENAME)
     if [ -z "$value" ]; then
         echo "key $key not found in metadata of $IMAGENAME"
         exit 1

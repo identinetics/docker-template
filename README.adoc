@@ -11,9 +11,10 @@ Features:
 - By default, containers do not run as root, but have unique users mapped to the docker host
 - The image produces immutable containers, i.e. a container can be removed and re-created
   any time without loss of data, because data is stored on mounted volumes.
+- Images are signed and verified using link:docs/SHIVA.adoc[SHIVA] (Simple Hack for Image Verification and Admission)
 - Configuration from a config file, building and running containers with the same script in
   different projects
-- Containers have a fixed IP-address baed on the container number. This allows load balancer
+- Containers have by default a fixed IP-address baed on the container number. This allows load balancer
   config without dependency on the container to have a dockerd-DNS entry (when not running).
 - Consistent image, container, user and network mapping for multiple containers
 - Pre-build hook: Allow script to modify the build env or Dockerfile before build. This can be used

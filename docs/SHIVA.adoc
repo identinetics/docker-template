@@ -5,17 +5,22 @@ The goal of image verification is to make sure that the image downloaded from th
 same as that created by the developer. While Docker offers Docker Content Trust, this LiveCD chose
 to use a simple and explicit GPG-signature scheme instead, which is easier to understand and to audit.
 
+== How does it work
 
-=== Docker Image Digest
-
-Docker Images feature a content digest, which will appear on `docker push`and `docker images --digests`. It can be
+The basis for Docker image signatures is the content digest, which will appear on `docker push`and `docker images --digests`. It can be
 obtained on the command line with
 
     docker inspect --format='{{.RepoDigests}}' <image id|name>
 
+Digests (DIDI files) are created and signed using PGP signatures for each image verison. Each file name
+starts with the first 16 characters of the digest of an image version and is published at an URL
+specified in the 'LABEL didi_dir' statement in the Dockerfile. These files are used by the
+consumer to vouch for the integrity and authenticity of images pulled from repositories based on
+the pre-shared public key of the signer.
+
 === Docker Image Digest Indicator ('DIDI')
 
-The content digest and the image name are extracted into a json-formatted signature claim for cryptographic verification,
+The content digest and the image name are extracted into a json-formatted file for cryptographic verification,
 e.g.:
 
 {
@@ -30,29 +35,56 @@ e.g.:
 
 The filename for the signature claim is produced by concatenating the first 16 characters of the digest with '.json'.
 
-== Docker Image Digest Indicator (DIDI)
-
-This directory contains DIDI files that are used to vouch for the integrity and authenticity of
-images pulled from repositories using PGP signatures and a pre-shared public key. Each file name
-starts with the first 16 characters of the digest of an image version.
-
 
 == Usage
 
+Prerequisites: The signer can create signatures
+
+    gpg2 -K
+
 === Signature Creation
 
-The developer creates a PGP-signed DIDI file using the create_didi.sh script. Each image version has a separate file,
-allowing to verify multiple versions in parallel.
+The developer creates a PGP-signed DIDI file using the create_didi.sh script. Each image version has
+a separate file, allowing to verify multiple versions in parallel. To activate image signing for
+an image the conf.sh script must define the signer's PGP uid in the DIDI_SIGNER variable, e.g.
 
-The DIDI file must made available at an URL that is available to the signature verifier, e.g. in Github. The URL must
+    export DIDI_SIGNER='tester@testinetics.at'
+
+The DIDI file must be made available at an URL that the signature verifier can access, e.g. in Github. The URL must
 be put into a label in the Dockerfile, where the URL points to the directory that will hold one or more DIDI files for
 the image.
 
+=== Key Sharing
+
+The public key must be installed and trusted on the target system (via RPM or some other mechanism).
+The signer needs to make her public key and trustdb-entry available as follows:
+
+    gpg2 -k
+        /root/.gnupg/pubring.gpg
+        ------------------------
+        pub   2048R/B5341047 2017-03-18 [verfällt: 2019-03-18]
+        uid                  Test User <tester@testinetics.at>
+        sub   2048R/65622119 2017-03-18 [verfällt: 2019-03-18]
+
+    gpg2 --armor --export tester@testinetics.at > testerTestineticsAt_pub.gpg
+    gpg2 --export-ownertrust > testerTestineticsAt_trust.gpg
+
+Import the key on the target system:
+
+    gpg2 --import testerTestineticsAt_pub.gpg
+    echo -e "trust\n5\ny" > trust.cmd
+    gpg2 --command-file x.cmd –edit-key B5341047   # replace the key id with the actual one
+    # As result you should see unlimited trust in the userid:
+    gpg --list-keys --list-options show-uid-validity
 
 === Signature Verification
-The LiveCD's startapp script verifies the signature by performing following steps:
+
+Target system verifies the signature if DIDI_SIGNER is set by performing following steps:
 
 - get DIDI directory URL from the image
-- get image digest from the image
-- extracting the signature claim and comparing it to the validated file.
+- create a local DIDI file
+- compare the remote and local DID file
+- validate the local DIDI file with the detached signature at the remote DIDI directory
 
+    dscripts/validate.sh # explicit
+    dscripts/run  # implicit
