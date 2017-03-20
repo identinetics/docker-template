@@ -14,8 +14,9 @@ main() {
 
 
 get_commandline_opts() {
-    while getopts ":hin:prRV" opt; do
+    while getopts ":dhin:prRV" opt; do
       case $opt in
+        d) dryrun='True';;
         i) runopt='-it --rm';;
         n) re='^[0-9][0-9]$'
            if ! [[ $OPTARG =~ $re ]] ; then
@@ -28,6 +29,7 @@ get_commandline_opts() {
         V) no_verify='True';;
         :) echo "Option -$OPTARG requires an argument"; exit 1;;
         *) echo "usage: $0 [-h] [-i] [-n container-nr ] [-p] [-r] -[R] [cmd]
+           -d  dry run - do not execute
            -h  print this help text
            -i  start in interactive mode and remove container afterwards
            -n  configuration number ('<NN>' in conf<NN>.sh)
@@ -62,7 +64,7 @@ remove_existing_container() {
 
 
 verify_signature() {
-    if [[ ! -z "$DIDI_SIGNER" || no_verify == 'True' ]]; then
+    if [[ ! -z "$DIDI_SIGNER" && "$no_verify" != 'True' ]]; then
         if [ ! -z "$config_nr" ]; then
             verifyconf="-n $config_nr"
         fi
@@ -94,10 +96,12 @@ prepare_run_command() {
 
 run_command() {
     $sudo docker rm -f $CONTAINERNAME 2>/dev/null || true
-    if [ "$print" = "True" ]; then
+    if [ "$print" == "True" ]; then
         echo $docker_run
     fi
-    $sudo $docker_run
+    if [ "$dryrun" != "True" ]; then
+        $sudo $docker_run
+    fi
 }
 
 
