@@ -14,7 +14,7 @@ main() {
 
 
 get_commandline_opts() {
-    while getopts ":hin:prR" opt; do
+    while getopts ":hin:prRV" opt; do
       case $opt in
         i) runopt='-it --rm';;
         n) re='^[0-9][0-9]$'
@@ -25,6 +25,7 @@ get_commandline_opts() {
         p) print="True";;
         r) useropt='-u 0';;
         R) remove='True';;
+        V) no_verify='True';;
         :) echo "Option -$OPTARG requires an argument"; exit 1;;
         *) echo "usage: $0 [-h] [-i] [-n container-nr ] [-p] [-r] -[R] [cmd]
            -h  print this help text
@@ -33,6 +34,7 @@ get_commandline_opts() {
            -p  print docker run command on stdout
            -r  start command as root user (default is $CONTAINERUSER)
            -R  remove dangling container before start
+           -V  skip image verification
            cmd shell command to be executed (default is $STARTCMD)"
           exit 0;;
       esac
@@ -60,7 +62,7 @@ remove_existing_container() {
 
 
 verify_signature() {
-    if [ ! -z "$DIDI_SIGNER" ]; then
+    if [[ ! -z "$DIDI_SIGNER" || no_verify == 'True' ]]; then
         if [ ! -z "$config_nr" ]; then
             verifyconf="-n $config_nr"
         fi
