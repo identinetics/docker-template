@@ -1,4 +1,4 @@
-# Docker Scripts - a simple image and container management
+# Docker Scripts - Leightweight Image and Container Management
 
 A git subproject for docker projects. Provides scripts for docker build, exec and run commands that
 are becoming unwiedly when one needs many arguments. Tries to be a thin wrapper around the
@@ -26,6 +26,7 @@ Features:
 
 Requirements:
 - SELinux must be enabled (permissive or enforcing)
+
 ## Configuration
 
 1. Add this project to your docker project as a subdirectory or git submodule, e.g.

@@ -1,38 +1,77 @@
-#!/usr/bin/env python
-
-# Create a signature claim from the output of `docker inspect'
-# Intended usage:
-#   docker inspect <image id|name> | create_sig_claim.py > didi.json
-
-import json
-import re
-import sys
-
-def main():
-    metadata = load_image_metadata()
-    write_signature_claim(metadata)
-
-
-def load_image_metadata():
-    return json.loads(sys.stdin.read())
-
-
-def write_signature_claim(metadata):
-    try:
-        repo_tags = metadata[0]['RepoTags']
-        repo_digests = metadata[0]['RepoDigests']
-    except (KeyError, IndexError):
-        pass
-    sig_claim =  {
-        "FormatVersion": 1,
-        "RepoTags": repo_tags,
-        "RepoDigests": repo_digests,
-    }
-    regex_result = re.search('sha256:(.+)$', repo_digests)
-    digest_short = regex_result.group(1)[0:8]
-
-    with open('')
-    print(json.dumps(sig_claim, indent=4))
-
-
-main()
+<md:EntityDescriptor entityID="https://shib-lms-1-dev.km.co.at/shibboleth">
+  <md:Extensions>
+      <mdattr:EntityAttributes>
+        <saml:Attribute Name="http://macedir.org/entity-category" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+          <saml:AttributeValue>http://edushare.at/namespaces/entitycategory/lmsuser/v1</saml:AttributeValue>
+       </saml:Attribute>
+      </mdattr:EntityAttributes>
+  </md:Extensions>
+  <md:SPSSODescriptor AuthnRequestsSigned="1" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol urn:oasis:names:tc:SAML:1.1:protocol urn:oasis:names:tc:SAML:1.0:protocol">
+    <md:Extensions xmlns:alg="urn:oasis:names:tc:SAML:metadata:algsupport">
+      <alg:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"/>
+      <alg:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
+      <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha512"/>
+      <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
+      <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256"/>
+      <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha512"/>
+      <mdui:UIInfo>
+        <mdui:DisplayName xml:lang="en">KM LMS</mdui:DisplayName>
+        <mdui:Description xml:lang="en">KM LMS</mdui:Description>
+        <mdui:Logo xml:lang="en" height="75" width="200">https://www.heiligenlexikon.de/Fotos/Malteserritter.gif</mdui:Logo>
+      </mdui:UIInfo>
+      <init:RequestInitiator xmlns:init="urn:oasis:names:tc:SAML:profiles:SSO:request-init" Binding="urn:oasis:names:tc:SAML:profiles:SSO:request-init" Location="https://shib-lms-1-dev.km.co.at/Shibboleth.sso/Login"/>
+      <idpdisc:DiscoveryResponse xmlns:idpdisc="urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol" Binding="urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol" Location="https://shib-lms-1-dev.km.co.at/Shibboleth.sso/Login" index="1"/>
+    </md:Extensions>
+    <md:KeyDescriptor>
+      <ds:KeyInfo>
+        <ds:KeyName>km.co.at</ds:KeyName>
+        <ds:KeyName>Active</ds:KeyName>
+        <ds:KeyName>https://km.co.at/shibboleth</ds:KeyName>
+        <ds:X509Data>
+          <ds:X509SubjectName>CN=km.co.at</ds:X509SubjectName>
+          <ds:X509Certificate>MIIDODCCAiCgAwIBAgIJALvt+/stKGtBMA0GCSqGSIb3DQEBBQUAMCIxIDAeBgNV
+            BAMTF3NoaWItbG1zLTEtZGV2LmttLmNvLmF0MB4XDTE2MTExODEyNDc1NloXDTE5
+            MTExODEyNDc1NlowIjEgMB4GA1UEAxMXc2hpYi1sbXMtMS1kZXYua20uY28uYXQw
+            ggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCm1p1gCzRtZDR4mz+ZPqgT
+            z/F4o9RJpkRw5rSlZgT5BJamfUqmaEr41m6WXkRNsG3jCHULJUd6sXY32U6ehYna
+            /0F1zrZdqB1TFJHGl4I53OcfnHcY8F1ZlskF3nif6tGWCnUTirNcb/vKop06ynZ+
+            l3WCJR+HTOuLO7IcrNIbftifMTGtHyarD5pctZ+rRK62/dz4e3Nzy5GrAfphU4gM
+            4JtNKPyVXU9wvvrOlycUzzGQ8HtKFRd+UoWVDaIVUQKK6D9OBayP17OPREApqn8C
+            8IrNIlS/JOgtM8L2uHU4AQh08tdwyvLvPuuejRTsvc1Lw+h9PANkPbKHwGC1ORsR
+            AgMBAAGjcTBvME4GA1UdEQRHMEWCF3NoaWItbG1zLTEtZGV2LmttLmNvLmF0hipo
+            dHRwczovL3NoaWItbG1zLTEtZGV2LmttLmNvLmF0L3NoaWJib2xldGgwHQYDVR0O
+            BBYEFBUKDNR713s1BuvpDO+XfBSn4XIRMA0GCSqGSIb3DQEBBQUAA4IBAQB/crJk
+            7p/+Erwi/4gei8oqG2O5BEjUb/WkbwZhtPtPKyninamtzydJqCiFZWV5xgnnidfT
+            rnZT8UdZw4vQV9YL8tQQOtdsn3Ieo9mdmAouPy8iYAdrP+vAFuc9bANb5t8KUJ2F
+            4aYcd79hHSqnGlIMSZzwkS0plEzJggco7LoaYuPWEtWob59KedzrH2RiiEDObaoD
+            ecgxK3mC3mKbM5yPBqFt7Qy+l2pyhD/OFeIU2dWaw5RVcGXblg9JQgnUmXMJhSiY
+            urg1byOy1Bg0r6FN1+iUMqhy64tM6R/OT8CsxYx6PabZKr5na+SA9g2GB7j2v8Ap
+            9HEN2p1VJ79QcZR2
+          </ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </md:KeyDescriptor>
+    <md:ArtifactResolutionService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://shib-lms-1-dev.km.co.at/Shibboleth.sso/Artifact/SOAP" index="1"/>
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://shib-lms-1-dev.km.co.at/Shibboleth.sso/SLO/SOAP"/>
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://shib-lms-1-dev.km.co.at/Shibboleth.sso/SLO/Redirect"/>
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://shib-lms-1-dev.km.co.at/Shibboleth.sso/SLO/POST"/>
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://shib-lms-1-dev.km.co.at/Shibboleth.sso/SLO/Artifact"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://shib-lms-1-dev.km.co.at/Shibboleth.sso/SAML2/POST" index="1"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST-SimpleSign" Location="https://shib-lms-1-dev.km.co.at/Shibboleth.sso/SAML2/POST-SimpleSign" index="2"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://shib-lms-1-dev.km.co.at/Shibboleth.sso/SAML2/Artifact" index="3"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:PAOS" Location="https://shib-lms-1-dev.km.co.at/Shibboleth.sso/SAML2/ECP" index="4"/>
+  </md:SPSSODescriptor>
+  <md:Organization>
+    <md:OrganizationName xml:lang="de">Knowledge Markets</md:OrganizationName>
+    <md:OrganizationName xml:lang="en">Knowledge Markets</md:OrganizationName>
+    <md:OrganizationDisplayName xml:lang="de">Knowledge Markets</md:OrganizationDisplayName>
+    <md:OrganizationDisplayName xml:lang="en">Knowledge Markets</md:OrganizationDisplayName>
+    <md:OrganizationURL xml:lang="de">https://www.km.co.at</md:OrganizationURL>
+    <md:OrganizationURL xml:lang="en">https://www.km.co.at</md:OrganizationURL>
+  </md:Organization>
+  <md:ContactPerson contactType="technical">
+    <md:GivenName>Sabine</md:GivenName>
+    <md:SurName>Stransky</md:SurName>
+    <md:EmailAddress>sabine.stransky@km.co.at</md:EmailAddress>
+  </md:ContactPerson>
+</md:EntityDescriptor>
