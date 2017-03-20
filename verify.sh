@@ -7,6 +7,7 @@ main() {
     load_config
     init_sudo
     verify_image
+    exit $gpg2_rc
 }
 
 
@@ -52,7 +53,7 @@ verify_image() {
 
 generate_local_didi() {
     DIDI_FILENAME=$($SCRIPTDIR/create_didi.py $IMAGENAME)
-    [ "$verbose" == 'True' ] && echo "generated didi/$DIDI_FILENAME"
+    log "generated didi/$DIDI_FILENAME"
 }
 
 
@@ -86,7 +87,7 @@ compare_local_with_remote_didi() {
         echo "Image verfication failed"
         exit 1
     else
-        [ "$verbose" == 'True' ] && echo "Local ($DIDI_FILENAME) and remote ($DIDIFILE) DIDI files are identical."
+        log "Local ($DIDI_FILENAME) and remote ($DIDIFILE) DIDI files are identical."
     fi
 }
 
@@ -95,18 +96,27 @@ verify_signature() {
     [ "$verbose" == 'True' ] || GPG_QUIET='--quiet'
     gpg2 --verify $GPG_QUIET $TEMPDIR/$DIDI_FILENAME.sig $TEMPDIR/$DIDI_FILENAME > $TEMPDIR/gpg2.log 2>&1
     gpg2_rc=$?
-    [ "$verbose" == 'True' ] && cat $TEMPDIR/gpg2.log
+    if [ "$verbose" == 'True' ]; then
+        cat $TEMPDIR/gpg2.log
+    fi
     if (($gpg2_rc > 0)); then
-        echo "Signature of DIDI broken. Image verfication failed."
+        echo "Signature of DIDI is broken. Image verfication failed."
         exit 1
     else
-        [ "$verbose" == 'True' ] && echo "Signature of DIDI valid. Image verfication passed."
+        log "Signature of DIDI is valid. Image verfication passed."
     fi
 }
 
 
 cleanup_tempdir() {
     rm -rf $TEMPDIR
+}
+
+
+log() {
+    if [ "$verbose" == 'True' ]; then
+        echo $1
+    fi
 }
 
 

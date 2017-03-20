@@ -59,7 +59,7 @@ the image.
 === Key Sharing
 
 The public key must be installed and trusted on the target system (via RPM or some other mechanism).
-The signer needs to make her public key and trustdb-entry available as follows:
+The signer needs to make her public key and trustdb-entry available either via a key server or as follows:
 
     gpg2 -k
         /root/.gnupg/pubring.gpg
@@ -78,6 +78,15 @@ Import the key on the target system:
     gpg2 --command-file x.cmd –edit-key B5341047   # replace the key id with the actual one
     # As result you should see unlimited trust in the userid:
     gpg --list-keys --list-options show-uid-validity
+
+As alternative get the key from a key server:
+
+    gpg2 -k
+    gpg2 --card-status
+    gpg2 --card-edit
+        fetch
+        quite
+
 
 === Signature Verification
 
