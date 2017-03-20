@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-set -e -o pipefail
 
 main() {
     get_commandline_opts  $@

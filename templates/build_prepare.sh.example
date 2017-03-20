@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-set -e -o pipefail
 
 # Initialize and update the docker build environment
 # Providing resources before starting docker build provides better control about updates

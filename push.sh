@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-set -e
-
 main() {
     get_options $@
     load_library_functions

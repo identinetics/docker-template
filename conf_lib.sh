@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-set -e -o pipefail
 
 # Common functions
 # In most cases there is no need to replace these functions.
