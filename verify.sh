@@ -16,22 +16,26 @@ get_commandline_opts() {
       case $opt in
         n) re='^[0-9][0-9]$'
            if ! [[ $OPTARG =~ $re ]] ; then
-             echo "error: -n argument ($OPTARG) is not a number in the range frmom 02 .. 99" >&2; exit 1
+             echo "error: -n argument ($OPTARG) is not a number in the range frmom 02 .. 99" 1>&2; exit 1
            fi
            config_nr=$OPTARG;;
         v) verbose='True';;
         V) verbose='False';;
         :) echo "Option -$OPTARG requires an argument"; exit 1;;
-        *) echo "usage: $0 [-h] [-n container-nr ] -v -V
-           -h  print this help text
-           -n  configuration number ('<NN>' in conf<NN>.sh)
-           -v  verbose
-           -V  not verbose"; exit 0;;
+        *) usage; exit 1;;
       esac
     done
     shift $((OPTIND-1))
 }
 
+
+usage() {
+    echo "usage: $0 [-h] [-n container-nr ] -v -V
+       -h  print this help text
+       -n  configuration number ('<NN>' in conf<NN>.sh)
+       -v  verbose
+       -V  not verbose"
+}
 
 load_library_functions() {
     SCRIPTDIR=$(cd $(dirname $BASH_SOURCE[0]) && pwd)
@@ -51,7 +55,7 @@ verify_image() {
 
 
 generate_local_didi() {
-    DIDI_FILENAME=$($SCRIPTDIR/create_didi.py $IMAGENAME)
+    DIDI_FILENAME=$($sudo $SCRIPTDIR/create_didi.py $IMAGENAME)
     log "generated didi/$DIDI_FILENAME"
 }
 
@@ -65,10 +69,10 @@ fetch_remote_didi() {
     cd $TEMPDIR
     get_didi_dir
     DIDIFILE="${DIDIDIR}/${DIDI_FILENAME}"
-    [ "$verbose" == 'True' ] && echo "GET $DIDIFILE"
+    [[ "$verbose" == 'True' ]] && echo "GET $DIDIFILE"
     wget -q $DIDIFILE
     (( $? > 0)) && echo "$DIDIFILE missing, image verfication failed" && exit 1
-    [ "$verbose" == 'True' ] && echo "GET $DIDIFILE.sig"
+    [[ "$verbose" == 'True' ]] && echo "GET $DIDIFILE.sig"
     wget -q $DIDIFILE.sig
     (( $? > 0)) && echo "$DIDIFILE.sig missing, image verfication failed" && exit 1
     :  # remedy for strange bug where bash exited in the previous line without obvious reason
@@ -76,7 +80,12 @@ fetch_remote_didi() {
 
 
 get_didi_dir() {
-    DIDIDIR=$(docker inspect --format='{{.Config.Labels.didi_dir}}' $IMAGENAME)
+    DIDIDIR=$($sudo docker inspect --format='{{.Config.Labels.didi_dir}}' $IMAGENAME)
+    if [[ $DIDIDIR == '<no value>' ]]; then
+        echo "Cannot verify signature - LABEL 'didi_dir' not set for image $IMAGENAME"
+        echo "Image verfication failed"
+        exit 1
+    fi
 }
 
 compare_local_with_remote_didi() {
@@ -92,10 +101,10 @@ compare_local_with_remote_didi() {
 
 
 verify_signature() {
-    [ "$verbose" == 'True' ] || GPG_QUIET='--quiet'
+    [[ "$verbose" == 'True' ]] || GPG_QUIET='--quiet'
     gpg2 --verify $GPG_QUIET $TEMPDIR/$DIDI_FILENAME.sig $TEMPDIR/$DIDI_FILENAME > $TEMPDIR/gpg2.log 2>&1
     gpg2_rc=$?
-    if [ "$verbose" == 'True' ]; then
+    if [[ "$verbose" == 'True' ]]; then
         cat $TEMPDIR/gpg2.log
     fi
     if (($gpg2_rc > 0)); then
@@ -113,7 +122,7 @@ cleanup_tempdir() {
 
 
 log() {
-    if [ "$verbose" == 'True' ]; then
+    if [[ "$verbose" == 'True' ]]; then
         echo $1
     fi
 }

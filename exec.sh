@@ -25,17 +25,7 @@ get_commandline_opts() {
         p) print='True';;
         r) useropt='-u 0';;
         :) echo "Option -$OPTARG requires an argument"; exit 1;;
-        *) echo "usage: $0 [-h] [-i] [-I] [-n <containernr>] [-p] [-r] [cmd]
-               -h  print this help text
-               -i  interactive (default; results in options -it for docker exec)
-               -I  non-interactive (no -it for docker exec)
-               -l  logpurge (execute /logpurge.sh in container) - mutual exclusive with cmd
-               -n  configuration number ('<NN>' in conf<NN>.sh)
-               -p  print docker exec command on stdout
-               -r  execute as root user
-               cmd shell command to be executed (default is $EXECCMD)
-               "
-          exit 0;;
+        *) usage; exit 1;;
       esac
     done
     shift $((OPTIND-1))
@@ -47,6 +37,20 @@ get_commandline_opts() {
         fi
     fi
 
+}
+
+
+usage() {
+    echo "usage: $0 [-h] [-i] [-I] [-n <containernr>] [-p] [-r] [cmd]
+       -h  print this help text
+       -i  interactive (default; results in options -it for docker exec)
+       -I  non-interactive (no -it for docker exec)
+       -l  logpurge (execute /logpurge.sh in container) - mutual exclusive with cmd
+       -n  configuration number ('<NN>' in conf<NN>.sh)
+       -p  print docker exec command on stdout
+       -r  execute as root user
+       cmd shell command to be executed (default is $EXECCMD)
+       "
 }
 
 

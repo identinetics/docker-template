@@ -13,13 +13,18 @@ get_options() {
     while getopts ":p" opt; do
       case $opt in
         p) print="True";;
-        *) echo "usage: $0 [-h] [-p]
-           push docker image to registry
-            -p  print docker commands on stdout
-       "; exit 0;;
+        *) usage; exit 1;;
       esac
     done
     shift $((OPTIND-1))
+}
+
+
+usage() {
+    echo "usage: $0 [-h] [-p]
+        push docker image to registry
+        -p  print docker commands on stdout
+    "
 }
 
 

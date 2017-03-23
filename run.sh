@@ -19,7 +19,7 @@ get_commandline_opts() {
         i) runopt='-it --rm';;
         n) re='^[0-9][0-9]$'
            if ! [[ $OPTARG =~ $re ]] ; then
-             echo "error: -n argument ($OPTARG) is not a number in the range frmom 02 .. 99" >&2; exit 1
+             echo "error: -n argument ($OPTARG) is not a number in the range frmom 02 .. 99" 1>&2; exit 1
            fi
            config_nr=$OPTARG;;
         p) print="True";;
@@ -27,17 +27,7 @@ get_commandline_opts() {
         R) remove='True';;
         V) no_verify='True';;
         :) echo "Option -$OPTARG requires an argument"; exit 1;;
-        *) echo "usage: $0 [-h] [-i] [-n container-nr ] [-p] [-r] -[R] [cmd]
-           -d  dry run - do not execute
-           -h  print this help text
-           -i  start in interactive mode and remove container afterwards
-           -n  configuration number ('<NN>' in conf<NN>.sh)
-           -p  print docker run command on stdout
-           -r  start command as root user (default is $CONTAINERUSER)
-           -R  remove dangling container before start
-           -V  skip image verification
-           cmd shell command to be executed (default is $STARTCMD)"
-          exit 0;;
+        *) usage; exit 1;;
       esac
     done
     shift $((OPTIND-1))
@@ -46,6 +36,20 @@ get_commandline_opts() {
     else
         cmd=$@
     fi
+}
+
+
+usage() {
+    echo "usage: $0 [-h] [-i] [-n container-nr ] [-p] [-r] -[R] [cmd]
+       -d  dry run - do not execute
+       -h  print this help text
+       -i  start in interactive mode and remove container afterwards
+       -n  configuration number ('<NN>' in conf<NN>.sh)
+       -p  print docker run command on stdout
+       -r  start command as root user (default is $CONTAINERUSER)
+       -R  remove dangling container before start
+       -V  skip image verification
+       cmd shell command to be executed (default is $STARTCMD)"
 }
 
 
