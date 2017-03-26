@@ -114,6 +114,7 @@ set_vol_mapping() {
 set_enable_sshd() {
     export SSHD_ROOTPW='changeit'
     map_docker_volume "${CONTAINERNAME}.ssh" "/etc/ssh" 'Z' $DOCKERLOG_SHORT
+    export CAPABILITIES="$CAPABILITIES --cap-add=setuid --cap-add=setgid --cap-add=chown"
     enable_sshd
 }
 

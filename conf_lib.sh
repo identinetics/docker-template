@@ -115,10 +115,9 @@ enable_pkcs11() {
 enable_sshd() {
     # add settings to start sshd (for remote debugging)
     export NETWORKSETTINGS="$NETWORKSETTINGS -p 2022:2022"
-    export VOLMAPPING="$VOLMAPPING -v $VOLROOT/opt/ssh:/opt/ssh:Z"
     export STARTCMD='/start_sshd.sh'  # need to have this script installed in image
+    export START_AS_ROOT='True'
     export BUILDARGS="$BUILDARGS --build-arg SSHD_ROOTPW=$SSHD_ROOTPW"
-
 }
 
 
