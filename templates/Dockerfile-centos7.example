@@ -131,6 +131,9 @@ RUN chmod +x /*.sh \
 #VOLUME /etc/sshd
 #EXPOSE 2022
 
+RUN mkdir -p /etc/sudoers.d /etc/profile.d
+COPY install/sudoers.d/* /etc/sudoers.d/
+COPY install/profile.d/* /etc/profile.d/
 
 USER $USERNAME
 CMD ["/start.sh"]

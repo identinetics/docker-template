@@ -1,0 +1,8 @@
+# Nice prompt:
+red=$(tput setaf 1)
+green=$(tput setaf 2)
+blue=$(tput setaf 4)
+reset=$(tput sgr0)
+promptchar='$'
+PS1='\[$red\]\u\[$reset\]@\[$green\]\h\[$reset\]:\w\[$reset\]\$ '
+PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
