@@ -91,7 +91,6 @@ prepare_run_command() {
     if [ -n "$START_AS_ROOT" ]; then
         useropt='-u 0'
     fi
-    get_capabilities
     docker_run="docker run $runopt $useropt --hostname=$CONTAINERNAME --name=$CONTAINERNAME
         $CAPABILITIES $ENVSETTINGS $NETWORKSETTINGS $VOLMAPPING $IMAGENAME $cmd"
 }
