@@ -9,7 +9,7 @@
 
 
 echo 'starting sshd in foreground'
-/usr/sbin/sshd -p 2022
+/usr/sbin/sshd -p 2022 -e -D
 
 echo 'ready to login, like:'
 echo 'ssh -o "StrictHostKeyChecking no" -i ~/.ssh/id_ed25519_loopback -p 2022 <someuser>@thishost'

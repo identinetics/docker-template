@@ -61,7 +61,7 @@ load_library_functions() {
 
 remove_existing_container() {
     if [ -e $remove ]; then
-        $sudo docker ps -a | grep $CONTAINERNAME > /dev/null && docker rm $CONTAINERNAME
+        $sudo docker ps -a | grep $CONTAINERNAME > /dev/null && docker rm -f $CONTAINERNAME
     fi
 }
 
