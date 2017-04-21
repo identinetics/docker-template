@@ -10,9 +10,15 @@ main() {
 
 
 get_options() {
-    while getopts ":p" opt; do
+    while getopts ":n:p" opt; do
       case $opt in
+        n) re='^[0-9][0-9]$'
+           if ! [[ $OPTARG =~ $re ]] ; then
+             echo "error: -n argument ($OPTARG) is not a number in the range frmom 02 .. 99" 1>&2; exit 1
+           fi
+           config_nr=$OPTARG;;
         p) print="True";;
+        :) echo "Option -$OPTARG requires an argument"; exit 1;;
         *) usage; exit 1;;
       esac
     done
@@ -23,6 +29,7 @@ get_options() {
 usage() {
     echo "usage: $0 [-h] [-p]
         push docker image to registry
+        -n  configuration number ('<NN>' in conf<NN>.sh)
         -p  print docker commands on stdout
     "
 }
