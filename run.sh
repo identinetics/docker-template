@@ -31,11 +31,7 @@ get_commandline_opts() {
       esac
     done
     shift $((OPTIND-1))
-    if [ -z "$1" ]; then
-        cmd=$STARTCMD
-    else
-        cmd=$@
-    fi
+    cmd=$@
 }
 
 
@@ -90,6 +86,9 @@ prepare_run_command() {
     fi
     if [ -n "$START_AS_ROOT" ]; then
         useropt='-u 0'
+    fi
+    if [ -z "$cmd" ]; then
+        cmd=$STARTCMD
     fi
     docker_run="docker run $runopt $useropt --hostname=$CONTAINERNAME --name=$CONTAINERNAME
         $CAPABILITIES $ENVSETTINGS $NETWORKSETTINGS $VOLMAPPING $IMAGENAME $cmd"
