@@ -4,12 +4,12 @@
 # In most cases there is no need to replace these functions.
 # However, if needed, then overwrite them in conf.sh
 
-SCRIPTDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+CONFLIBDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
 load_config() {
     # determine config script (there may be more than one to run multiple containers)
     # if config_nr not given and there is only one file matching conf*.sh take this one
-    PROJ_HOME=$(cd $(dirname $SCRIPTDIR) && pwd)
+    PROJ_HOME=$(cd $(dirname $CONFLIBDIR) && pwd)
     cd $PROJ_HOME; confs=(conf*.sh); cd $OLDPWD
     if [ ! -z ${config_nr} ]; then
         conf_script=conf${config_nr}.sh
@@ -158,7 +158,7 @@ map_docker_volume() {
     export VOLMAPPING="$VOLMAPPING -v $VOL_NAME:$CONTAINERPATH:$MOUNT_OPTION"
     mkdir -p $PREFIX
     [ "$TRAVIS" == "true" ] || chcon_opt='--selinux-type svirt_sandbox_file_t'
-    $sudo $SCRIPTDIR/docker_vol_mount.py --prefix $PREFIX --symlink --groupwrite \
+    $sudo $CONFLIBDIR/docker_vol_mount.py --prefix $PREFIX --symlink --groupwrite \
         $chcon_opt --volume $VOL_NAME
 }
 

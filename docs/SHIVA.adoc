@@ -1,4 +1,4 @@
-= SHIVA (Simple Hack for Image Verification and Admission)
+= SHIVA (Simple Hack for Image Verification and Authentication)
 
 SHIVA verifies the authenticity and integrity of Docker images using sigital signatures.
 The goal of image verification is to make sure that the image downloaded from the registry is the
