@@ -43,8 +43,8 @@ get_commandline_opts() {
 
 
 load_library_functions() {
-    SCRIPTDIR=$(cd $(dirname $BASH_SOURCE[0]) && pwd)
-    PROJ_HOME=$(cd $(dirname $SCRIPTDIR) && pwd)
+    BUILDSCRIPTDIR=$(cd $(dirname $BASH_SOURCE[0]) && pwd)
+    PROJ_HOME=$(cd $(dirname $BUILDSCRIPTDIR) && pwd)
     source $PROJ_HOME/dscripts/conf_lib.sh
 }
 
@@ -86,7 +86,7 @@ exec_build_command() {
 
 list_repo_branches() {
     echo "List git repositories and their current branch"
-    $SCRIPTDIR/show_repo_branches.sh
+    $BUILDSCRIPTDIR/show_repo_branches.sh
     echo
 }
 
