@@ -33,4 +33,5 @@ file coordinates the assigned numbers:
 |343032|getbpk
 |343033|rocket.chat
 |343034|mongo
+|343035|jenkinsci
 |===
