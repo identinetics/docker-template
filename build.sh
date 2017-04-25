@@ -50,7 +50,7 @@ load_library_functions() {
 
 
 prepare_docker_build_env() {
-    if [ -e $PROJROOT/build_prepare.sh ]; then
+    if [ -e $PROJ_HOME/build_prepare.sh ]; then
        $PROJROOT/build_prepare.sh $update_pkg
     fi
 }
