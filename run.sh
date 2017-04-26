@@ -13,18 +13,20 @@ main() {
 
 
 get_commandline_opts() {
-    while getopts ":dhin:prRV" opt; do
+    remove='--rm'
+    while getopts ":dhiIn:prRV" opt; do
       case $opt in
         d) dryrun='True';;
-        i) runopt='-it --rm';;
+        i) runmode='-it';;
+        I) runmode='-i';;
         n) re='^[0-9][0-9]$'
            if ! [[ $OPTARG =~ $re ]] ; then
              echo "error: -n argument ($OPTARG) is not a number in the range frmom 02 .. 99" 1>&2; exit 1
            fi
            config_nr=$OPTARG;;
-        p) print="True";;
+        p) print='True';;
         r) useropt='-u 0';;
-        R) remove='True';;
+        R) remove='';;
         V) no_verify='True';;
         :) echo "Option -$OPTARG requires an argument"; exit 1;;
         *) usage; exit 1;;
@@ -39,11 +41,12 @@ usage() {
     echo "usage: $0 [-h] [-i] [-n container-nr ] [-p] [-r] -[R] [cmd]
        -d  dry run - do not execute
        -h  print this help text
-       -i  start in interactive mode and remove container afterwards
+       -i  start in interactive mode and assign terminal
+       -I  start in interactive mode and do not assign terminal
        -n  configuration number ('<NN>' in conf<NN>.sh)
        -p  print docker run command on stdout
        -r  start command as root user (default is $CONTAINERUSER)
-       -R  remove dangling container before start
+       -R  do not remove existing container before start (default: do remove)
        -V  skip image verification
        cmd shell command to be executed (default is $STARTCMD)"
 }
@@ -78,8 +81,8 @@ verify_signature() {
 
 
 prepare_run_command() {
-    if [ -z "$runopt" ]; then
-        runopt='-d --restart=unless-stopped'
+    if [ -z "$runmode" ]; then
+        runmode='-d --restart=unless-stopped'
     fi
     if [ -z "$useropt" ] && [ ! -z $CONTAINERUID ]; then
         useropt="-u $CONTAINERUID"
@@ -90,7 +93,7 @@ prepare_run_command() {
     if [ -z "$cmd" ]; then
         cmd=$STARTCMD
     fi
-    docker_run="docker run $runopt $useropt --hostname=$CONTAINERNAME --name=$CONTAINERNAME
+    docker_run="docker run $runmode $remove $useropt --hostname=$CONTAINERNAME --name=$CONTAINERNAME
         $CAPABILITIES $ENVSETTINGS $NETWORKSETTINGS $VOLMAPPING $IMAGENAME $cmd"
 }
 
