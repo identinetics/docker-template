@@ -83,12 +83,12 @@ verify_signature() {
 
 prepare_run_command() {
 remove_opt='True'
-    if [[ interactive_opt == 'False' ]]; then
+    if [[ "$interactive_opt" == 'False' ]]; then
         runmode='-d --restart=unless-stopped'
     else
         runmode="-i $tty"
     fi
-    if [[ interactive_opt == 'False' && remove_opt == 'True' ]]; then
+    if [[ "$interactive_opt" == 'False' && remove_opt == 'True' ]]; then
         remove='--rm'
     fi
     if [[ -z "$user_opt" ]] && [[ ! -z $CONTAINERUID ]]; then
