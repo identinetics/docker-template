@@ -14,6 +14,7 @@ main() {
 
 get_commandline_opts() {
     remove='--rm'
+    runmode='-d --restart=unless-stopped'
     while getopts ":dhiIn:prRV" opt; do
       case $opt in
         d) dryrun='True';;
@@ -81,9 +82,6 @@ verify_signature() {
 
 
 prepare_run_command() {
-    if [ -z "$runmode" ]; then
-        runmode='-d --restart=unless-stopped'
-    fi
     if [ -z "$useropt" ] && [ ! -z $CONTAINERUID ]; then
         useropt="-u $CONTAINERUID"
     fi
