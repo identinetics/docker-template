@@ -13,12 +13,13 @@ main() {
 
 
 get_commandline_opts() {
+    interactive_opt='False'
     remove_opt='True'
     while getopts ":dhiIn:prRV" opt; do
       case $opt in
         d) dryrun='True';;
-        i) interactive_opt='False'; tty='-t';;
-        I) interactive_opt='False'; tty='';;
+        i) interactive_opt='True'; tty='-t';;
+        I) interactive_opt='True'; tty='';;
         n) re='^[0-9][0-9]$'
            if ! [[ $OPTARG =~ $re ]] ; then
              echo "error: -n argument ($OPTARG) is not a number in the range frmom 02 .. 99" 1>&2; exit 1
