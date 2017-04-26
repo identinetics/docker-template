@@ -13,21 +13,20 @@ main() {
 
 
 get_commandline_opts() {
-    remove='--rm'
-    runmode='-d --restart=unless-stopped'
+    remove_opt='True'
     while getopts ":dhiIn:prRV" opt; do
       case $opt in
         d) dryrun='True';;
-        i) runmode='-it';;
-        I) runmode='-i';;
+        i) interactive_opt='False'; tty='-t';;
+        I) interactive_opt='False'; tty='';;
         n) re='^[0-9][0-9]$'
            if ! [[ $OPTARG =~ $re ]] ; then
              echo "error: -n argument ($OPTARG) is not a number in the range frmom 02 .. 99" 1>&2; exit 1
            fi
            config_nr=$OPTARG;;
-        p) print='True';;
-        r) useropt='-u 0';;
-        R) remove='';;
+        p) print_opt='True';;
+        r) user_opt='-u 0';;
+        R) remove_opt='False';;
         V) no_verify='True';;
         :) echo "Option -$OPTARG requires an argument"; exit 1;;
         *) usage; exit 1;;
@@ -60,7 +59,7 @@ load_library_functions() {
 }
 
 remove_existing_container() {
-    if [ -e $remove ]; then
+    if [[ -e $remove ]]; then
         $sudo docker ps -a | grep $CONTAINERNAME > /dev/null && docker rm -f $CONTAINERNAME
     fi
 }
@@ -68,10 +67,10 @@ remove_existing_container() {
 
 verify_signature() {
     if [[ ! -z "$DIDI_SIGNER" && "$no_verify" != 'True' ]]; then
-        if [ ! -z "$config_nr" ]; then
+        if [[ ! -z "$config_nr" ]]; then
             verifyconf="-n $config_nr"
         fi
-        [ "$PRINT" == 'True' ] || VERIFY_VERBOSE='-V'
+        [[ "$PRINT" == 'True' ]] || VERIFY_VERBOSE='-V'
         dscripts/verify.sh $VERIFY_VERBOSE $verifyconf
         if (( $? > 0)); then
             echo "Image verfication failed, container not started."
@@ -82,26 +81,35 @@ verify_signature() {
 
 
 prepare_run_command() {
-    if [ -z "$useropt" ] && [ ! -z $CONTAINERUID ]; then
-        useropt="-u $CONTAINERUID"
+remove_opt='True'
+    if [[ interactive_opt == 'False' ]]; then
+        runmode='-d --restart=unless-stopped'
+    else
+        runmode="-i $tty"
     fi
-    if [ -n "$START_AS_ROOT" ]; then
-        useropt='-u 0'
+    if [[ interactive_opt == 'False' && remove_opt == 'True' ]]; then
+        remove='--rm'
     fi
-    if [ -z "$cmd" ]; then
+    if [[ -z "$user_opt" ]] && [[ ! -z $CONTAINERUID ]]; then
+        user_opt="-u $CONTAINERUID"
+    fi
+    if [[ -n "$START_AS_ROOT" ]]; then
+        user_opt='-u 0'
+    fi
+    if [[ -z "$cmd" ]]; then
         cmd=$STARTCMD
     fi
-    docker_run="docker run $runmode $remove $useropt --hostname=$CONTAINERNAME --name=$CONTAINERNAME
+    docker_run="docker run $runmode $remove $user_opt --hostname=$CONTAINERNAME --name=$CONTAINERNAME
         $CAPABILITIES $ENVSETTINGS $NETWORKSETTINGS $VOLMAPPING $IMAGENAME $cmd"
 }
 
 
 run_command() {
     $sudo docker rm -f $CONTAINERNAME 2>/dev/null || true
-    if [ "$print" == "True" ]; then
+    if [[ "$print_opt" == "True" ]]; then
         echo $docker_run
     fi
-    if [ "$dryrun" != "True" ]; then
+    if [[ "$dryrun" != "True" ]]; then
         $sudo $docker_run
     fi
 }
