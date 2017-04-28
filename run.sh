@@ -59,6 +59,7 @@ load_library_functions() {
     source $PROJ_HOME/dscripts/conf_lib.sh
 }
 
+
 remove_existing_container() {
     if [[ -e $remove ]]; then
         $sudo docker ps -a | grep $CONTAINERNAME > /dev/null && docker rm -f $CONTAINERNAME

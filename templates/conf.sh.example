@@ -24,7 +24,7 @@ main() {
 set_volume_root() {
     DOCKERVOL_SHORT='/dv'
     DOCKERLOG_SHORT='/dl'
-    if [ "$TRAVIS" == "true" ]; then
+    if [[ "$TRAVIS" == "true" ]] || [[ ! -z ${JENKINS_HOME+x} ]]; then
         DOCKERVOL_SHORT='./dv';
         DOCKERLOG_SHORT='./dl';
     fi
@@ -98,6 +98,7 @@ set_network() {
 
 
 set_vol_mapping() {
+    VOLMAPPING=''
     # create container user on docker host
     create_user $CONTAINERUSER $CONTAINERUID
 

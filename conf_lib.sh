@@ -160,8 +160,11 @@ map_docker_volume() {
     $sudo docker volume create --name $VOL_NAME >/dev/null
     export VOLMAPPING="$VOLMAPPING -v $VOL_NAME:$CONTAINERPATH:$MOUNT_OPTION"
     mkdir -p $PREFIX
-    [ "$TRAVIS" == "true" ] || chcon_opt='--selinux-type svirt_sandbox_file_t'
-    $sudo $CONFLIBDIR/docker_vol_mount.py --prefix $PREFIX --symlink --groupwrite \
+    if [[ "$TRAVIS" == "true" ]] || [[ ! -z ${JENKINS_HOME+x} ]]; then
+        chcon_opt='--selinux-type svirt_sandbox_file_t'
+        symlink='--symlink'
+    fi
+    $sudo $CONFLIBDIR/docker_vol_mount.py --prefix $PREFIX $symlink --groupwrite \
         $chcon_opt --volume $VOL_NAME
 }
 
