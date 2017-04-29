@@ -163,7 +163,7 @@ map_docker_volume() {
     if [[ "$TRAVIS" == "true" ]]; then
         chcon_opt='--selinux-type svirt_sandbox_file_t'
     fi
-    if [[ "$TRAVIS" != "true" ]] && [[ ! -z ${JENKINS_HOME+x} ]]; then
+    if if [[ ! "$TRAVIS" ]] && [[ ! $JENKINS_HOME ]]; then
         fs_access="--symlink --prefix $PREFIX $symlink --groupwrite"
     fi
     $sudo $CONFLIBDIR/docker_vol_mount.py $fs_access $chcon_opt --volume $VOL_NAME
