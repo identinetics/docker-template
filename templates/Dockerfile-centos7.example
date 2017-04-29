@@ -23,7 +23,7 @@ RUN yum -y groupinstall "Development Tools" --setopt=group_package_types=mandato
 
 # EPEL
 RUN yum -y install epel-release \
- && yum clean all
+ && yum clean allyum
 
 # GNOME
 RUN yum -y groups install "GNOME Desktop" \
