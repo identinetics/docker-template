@@ -91,14 +91,23 @@ create_user() {
 }
 
 
-enable_x11_client() {
-    # How to enable xclients in Docker containers: http://wiki.ros.org/docker/Tutorials/GUI
-    export ENVSETTINGS="$ENVSETTINGS
-        -e DISPLAY=$DISPLAY
-    "
-    export VOLMAPPING="$VOLMAPPING
-        -v /tmp/.X11-unix/:/tmp/.X11-unix:Z
-    "
+get_capabilities() {
+    # Extract capabilites for docker run defined with the label "capabilites" in the Dockerfile
+    export CAPABILITIES=$(docker inspect --format='{{.Config.Labels.capabilities}}' $IMAGENAME)
+    if [[ $CAPABILITIES == '<no value>' ]]; then
+        export CAPABILITIES=''
+    fi
+}
+
+
+get_metadata() {
+    # Extract metadata for docker run defined with 'LABEL' in the Dockerfile
+    key=$1
+    value=$(docker inspect --format='{{.Config.Labels.${key}}}' $IMAGENAME)
+    if [ -z "$value" ]; then
+        echo "key $key not found in metadata of $IMAGENAME"
+        exit 1
+    fi
 }
 
 
@@ -121,23 +130,14 @@ enable_sshd() {
 }
 
 
-get_capabilities() {
-    # Extract capabilites for docker run defined with the label "capabilites" in the Dockerfile
-    export CAPABILITIES=$(docker inspect --format='{{.Config.Labels.capabilities}}' $IMAGENAME)
-    if [[ $CAPABILITIES == '<no value>' ]]; then
-        export CAPABILITIES=''
-    fi
-}
-
-
-get_metadata() {
-    # Extract metadata for docker run defined with 'LABEL' in the Dockerfile
-    key=$1
-    value=$(docker inspect --format='{{.Config.Labels.${key}}}' $IMAGENAME)
-    if [ -z "$value" ]; then
-        echo "key $key not found in metadata of $IMAGENAME"
-        exit 1
-    fi
+enable_x11_client() {
+    # How to enable xclients in Docker containers: http://wiki.ros.org/docker/Tutorials/GUI
+    export ENVSETTINGS="$ENVSETTINGS
+        -e DISPLAY=$DISPLAY
+    "
+    export VOLMAPPING="$VOLMAPPING
+        -v /tmp/.X11-unix/:/tmp/.X11-unix:Z
+    "
 }
 
 
@@ -178,6 +178,28 @@ map_host_directory() {
         chkdir $HOSTPATH
     else
         create_chown_dir $HOSTPATH $CONTAINERUID
+    fi
+}
+
+
+set_staging_env() {
+    # get current git branch and export STAGING_ENV to following values:
+    #  master -> '-pr'
+    #  qa -> '-qa'
+    #  dev -> '-dev'
+    #  any other -> ''
+    if [ "$TRAVIS" == "true" ]; then
+        GIT_BRANCH=$TRAVIS_BRANCH
+    else
+        GIT_BRANCH=$(git symbolic-ref --short -q HEAD)
+    fi
+    export STAGING_ENV=''
+    if [ "$GIT_BRANCH" == "master" ]; then
+        export STAGING_ENV='pr'
+    elif [ "$GIT_BRANCH" == "qa" ]; then
+        export STAGING_ENV='qa'
+    elif [ "$GIT_BRANCH" == "dev" ]; then
+        export STAGING_ENV='dev'
     fi
 }
 
@@ -239,26 +261,8 @@ get_from_ziparchive_with_checksum() {
     fi
 }
 
-set_staging_env() {
-    # get current git branch and export STAGING_ENV to following values:
-    #  master -> '-pr'
-    #  qa -> '-qa'
-    #  dev -> '-dev'
-    #  any other -> ''
-    if [ "$TRAVIS" == "true" ]; then
-        GIT_BRANCH=$TRAVIS_BRANCH
-    else
-        GIT_BRANCH=$(git symbolic-ref --short -q HEAD)
-    fi
-    export STAGING_ENV=''
-    if [ "$GIT_BRANCH" == "master" ]; then
-        export STAGING_ENV='pr'
-    elif [ "$GIT_BRANCH" == "qa" ]; then
-        export STAGING_ENV='qa'
-    elif [ "$GIT_BRANCH" == "dev" ]; then
-        export STAGING_ENV='dev'
-    fi
-}
+
+# ---------------------------- functions for build.sh -----------------------------
 
 
 echo_commit_status() {
@@ -303,6 +307,7 @@ show_git_branches() {
         cd $OLDPWD
     done
 }
+
 
 do_not_build() {
     if [ "$1" == "--build" ]; then
