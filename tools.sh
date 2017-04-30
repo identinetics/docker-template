@@ -19,9 +19,14 @@ main() {
 
 
 get_options() {
-    while getopts ":dp" opt; do
+    while getopts ":dn:p" opt; do
       case $opt in
         d) dryrun='True';;
+        n) re='^[0-9][0-9]$'
+           if ! [[ $OPTARG =~ $re ]] ; then
+             echo "error: -n argument ($OPTARG) is not a number in the range frmom 02 .. 99" 1>&2; exit 1
+           fi
+           config_nr=$OPTARG;;
         p) print="True";;
         *) usage; exit 1;;
       esac
@@ -32,8 +37,10 @@ get_options() {
 
 
 usage() {
-    echo "usage: $0 [-h] [-p] pull | push | rm
+    echo "usage: $0 [-h] [-p] listlog|pull|push|rm|rmvol
         more dscripts docker utilities
+        -d  dry run - do not execute
+        -n  configuration number ('<NN>' in conf<NN>.sh) if using multiple configurations
         -p  print docker command on stdout
         listlog list container logfiles
         pull    push to docker registry
