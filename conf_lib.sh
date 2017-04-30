@@ -150,6 +150,12 @@ init_sudo() {
 }
 
 
+logrotate() {
+    # stub: overwrite this in conf.sh
+    echo "no logrotation configured for ${CONTAINERNAME}"
+}
+
+
 map_docker_volume() {
     # Map container directory to Docker volume
     # - Create volume if it does not exist
@@ -204,6 +210,12 @@ set_staging_env() {
     elif [ "$GIT_BRANCH" == "dev" ]; then
         export STAGING_ENV='dev'
     fi
+}
+container_status() {
+    # stub: overwrite this in conf.sh
+    $sudo docker ps | head -1
+    $sudo docker ps --all | egrep $CONTAINERNAME\$
+    echo "no specific status reporting configured for ${CONTAINERNAME}"
 }
 
 

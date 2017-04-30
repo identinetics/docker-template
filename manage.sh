@@ -8,11 +8,13 @@ main() {
     load_config
     init_sudo
     case $cmd in
-        listlog) echo "$LOGFILES";;
-        pull)    exec_docker_cmd "docker pull $DOCKER_REGISTRY/$IMAGENAME";;
-        push)    exec_docker_cmd "docker push $DOCKER_REGISTRY/$IMAGENAME";;
-        rm)      exec_docker_cmd "docker rm -f $CONTAINERNAME";;
-        rmvol)   exec_docker_cmd "docker volume rm $VOLLIST";;
+        listlog)   echo "$LOGFILES";;
+        logrotate) logrotate;;
+        pull)      exec_docker_cmd "docker pull $DOCKER_REGISTRY/$IMAGENAME";;
+        push)      exec_docker_cmd "docker push $DOCKER_REGISTRY/$IMAGENAME";;
+        rm)        exec_docker_cmd "docker rm -f $CONTAINERNAME";;
+        rmvol)     exec_docker_cmd "docker volume rm $VOLLIST";;
+        status)    container_status;;
         *) echo "missing command"; usage; exit 1;;
     esac
 }
@@ -37,16 +39,18 @@ get_options() {
 
 
 usage() {
-    echo "usage: $0 [-h] [-p] listlog|pull|push|rm|rmvol
+    echo "usage: $0 [-h] [-p] listlog|logrotate|pull|push|rm|rmvol|status
         more dscripts docker utilities
         -d  dry run - do not execute
         -n  configuration number ('<NN>' in conf<NN>.sh) if using multiple configurations
         -p  print docker command on stdout
-        listlog list container logfiles
-        pull    push to docker registry
-        push    pull from docker registry
-        rm      remove docker image (--force)
-        rmvol   remove docker volumes defined in conf.sh
+        listlog    list container logfiles
+        logrotate  rotate, archive and purge logs
+        pull       push to docker registry
+        push       pull from docker registry
+        rm         remove docker image (--force)
+        rmvol      remove docker volumes defined in conf.sh
+        status     report container status
     "
 }
 
