@@ -41,7 +41,7 @@ get_options() {
 usage() {
     echo "usage: $0 [-h] [-p] listlog|logrotate|pull|push|rm|rmvol|status
         more dscripts docker utilities
-        -d  dry run - do not execute
+        -d  dry run - do not execute (except logrotate, status)
         -n  configuration number ('<NN>' in conf<NN>.sh) if using multiple configurations
         -p  print docker command on stdout
         listlog    list container logfiles
