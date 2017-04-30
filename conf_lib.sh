@@ -25,8 +25,6 @@ load_config() {
         exit 1
     fi
     source $PROJ_HOME/$conf_script
-    export VOLMAPPING=''
-    export VOLLIST=''
 }
 
 

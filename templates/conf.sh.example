@@ -98,6 +98,8 @@ set_network() {
 
 
 set_vol_mapping() {
+    export VOLLIST=''
+    export VOLMAPPING=''
     # create container user on docker host
     create_user $CONTAINERUSER $CONTAINERUID
 
