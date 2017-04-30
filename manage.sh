@@ -9,12 +9,12 @@ main() {
     init_sudo
     case $cmd in
         listlog)   echo "$LOGFILES";;
-        logrotate) logrotate;;
+        logrotate) call_logrotate;;
         pull)      exec_docker_cmd "docker pull $DOCKER_REGISTRY/$IMAGENAME";;
         push)      exec_docker_cmd "docker push $DOCKER_REGISTRY/$IMAGENAME";;
         rm)        exec_docker_cmd "docker rm -f $CONTAINERNAME";;
         rmvol)     exec_docker_cmd "docker volume rm $VOLLIST";;
-        status)    container_status;;
+        status)    call_container_status;;
         *) echo "missing command"; usage; exit 1;;
     esac
 }
@@ -52,6 +52,26 @@ usage() {
         rmvol      remove docker volumes defined in conf.sh
         status     report container status
     "
+}
+
+
+call_container_status() {
+    if [[ $(declare -F container_status) ]]; then
+        container_status
+    else
+        $sudo docker ps | head -1
+        $sudo docker ps --all | egrep $CONTAINERNAME\$
+        echo "no specific status reporting configured for ${CONTAINERNAME} in conf.sh"
+    fi
+}
+
+
+call_logrotate() {
+    if [[ $(declare -F logrotate) ]]; then
+        logrotate
+    else
+        echo "no logrotation configured for ${CONTAINERNAME} in conf.sh"
+    fi
 }
 
 
