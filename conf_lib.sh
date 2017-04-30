@@ -25,6 +25,8 @@ load_config() {
         exit 1
     fi
     source $PROJ_HOME/$conf_script
+    export VOLMAPPING=''
+    export VOLLIST=''
 }
 
 
@@ -159,6 +161,7 @@ map_docker_volume() {
     fi
     $sudo docker volume create --name $VOL_NAME >/dev/null
     export VOLMAPPING="$VOLMAPPING -v $VOL_NAME:$CONTAINERPATH:$MOUNT_OPTION"
+    export VOLLIST="$VOLLIST $VOL_NAME"
     mkdir -p $PREFIX
     if [[ "$TRAVIS" == "true" ]]; then
         chcon_opt='--selinux-type svirt_sandbox_file_t'

@@ -98,7 +98,6 @@ set_network() {
 
 
 set_vol_mapping() {
-    VOLMAPPING=''
     # create container user on docker host
     create_user $CONTAINERUSER $CONTAINERUID
 
@@ -109,6 +108,11 @@ set_vol_mapping() {
 
     #export VOLROOT="${DOCKERVOL_SHORT}/$CONTAINERNAME"  # container volumes on docker host
     #map_host_directory "$DOCKERLOG_SHORT/var/log/" '/var/log/' 'Z'
+
+    export LOGFILES="
+        tail -f DOCKERLOG_SHORT/${CONTAINERNAME}.var_log/xyz.log
+        tail -f DOCKERLOG_SHORT/${CONTAINERNAME}.var_log/xyz.err
+    "
 }
 
 
