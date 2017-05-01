@@ -5,8 +5,8 @@ main() {
     load_library_functions
     load_config
     init_sudo
+    verify_signature
     remove_existing_container
-    verify_signature $@
     prepare_run_command
     run_command
 }
@@ -60,13 +60,6 @@ load_library_functions() {
 }
 
 
-remove_existing_container() {
-    if [[ -e $remove ]]; then
-        $sudo docker ps -a | grep $CONTAINERNAME > /dev/null && docker rm -f $CONTAINERNAME
-    fi
-}
-
-
 verify_signature() {
     if [[ ! -z "$DIDI_SIGNER" && "$no_verify" != 'True' ]]; then
         if [[ ! -z "$config_nr" ]]; then
@@ -82,8 +75,14 @@ verify_signature() {
 }
 
 
+remove_existing_container() {
+    if [[ "$remove_opt" == 'True' ]]; then
+        $sudo docker ps -a | grep $CONTAINERNAME > /dev/null && docker rm -f $CONTAINERNAME
+    fi
+}
+
+
 prepare_run_command() {
-remove_opt='True'
     if [[ "$interactive_opt" == 'False' ]]; then
         runmode='-d --restart=unless-stopped'
     else
