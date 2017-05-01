@@ -3,6 +3,7 @@
 # Common functions
 # In most cases there is no need to replace these functions.
 # However, if needed, then overwrite them in conf.sh
+PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
 
 CONFLIBDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
@@ -113,11 +114,9 @@ get_metadata() {
 
 enable_pkcs11() {
     #enable Smartcard Reader in Docker
-    # --privileged mapping of usb devices allows a generic configreation without knowing the
+    # --privileged mapping of usb devices allows the generic configuration without knowing the
     # USB device name. Alternatively, devices can be mapped using '--device'
-    export VOLMAPPING="$VOLMAPPING
-        --privileged -v /dev/bus/usb:/dev/bus/usb
-    "
+    export ENVSETTINGS="$ENVSETTINGS --privileged -v /dev/bus/usb:/dev/bus/usb"
 }
 
 
