@@ -86,10 +86,7 @@ prepare_run_command() {
     if [[ "$interactive_opt" == 'False' ]]; then
         runmode='-d --restart=unless-stopped'
     else
-        runmode="-i $tty"
-    fi
-    if [[ "$interactive_opt" == 'False' ]]; then
-        remove='--rm'
+        runmode="-i $tty --rm"
     fi
     if [[ -z "$user_opt" ]] && [[ ! -z $CONTAINERUID ]]; then
         user_opt="-u $CONTAINERUID"
