@@ -99,8 +99,7 @@ RUN python3.4 -m pip install virtualenv \
 # Need dbus running for USB interface -> https://github.com/CentOS/sig-cloud-instance-images/issues/22
 ENV container docker
 RUN yum -y swap -- remove systemd-container systemd-container-libs -- install systemd systemd-libs \
- && yum -y opensc pcsc-lite usbutils \
- && systemctl enable  pcscd.service \
+ && yum -y install opensc pcsc-lite usbutils \
  && yum clean all
 # install MOCCA (+Jaba Webstart, pcsc)
 

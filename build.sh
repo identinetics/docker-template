@@ -10,6 +10,7 @@ main() {
     prepare_build_command
     exec_build_command
     list_repo_branches
+
 }
 
 get_commandline_opts() {
@@ -80,6 +81,9 @@ exec_build_command() {
         fi
     else
         echo -e '\E[33;31m'"\033[1mError\033[0m Docker build failed"
+    fi
+    if [ "push" == "True" ]; then
+        $sudo docker push $DOCKER_REGISTRY/$IMAGENAME
     fi
 }
 
