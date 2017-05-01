@@ -88,7 +88,7 @@ prepare_run_command() {
     else
         runmode="-i $tty"
     fi
-    if [[ "$interactive_opt" == 'False' && remove_opt == 'True' ]]; then
+    if [[ "$interactive_opt" == 'False']]; then
         remove='--rm'
     fi
     if [[ -z "$user_opt" ]] && [[ ! -z $CONTAINERUID ]]; then
@@ -106,7 +106,6 @@ prepare_run_command() {
 
 
 run_command() {
-    $sudo docker rm -f $CONTAINERNAME 2>/dev/null || true
     if [[ "$print_opt" == "True" ]]; then
         echo $docker_run
     fi
