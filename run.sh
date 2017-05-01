@@ -88,7 +88,7 @@ prepare_run_command() {
     else
         runmode="-i $tty"
     fi
-    if [[ "$interactive_opt" == 'False']]; then
+    if [[ "$interactive_opt" == 'False' ]]; then
         remove='--rm'
     fi
     if [[ -z "$user_opt" ]] && [[ ! -z $CONTAINERUID ]]; then
