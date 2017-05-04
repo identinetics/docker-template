@@ -35,8 +35,8 @@ chkdir() {
     if [[ "${1:0:1}" == / ]]; then
         dir=$1  # absolute path
     else   # deprecated
-        [ -z $VOLROOT ] && echo 'VOLROOT not defined' && exit 1
-        dir=$VOLROOT/$1
+        [ -z $DOCKERVOL_SHORT ] && echo 'DOCKERVOL_SHORT not defined' && exit 1
+        dir=$DOCKERVOL_SHORT/$1
     fi
     if [ ! -e "$dir" ]; then
         echo "$0: Missing directory: $dir"
@@ -50,8 +50,8 @@ create_chown_dir() {
     if [[ "${1:0:1}" == / ]]; then
         dir=$1  # absolute path
     else  # deprecated
-        [ -z $VOLROOT ] && echo 'VOLROOT not defined' && exit 1
-        dir=$VOLROOT/$1
+        [ -z $DOCKERVOL_SHORT ] && echo 'DOCKERVOL_SHORT not defined' && exit 1
+        dir=$DOCKERVOL_SHORT/$1
     fi
     user=$2
     if [ -z $3 ]; then
