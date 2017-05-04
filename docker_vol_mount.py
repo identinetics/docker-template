@@ -44,9 +44,13 @@ if args.symlink:
         os.remove(linkfrom_path)
     except OSError:
         pass
-    os.symlink(linkto_path, linkfrom_path)
-    if args.verbose:
-        print("created symlink %s -> %s" % (linkfrom_path, linkto_path))
+    try:
+        os.symlink(linkto_path, linkfrom_path)
+        if args.verbose:
+            print("created symlink %s -> %s" % (linkfrom_path, linkto_path))
+    except OSError as e:
+        print("error when creating symlink %s -> %s: %s" % (linkfrom_path, linkto_path, str(e)))
+
 
 if args.type:
     call(["chcon", "-Rt", args.type, linkto_path])
