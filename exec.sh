@@ -36,7 +36,9 @@ get_commandline_opts() {
             echo "-l and cmd are mutually exclusive"
         fi
     fi
-
+    if [[ $1 ]]; then
+        EXECCMD=$1
+    fi
 }
 
 

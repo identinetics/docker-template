@@ -6,6 +6,7 @@ starting containers with -u (and possible massaging /etc/passwd), a temporary fi
 a unqiue userid to a set of containers. For the github repos rhoerbe/* and identinetics/* this
 file coordinates the assigned numbers:
 
+Default
 |===
 |343002|nginx
 |343003|pyff
@@ -34,4 +35,9 @@ file coordinates the assigned numbers:
 |343033|rocket.chat
 |343034|mongo
 |343035|jenkinsci
+|343036|shinken
+
 |===
+
+Netcup8
+|343037|pyff|mdfeed.wpv.pv.at
