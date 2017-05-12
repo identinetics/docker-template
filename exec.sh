@@ -37,7 +37,7 @@ get_commandline_opts() {
         fi
     fi
     if [[ $1 ]]; then
-        EXECCMD=$1
+        EXECCMD=$@
     fi
 }
 
