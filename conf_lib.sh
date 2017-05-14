@@ -26,7 +26,11 @@ load_config() {
         exit 1
     fi
     source $PROJ_HOME/$conf_script
-    export DOCKER_REGISTRY_PREFIX="$DOCKER_REGISTRY/"
+    if [[ "$DOCKER_REGISTRY" ]]; then
+        export DOCKER_REGISTRY_PREFIX="$DOCKER_REGISTRY/"
+    else
+        export DOCKER_REGISTRY_PREFIX=''
+    fi
 }
 
 
