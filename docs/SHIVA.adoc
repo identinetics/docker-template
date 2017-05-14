@@ -75,11 +75,11 @@ Import the key on the target system:
 
     gpg2 --import testerTestineticsAt_pub.gpg
     echo -e "trust\n5\ny" > trust.cmd
-    gpg2 --command-file x.cmd –edit-key B5341047   # replace the key id with the actual one
+    gpg2 --command-file trust.cmd –edit-key B5341047   # replace the key id with the actual one
     # As result you should see unlimited trust in the userid:
     gpg --list-keys --list-options show-uid-validity
 
-As alternative get the key from a key server:
+As alternative import the key from a key server:
 
     gpg2 -k
     gpg2 --card-status

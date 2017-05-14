@@ -134,7 +134,7 @@ set_enable_sshd() {
 
 
 logrotate() {
-    find $DOCKERLOG_SHORT/${CONTAINERNAME}.var_log/ -mtime +5 -exec ls -ld {} \;"
+    find $DOCKERLOG_SHORT/${CONTAINERNAME}.var_log/ -mtime +5 -exec ls -ld {} \;
 }
 
 

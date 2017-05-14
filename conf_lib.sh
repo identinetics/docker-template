@@ -160,9 +160,9 @@ map_docker_volume() {
     export VOLMAPPING="$VOLMAPPING -v $VOL_NAME:$CONTAINERPATH:$MOUNT_OPTION"
     export VOLLIST="$VOLLIST $VOL_NAME"
     mkdir -p $PREFIX
-    if [[ "$TRAVIS" == "true" ]]; then
-        chcon_opt='--selinux-type svirt_sandbox_file_t'
-    fi
+    #if [[ "$TRAVIS" == "true" ]]; then
+    #    chcon_opt='--selinux-type svirt_sandbox_file_t'
+    #fi
     if [[ ! $JENKINS_HOME ]]; then
         fs_access="--symlink --prefix $PREFIX $symlink --groupwrite"
     fi
