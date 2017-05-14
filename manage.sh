@@ -9,6 +9,7 @@ main() {
     init_sudo
     case $cmd in
         listlog)   echo "$LOGFILES";;
+        logs)      exec_docker_cmd "docker logs -f $DOCKER_REGISTRY/$IMAGENAME";;
         logrotate) call_logrotate;;
         pull)      exec_docker_cmd "docker pull $DOCKER_REGISTRY/$IMAGENAME";;
         push)      exec_docker_cmd "docker push $DOCKER_REGISTRY/$IMAGENAME";;
