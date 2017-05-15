@@ -87,9 +87,9 @@ load_library_functions() {
 
 
 call_multitail(){
-    [[ -z "$VOLLIST" ]] && echo 'No LOGFILES set on conf.sh' && exit 1
+    [[ -z "$LOGFILES" ]] && echo 'No LOGFILES set on conf.sh' && exit 1
     cmd='multitail'
-    for logile in $VOLLIST; do
+    for logfile in $LOGFILES; do
         cmd="${cmd} -i ${logfile}"
     done
     $cmd
