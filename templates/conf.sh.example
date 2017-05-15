@@ -106,7 +106,7 @@ set_vol_mapping() {
     # it is good practice to map each VOLUME from the Dockerfile
     map_docker_volume "${CONTAINERNAME}.var_db" '/var/db' 'Z' $DOCKERVOL_SHORT
     map_docker_volume "${CONTAINERNAME}.var_log" '/var/log' 'Z' $DOCKERLOG_SHORT
-	chown -R $CONTAINERUSER:$CONTAINERUSER $DOCKERVOL_SHORT/${CONTAINERNAME}.*
+	$sudo chown -R $CONTAINERUSER:$CONTAINERUSER $DOCKERVOL_SHORT/${CONTAINERNAME}.*
 
     #export VOLROOT="${DOCKERVOL_SHORT}/$CONTAINERNAME"  # container volumes on docker host
     #map_host_directory "$DOCKERLOG_SHORT/var/log/" '/var/log/' 'Z'

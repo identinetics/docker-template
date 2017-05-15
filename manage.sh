@@ -8,9 +8,10 @@ main() {
     load_config
     init_sudo
     case $cmd in
-        listlog)   echo "$LOGFILES";;
-        logs)      exec_docker_cmd "docker logs -f $CONTAINERNAME";;
+        logfiles)  echo "$LOGFILES";;
         logrotate) call_logrotate;;
+        logs)      exec_docker_cmd "docker logs -f $CONTAINERNAME";;
+        multitail) call_multitail;;
         pull)      exec_docker_cmd "docker pull $$DOCKER_REGISTRY_PREFIX$IMAGENAME";;
         push)      exec_docker_cmd "docker push $DOCKER_REGISTRY_PREFIX$IMAGENAME";;
         rm)        exec_docker_cmd "docker rm -f $CONTAINERNAME";;
@@ -45,8 +46,10 @@ usage() {
         -d  dry run - do not execute (except logrotate, status)
         -n  configuration number ('<NN>' in conf<NN>.sh) if using multiple configurations
         -p  print docker command on stdout
-        listlog    list container logfiles
+        logfiles   list container logfiles
         logrotate  rotate, archive and purge logs
+        logs       docker logs -f
+        multitail  multitail on all logfiles in \$VOLLIST
         pull       push to docker registry
         push       pull from docker registry
         rm         remove docker image (--force)
@@ -80,6 +83,15 @@ load_library_functions() {
     SCRIPTDIR=$(cd $(dirname $BASH_SOURCE[0]) && pwd)
     PROJ_HOME=$(cd $(dirname $SCRIPTDIR) && pwd)
     source $PROJ_HOME/dscripts/conf_lib.sh
+}
+
+
+call_multitail(){
+    cmd='multitail'
+    for logile in $VOLLIST; do
+        cmd="${cmd} -i ${logfile}"
+    done
+    $cmd
 }
 
 
