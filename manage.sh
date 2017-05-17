@@ -11,6 +11,7 @@ main() {
         logfiles)  echo "$LOGFILES";;
         logrotate) call_logrotate;;
         logs)      exec_docker_cmd "docker logs -f $CONTAINERNAME";;
+        lsvol)     exec_docker_cmd "docker inspect -f '{{ .Mounts }}' 06openldap |perl -pe 's/\}\s*\{/}\n{/g'"
         multitail) call_multitail;;
         pull)      exec_docker_cmd "docker pull $$DOCKER_REGISTRY_PREFIX$IMAGENAME";;
         push)      exec_docker_cmd "docker push $DOCKER_REGISTRY_PREFIX$IMAGENAME";;
@@ -49,6 +50,7 @@ usage() {
         logfiles   list container logfiles
         logrotate  rotate, archive and purge logs
         logs       docker logs -f
+        lsvol      list volumes of container
         multitail  multitail on all logfiles in \$VOLLIST
         pull       push to docker registry
         push       pull from docker registry
