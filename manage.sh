@@ -11,7 +11,7 @@ main() {
         logfiles)  echo "$LOGFILES";;
         logrotate) call_logrotate;;
         logs)      exec_docker_cmd "docker logs -f $CONTAINERNAME";;
-        lsvol)     $sudo docker inspect -f '{{ .Mounts }}' 06openldap |perl -pe 's/\}\s*\{/}\n{/g';;
+        lsvol)     $sudo docker inspect -f '{{ .Mounts }}' $CONTAINERNAME | perl -pe 's/\}\s*\{/}\n{/g';;
         multitail) call_multitail;;
         pull)      exec_docker_cmd "docker pull $$DOCKER_REGISTRY_PREFIX$IMAGENAME";;
         push)      exec_docker_cmd "docker push $DOCKER_REGISTRY_PREFIX$IMAGENAME";;
