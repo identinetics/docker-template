@@ -34,7 +34,7 @@ get_commandline_opts() {
       esac
     done
     shift $((OPTIND-1))
-    cmd=$@
+    cmd="$@"
 }
 
 
@@ -112,4 +112,4 @@ run_command() {
 }
 
 
-main $@
+main "$@"

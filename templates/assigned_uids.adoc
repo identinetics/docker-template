@@ -36,8 +36,19 @@ Default
 |343034|mongo
 |343035|jenkinsci
 |343036|shinken
+|343037|toggl
+
 
 |===
 
 Netcup8
 |343037|pyff|mdfeed.wpv.pv.at
+|343040 |pyff|mdfeed.test.edu.pv.at
+|343041 |shipidp| idp1.test.edu.pv.at
+|343042 |shipsp|sp1.test.edu.pv.at
+|343043 |shipsp|sp2.test.edu.pv.at
+|343044 |shipsp|sp3.test.edu.pv.at
+|343045 |shipsp|sp1.test.portalverbund.gv.at
+|343046 |shipsp|sp4.test.edu.pv.at (pwchange)
+|343047 |shipsp|testsp.wpv.portalverbund.at
+|3430 ||

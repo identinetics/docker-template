@@ -106,14 +106,16 @@ set_vol_mapping() {
     # it is good practice to map each VOLUME from the Dockerfile
     map_docker_volume "${CONTAINERNAME}.var_db" '/var/db' 'Z' $DOCKERVOL_SHORT
     map_docker_volume "${CONTAINERNAME}.var_log" '/var/log' 'Z' $DOCKERLOG_SHORT
-	$sudo chown -R $CONTAINERUSER:$CONTAINERUSER $DOCKERVOL_SHORT/${CONTAINERNAME}.*
+    if [[ ! $JENKINS_HOME ]]; then
+        $sudo chown -R $CONTAINERUID:$CONTAINERUID $DOCKER_VOLUME_ROOT/$CONTAINERNAME.* 2>/dev/null || true
+    fi
 
     #export VOLROOT="${DOCKERVOL_SHORT}/$CONTAINERNAME"  # container volumes on docker host
     #map_host_directory "$DOCKERLOG_SHORT/var/log/" '/var/log/' 'Z'
 
     export LOGFILES="
-        tail -f DOCKERLOG_SHORT/${CONTAINERNAME}.var_log/xyz.log
-        tail -f DOCKERLOG_SHORT/${CONTAINERNAME}.var_log/xyz.err
+        $DOCKERLOG_SHORT/${CONTAINERNAME}.var_log/xyz.log
+        $DOCKERLOG_SHORT/${CONTAINERNAME}.var_log/xyz.err
     "
 }
 
