@@ -2,9 +2,9 @@
 
 main() {
     get_commandline_opts $@
+    init_sudo
     load_library_functions
     load_config
-    init_sudo
     verify_signature
     remove_existing_container
     prepare_run_command
