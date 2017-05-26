@@ -2,8 +2,8 @@
 
 main() {
     get_commandline_opts $@
-    init_sudo
     load_library_functions
+    init_sudo
     load_config
     verify_signature
     remove_existing_container
