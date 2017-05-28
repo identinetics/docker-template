@@ -38,8 +38,8 @@ usage() {
 }
 
 load_library_functions() {
-    SCRIPTDIR=$(cd $(dirname $BASH_SOURCE[0]) && pwd)
-    PROJ_HOME=$(cd $(dirname $SCRIPTDIR) && pwd)
+    DSCRIPTDIR=$(cd $(dirname $BASH_SOURCE[0]) && pwd)
+    PROJ_HOME=$(cd $(dirname $DSCRIPTDIR) && pwd)
     source $PROJ_HOME/dscripts/conf_lib.sh
 }
 
