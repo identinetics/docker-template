@@ -55,7 +55,7 @@ verify_image() {
 
 
 generate_local_didi() {
-    DIDI_FILENAME=$($sudo $SCRIPTDIR/create_didi.py $IMAGENAME)
+    DIDI_FILENAME=$($sudo $DSCRIPTDIR/create_didi.py $IMAGENAME)
     log "generated didi/$DIDI_FILENAME"
 }
 
