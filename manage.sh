@@ -10,13 +10,13 @@ main() {
     case $cmd in
         logfiles)  echo "$LOGFILES";;
         logrotate) call_logrotate;;
-        logs)      exec_docker_cmd "docker logs -f $CONTAINERNAME";;
+        logs)      exec_docker_cmd "docker logs -f ${CONTAINERNAME}";;
         lsvol)     $sudo docker inspect -f '{{ .Mounts }}' $CONTAINERNAME | perl -pe 's/\}\s*\{/}\n{/g';;
         multitail) call_multitail;;
-        pull)      exec_docker_cmd "docker pull $$DOCKER_REGISTRY_PREFIX$IMAGENAME";;
-        push)      exec_docker_cmd "docker push $DOCKER_REGISTRY_PREFIX$IMAGENAME";;
-        rm)        exec_docker_cmd "docker rm -f $CONTAINERNAME";;
-        rmvol)     exec_docker_cmd "docker volume rm $VOLLIST";;
+        pull)      exec_docker_cmd "docker pull ${DOCKER_REGISTRY_PREFIX}${IMAGENAME}";;
+        push)      exec_docker_cmd "docker push ${DOCKER_REGISTRY_PREFIX}${IMAGENAME}";;
+        rm)        exec_docker_cmd "docker rm -f ${CONTAINERNAME}";;
+        rmvol)     exec_docker_cmd "docker volume rm ${VOLLIST}";;
         status)    call_container_status;;
         *) echo "missing command"; usage; exit 1;;
     esac
