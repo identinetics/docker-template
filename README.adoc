@@ -55,7 +55,12 @@ Requirements:
     dscript/build.sh [-h] [-n container-nr] [-p] [-r]
     dscript/run.sh [-h] [-i] [-n container-nr] [-p] [-r] -[R] [cmd]
     dscript/exec.sh [-h] [-i] [-n container-nr] [-p] [-r] [cmd]
-    
+
+    # auxiliary functions:
+    dscript/manage.sh [-h] [-n container-nr] cmd
+    dscript/sign.sh [-h] [-n container-nr]
+    dscript/verify.sh [-h] [-n container-nr]
+
     To run multiple XYZ containers on the same system you need to create separate
     conf.sh files and build separate images:
     E.g. to create XYZ container instance 3:
@@ -63,7 +68,3 @@ Requirements:
     b) build the container with the -n option, e.g. `build.sh -n 3`
     c) run the container with the -n option, e.g. `run.sh -n 3`
 
-## Alternatives
-
-- Do not map Volumes to the docker host, but use other docker storage options. Handle container
-  startup with docker-compose.
