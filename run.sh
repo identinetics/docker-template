@@ -98,19 +98,20 @@ prepare_run_command() {
         cmd=$STARTCMD
     fi
     if [[ ! -z "$SERVICEDESCRIPTION" ]]; then
-        LABEL="--label 'x.service=$SERVICEDESCRIPTION'"
+        label="--label x.service=$SERVICEDESCRIPTION"
     fi
-    docker_run="docker run $runmode $remove $user_opt --hostname=$CONTAINERNAME --name=$CONTAINERNAME
-        $LABEL $CAPABILITIES $ENVSETTINGS $NETWORKSETTINGS $VOLMAPPING $IMAGENAME $cmd"
+    # shells do not expand variables with quotes and spaces as needed, use array instead (http://mywiki.wooledge.org/BashFAQ/050)
+    run_args=($runmode $remove $user_opt --hostname=$CONTAINERNAME --name=$CONTAINERNAME
+        $label $CAPABILITIES $ENVSETTINGS $NETWORKSETTINGS $VOLMAPPING $IMAGENAME $cmd)
 }
 
 
 run_command() {
     if [[ "$print_opt" == "True" ]]; then
-        echo $docker_run
+        echo docker run "${run_args[@]}"
     fi
     if [[ "$dryrun" != "True" ]]; then
-        $sudo $docker_run
+        $sudo docker run "${run_args[@]}"
     fi
 }
 
