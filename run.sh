@@ -98,7 +98,7 @@ prepare_run_command() {
         cmd=$STARTCMD
     fi
     if [[ ! -z "$SERVICEDESCRIPTION" ]]; then
-        LABEL="--label $SERVICEDESCRIPTION"
+        LABEL="--label x.service=$SERVICEDESCRIPTION"
     fi
     docker_run="docker run $runmode $remove $user_opt --hostname=$CONTAINERNAME --name=$CONTAINERNAME
         $LABEL $CAPABILITIES $ENVSETTINGS $NETWORKSETTINGS $VOLMAPPING $IMAGENAME $cmd"
