@@ -7,8 +7,8 @@ to use a simple and explicit GPG-signature scheme instead, which is easier to un
 
 == How does it work
 
-The basis for Docker image signatures is the content digest, which will appear on `docker push`and `docker images --digests`. It can be
-obtained on the command line with
+The basis for Docker image signatures is the content digest, which will appear on `docker push`and
+`docker images --digests`. It can be obtained on the command line with
 
     docker inspect --format='{{.RepoDigests}}' <image id|name>
 

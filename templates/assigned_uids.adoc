@@ -37,6 +37,8 @@ Default
 |343035|jenkinsci
 |343036|shinken
 |343037|toggl
+|343038|phpldapadmin
+|343039|pvzdfrontend
 
 
 |===
