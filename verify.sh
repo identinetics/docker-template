@@ -19,6 +19,7 @@ get_commandline_opts() {
              echo "error: -n argument ($OPTARG) is not a number in the range frmom 02 .. 99" 1>&2; exit 1
            fi
            config_nr=$OPTARG;;
+        o) offline='True';;
         v) verbose='True';;
         V) verbose='False';;
         :) echo "Option -$OPTARG requires an argument"; exit 1;;
@@ -30,12 +31,15 @@ get_commandline_opts() {
 
 
 usage() {
-    echo "usage: $0 [-h] [-n container-nr ] -v -V
+    echo "Verify a Docker image using a trusted PGP signature
+    usage: $0 [-h] [-n container-nr ] [-v] [-V]
        -h  print this help text
        -n  configuration number ('<NN>' in conf<NN>.sh)
+       -o  offline use: take didi (docker image digest) from $PROJ_HOME/didi
        -v  verbose
        -V  not verbose"
 }
+
 
 load_library_functions() {
     DSCRIPTDIR=$(cd $(dirname $BASH_SOURCE[0]) && pwd)
@@ -45,51 +49,57 @@ load_library_functions() {
 
 
 verify_image() {
+    make_tempdirs
     generate_local_didi
-    make_tempdir
-    fetch_remote_didi
-    compare_local_with_remote_didi  # to detect errors before the signature check
+    get_didi_from_repo
+    compare_generated_with_repo_didi  # to detect errors before the signature check
     verify_signature
     cleanup_tempdir
 }
 
 
+make_tempdirs() {
+    TEMPDIR_DIDI_GENERATED=$(mktemp -d 2>/dev/null || mktemp -d -t 'dscripts_repo')
+    TEMPDIR_DIDI_REPO=$(mktemp -d 2>/dev/null || mktemp -d -t 'dscripts_tmp')  # works for Linux + OSX
+}
+
+
 generate_local_didi() {
-    DIDI_FILENAME=$($sudo $DSCRIPTDIR/create_didi.py $IMAGENAME)
-    log "generated didi/$DIDI_FILENAME"
+    DIDI_FILENAME=$($sudo $DSCRIPTDIR/create_didi.py $IMAGENAME $TEMPDIR_DIDI_GENERATED)
+    log "generated $TEMPDIR_DIDI_GENERATED/$DIDI_FILENAME"
 }
 
 
-make_tempdir() {
-    TEMPDIR=$(mktemp -d 2>/dev/null || mktemp -d -t 'dscripts_tmp')  # works for Linux + OSX
-}
-
-
-fetch_remote_didi() {
-    cd $TEMPDIR
-    get_didi_dir
-    DIDIFILE="${DIDIDIR}/${DIDI_FILENAME}"
-    [[ "$verbose" == 'True' ]] && echo "GET $DIDIFILE"
-    wget -q $DIDIFILE
-    (( $? > 0)) && echo "$DIDIFILE missing, image verfication failed" && exit 1
-    [[ "$verbose" == 'True' ]] && echo "GET $DIDIFILE.sig"
-    wget -q $DIDIFILE.sig
-    (( $? > 0)) && echo "$DIDIFILE.sig missing, image verfication failed" && exit 1
-    :  # remedy for strange bug where bash exited in the previous line without obvious reason
+get_didi_from_repo() {
+    cd $TEMPDIR_DIDI_REPO
+    if [[ "$offline" == 'True' ]]; then  # need to have signature file locally
+        cp $PROJ_HOME/didi/* .
+    else
+        get_didi_dir
+        DIDIFILE="${DIDIURL}/${DIDI_FILENAME}"
+        [[ "$verbose" == 'True' ]] && echo "GET $DIDIFILE"
+        wget -q $DIDIFILE
+        (( $? > 0)) && echo "$DIDIFILE missing, image verfication failed" && exit 1
+        [[ "$verbose" == 'True' ]] && echo "GET $DIDIFILE.sig"
+        wget -q $DIDIFILE.sig
+        (( $? > 0)) && echo "$DIDIFILE.sig missing, image verfication failed" && exit 1
+        :  # remedy for strange bug where bash exited in the previous line without obvious reason
+    fi
 }
 
 
 get_didi_dir() {
-    DIDIDIR=$($sudo docker inspect --format='{{.Config.Labels.didi_dir}}' $IMAGENAME)
-    if [[ $DIDIDIR == '<no value>' ]]; then
+    DIDIURL=$($sudo docker inspect --format='{{.Config.Labels.didi_dir}}' $IMAGENAME)
+    if [[ $DIDIURL == '<no value>' ]]; then
         echo "Cannot verify signature - LABEL 'didi_dir' not set for image $IMAGENAME"
         echo "Image verfication failed"
         exit 1
     fi
 }
 
-compare_local_with_remote_didi() {
-    diff -q $DIDI_FILENAME $TEMPDIR/$DIDI_FILENAME
+
+compare_generated_with_repo_didi() {
+    diff -q $DIDI_FILENAME $TEMPDIR_DIDI_REPO/$DIDI_FILENAME
     if (( $? > 0)); then
         echo "Local ($DIDI_FILENAME) and remote ($DIDIFILE) DIDI files are different."
         echo "Image verfication failed"
@@ -102,10 +112,10 @@ compare_local_with_remote_didi() {
 
 verify_signature() {
     [[ "$verbose" == 'True' ]] || GPG_QUIET='--quiet'
-    gpg2 --verify $GPG_QUIET $TEMPDIR/$DIDI_FILENAME.sig $TEMPDIR/$DIDI_FILENAME > $TEMPDIR/gpg2.log 2>&1
+    gpg2 --verify $GPG_QUIET $TEMPDIR_DIDI_REPO/$DIDI_FILENAME.sig $TEMPDIR_DIDI_REPO/$DIDI_FILENAME > $TEMPDIR_DIDI_REPO/gpg2.log 2>&1
     gpg2_rc=$?
     if [[ "$verbose" == 'True' ]]; then
-        cat $TEMPDIR/gpg2.log
+        cat $TEMPDIR_DIDI_REPO/gpg2.log
     fi
     if (($gpg2_rc > 0)); then
         echo "Signature of DIDI is broken. Image verfication failed."
@@ -117,7 +127,7 @@ verify_signature() {
 
 
 cleanup_tempdir() {
-    rm -rf $TEMPDIR
+    rm -rf $TEMPDIR_DIDI_REPO
 }
 
 

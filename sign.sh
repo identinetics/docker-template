@@ -19,7 +19,7 @@ load_library_functions() {
 
 
 generate_didi() {
-    DIDI_FILENAME=$($sudo dscripts/create_didi.py $IMAGENAME)
+    DIDI_FILENAME=$($sudo dscripts/create_didi.py $IMAGENAME 'didi')
 }
 
 
