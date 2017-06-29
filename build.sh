@@ -10,6 +10,7 @@ main() {
     prepare_build_command
     exec_build_command
     list_repo_branches
+    do_cleanup
 
 }
 
@@ -91,5 +92,10 @@ list_repo_branches() {
     echo
 }
 
+do_cleanup() {
+    if [ -e $PROJ_HOME/cleanup.sh ]; then
+       $PROJ_HOME/cleanup.sh $update_pkg
+    fi
+}
 
 main $@
