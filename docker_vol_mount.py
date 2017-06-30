@@ -16,6 +16,8 @@ parser = argparse.ArgumentParser(description='Show Docker volume mount')
 parser.add_argument('-g', '--groupwrite', dest='groupwrite', action="store_true",
                     help='Execute `chmod g+w` on mountpoint')
 parser.add_argument('-p', '--prefix', dest='prefix', default='/dv', help='Path prefix for symlink')
+parser.add_argument('-S', '--sudo', dest='sudo',
+                    help='Optional sudo command')
 parser.add_argument('-s', '--symlink', dest='symlink', action="store_true",
                     help='Create symlink at path prefix')
 parser.add_argument('-t', '--selinux-type', dest='type', help='Execute `chcon -Rt <type>`')
@@ -24,7 +26,10 @@ parser.add_argument('-V', '--volume', dest='volume', required=True, help='Name o
 args = parser.parse_args()
 
 try:
-    in_str = check_output(["docker", "volume", "inspect", args.volume])
+    cmd = ["docker", "volume", "inspect", args.volume]
+    if args.sudo :
+        cmd.insert (0, args.sudo)
+    in_str = check_output(cmd)
 except CalledProcessError as e:
     print("cannot execute 'docker volume inspect ' + volume")
     raise
@@ -53,6 +58,9 @@ if args.symlink:
 
 
 if args.type:
-    call(["chcon", "-Rt", args.type, linkto_path])
+    cmd = ["chcon", "-Rt", args.type, linkto_path]
+    if args.sudo :
+        cmd.insert (0, args.sudo)
+    call(cmd)
     if args.verbose:
-        print("set lebel %s on %s" % (args.type, linkto_path))
+        print("set label %s on %s" % (args.type, linkto_path))

@@ -168,10 +168,14 @@ map_docker_volume() {
     #if [[ "$TRAVIS" == "true" ]]; then
     #    chcon_opt='--selinux-type svirt_sandbox_file_t'
     #fi
-    if [[ ! $JENKINS_HOME ]]; then
-        fs_access="--symlink --prefix $PREFIX $symlink --groupwrite"
+    GW=
+    if [ "$CONTAINER_GROUPWRITE" != 'no' ] ; then
+        GW=--groupwrite
     fi
-    $sudo $CONFLIBDIR/docker_vol_mount.py $fs_access $chcon_opt --volume $VOL_NAME
+    if [[ ! $JENKINS_HOME ]]; then
+        fs_access="--symlink --prefix $PREFIX $symlink $GW"
+    fi
+    $CONFLIBDIR/docker_vol_mount.py -S "$sudo" $fs_access $chcon_opt --volume $VOL_NAME
 }
 
 
