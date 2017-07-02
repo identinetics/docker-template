@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-# settings for docker build, run and exec
-
 main() {
     SCRIPTDIR=$(cd $(dirname $BASH_SOURCE[0]) && pwd)
     source $SCRIPTDIR/dscripts/conf_lib.sh  # load library functions
@@ -33,7 +31,7 @@ set_volume_root() {
 
 
 set_image_and_container_name() {
-    # This IMGID qualifies image, container, user and IP adddress; this is helpful for managing
+    # IMGID qualifies image, container, user and IP adddress; this is helpful for managing
     # processes on the docker host etc.
     IMGID='99'  # range from 02 .. 99; must be unique per node (registered in github.com/identinetics/dscripts/templates/assigned-uids.adoc)
     PROJSHORT='template'
