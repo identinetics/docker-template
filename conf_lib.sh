@@ -158,8 +158,8 @@ map_docker_volume() {
     # - Append to VOLMAPPING
     # - chmod g+w and create symlink in PREFIX
     VOL_NAME=$1; CONTAINERPATH=$2; MOUNT_OPTION=$3; PREFIX=$4
-    if [ -z ${PREFIX+x} ]; then
-        echo "conf_lib.sh/map_docker_volume(): All 4 arguments need to be set; found: $@" && exit 1;
+    if [ ! -d "${PREFIX}" ]; then
+        echo "conf_lib.sh/map_docker_volume(): argument 4 must be a valid directory; args found: $@" && exit 1;
     fi
     $sudo docker volume create --name $VOL_NAME >/dev/null
     export VOLMAPPING="$VOLMAPPING -v $VOL_NAME:$CONTAINERPATH:$MOUNT_OPTION"
