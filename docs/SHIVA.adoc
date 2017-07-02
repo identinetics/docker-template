@@ -44,7 +44,7 @@ Prerequisites: The signer can create signatures
 
 === Signature Creation
 
-The developer creates a PGP-signed DIDI file using the create_didi.sh script. Each image version has
+The developer creates a PGP-signed DIDI file using the descripts/sign.sh script. Each image version has
 a separate file, allowing to verify multiple versions in parallel. To activate image signing for
 an image the conf.sh script must define the signer's PGP uid in the DIDI_SIGNER variable and
 the default key in GPG_SIGN_OPTIONS, e.g.

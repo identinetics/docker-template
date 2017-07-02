@@ -201,7 +201,8 @@ set_staging_env() {
     if [ "$TRAVIS" == "true" ]; then
         GIT_BRANCH=$TRAVIS_BRANCH
     else
-        GIT_BRANCH=$(cd $PROJ_HOME; git symbolic-ref --short -q HEAD)
+        proj_home=$(cd $(dirname $CONFLIBDIR) && pwd)
+        GIT_BRANCH=$(cd $proj_home; git symbolic-ref --short -q HEAD)
     fi
     export STAGING_ENV=''
     if [ "$GIT_BRANCH" == "master" ]; then
