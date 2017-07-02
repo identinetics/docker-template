@@ -34,6 +34,7 @@ def get_args():
     parser.add_argument('-t', '--selinux-type', dest='type', help='Execute `chcon -Rt <type>`')
     parser.add_argument('-v', '--verbose', dest='verbose', action="store_true")
     parser.add_argument('-V', '--volume', dest='volume', required=True, help='Name of Docker volume')
+    global args
     args = parser.parse_args()
 
 
@@ -47,6 +48,7 @@ def print_volume_mount_path():
         print("cannot execute 'docker volume inspect ' + volume")
         raise
     container = json.loads(in_str)
+    global linkto_path
     linkto_path = container[0]['Mountpoint']
     if args.verbose:
         print(container[0]['Name'] + ': ' + linkto_path)
