@@ -39,6 +39,9 @@ Default
 |343037|toggl
 |343038|phpldapadmin
 |343039|pvzdfrontend
+|343040|openldap2
+|343041|openldap3
+
 
 
 |===
