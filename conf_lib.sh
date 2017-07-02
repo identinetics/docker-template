@@ -156,15 +156,15 @@ map_docker_volume() {
     # Map container directory to Docker volume
     # - Create volume if it does not exist
     # - Append to VOLMAPPING
-    # - chmod g+w and create symlink in PREFIX
-    VOL_NAME=$1; CONTAINERPATH=$2; MOUNT_OPTION=$3; PREFIX=$4
-    if [ ! -d "${PREFIX}" ]; then
+    # - chmod g+w and create symlink in SHORTCUT_DIR
+    VOL_NAME=$1; CONTAINERPATH=$2; MOUNT_OPTION=$3; SHORTCUT_DIR=$4
+    if [ ! -d "${SHORTCUT_DIR}" ]; then
         echo "conf_lib.sh/map_docker_volume(): argument 4 must be a valid directory; args found: $@" && exit 1;
     fi
     $sudo docker volume create --name $VOL_NAME >/dev/null
     export VOLMAPPING="$VOLMAPPING -v $VOL_NAME:$CONTAINERPATH:$MOUNT_OPTION"
     export VOLLIST="$VOLLIST $VOL_NAME"
-    mkdir -p $PREFIX
+    mkdir -p $SHORTCUT_DIR
     #if [[ "$TRAVIS" == "true" ]]; then
     #    chcon_opt='--selinux-type svirt_sandbox_file_t'
     #fi
@@ -173,7 +173,7 @@ map_docker_volume() {
         GW=--groupwrite
     fi
     if [[ ! $JENKINS_HOME ]]; then
-        fs_access="--symlink --prefix $PREFIX $symlink $GW"
+        fs_access="--symlink --prefix $SHORTCUT_DIR $symlink $GW"
     fi
     [[ $sudo ]] && sudoopt='-S'
     $CONFLIBDIR/docker_vol_mount.py $sudoopt $fs_access $chcon_opt --volume $VOL_NAME
