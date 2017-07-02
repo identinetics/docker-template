@@ -175,7 +175,8 @@ map_docker_volume() {
     if [[ ! $JENKINS_HOME ]]; then
         fs_access="--symlink --prefix $PREFIX $symlink $GW"
     fi
-    $CONFLIBDIR/docker_vol_mount.py -S "$sudo" $fs_access $chcon_opt --volume $VOL_NAME
+    [[ $sudo ]] && sudoopt='-S'
+    $CONFLIBDIR/docker_vol_mount.py $sudoopt $fs_access $chcon_opt --volume $VOL_NAME
 }
 
 
