@@ -41,8 +41,8 @@ def get_args():
 def print_volume_mount_path():
     try:
         cmd = ["docker", "volume", "inspect", args.volume]
-        if args.sudo :
-            cmd.insert (0, args.sudo)
+        if args.sudo:
+            cmd.insert (0, 'sudo')
         in_str = check_output(cmd)
     except CalledProcessError as e:
         print("cannot execute 'docker volume inspect ' + volume")
