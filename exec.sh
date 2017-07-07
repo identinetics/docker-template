@@ -12,10 +12,12 @@ main() {
 
 get_commandline_opts() {
     EXECCMD='/bin/bash'
-    runopt='-it'
-    while getopts ":hiIln:pr" opt; do
+    interactive_opt='True'
+    while getopts ":hbiIln:pr" opt; do
       case $opt in
-        I) runopt='';;
+        b) interactive_opt='False';;
+        i) tty='-t';;
+        I) tty='';;
         l) logpurge='True';;
         n) config_nr=$OPTARG
            re='^[0-9][0-9]$'
@@ -44,9 +46,10 @@ get_commandline_opts() {
 
 usage() {
     echo "usage: $0 [-h] [-i] [-I] [-n <containernr>] [-p] [-r] [cmd]
+       -b  non-interactive (no '-i' for docker exec)
        -h  print this help text
-       -i  interactive (default; results in options -it for docker exec)
-       -I  non-interactive (no -it for docker exec)
+       -i  start in interactive mode and assign terminal (default)
+       -I  start in interactive mode and do not assign terminal
        -l  logpurge (execute /logpurge.sh in container) - mutual exclusive with cmd
        -n  configuration number ('<NN>' in conf<NN>.sh)
        -p  print docker exec command on stdout
@@ -69,7 +72,7 @@ prepare_command() {
     else
         cmd=$@
     fi
-    docker_exec="docker exec $runopt $useropt $CONTAINERNAME $cmd"
+    docker_exec="docker exec $interactive_opt $tty $useropt $CONTAINERNAME $cmd"
 }
 
 

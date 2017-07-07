@@ -20,12 +20,14 @@ main() {
 
 
 set_volume_root() {
+    # container volumes mounted to host paths, or symlinks to docker volumes
     DOCKERVOL_SHORT='/dv'
     DOCKERLOG_SHORT='/dl'
     if [[ "$TRAVIS" == "true" ]] || [[ ! -z ${JENKINS_HOME+x} ]]; then
         DOCKERVOL_SHORT='./dv';
         DOCKERLOG_SHORT='./dl';
     fi
+    mkdir -p $DOCKERVOL_SHORT $DOCKERLOG_SHORT
     #DOCKER_VOLUME_ROOT='/var/lib/docker/volumes'  # hard coded - check for your config if applicable!
 }
 
