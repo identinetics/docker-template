@@ -12,12 +12,12 @@ main() {
 
 get_commandline_opts() {
     EXECCMD='/bin/bash'
-    interactive_opt='True'
+    interactive_opt='-it'
     while getopts ":hbiIln:pr" opt; do
       case $opt in
-        b) interactive_opt='False';;
-        i) tty='-t';;
-        I) tty='';;
+        b) interactive_opt='';;
+        i) interactive_opt='-it';;
+        I) interactive_opt='-i';;
         l) logpurge='True';;
         n) config_nr=$OPTARG
            re='^[0-9][0-9]$'
@@ -38,7 +38,7 @@ get_commandline_opts() {
             echo "-l and cmd are mutually exclusive"
         fi
     fi
-    if [[ $1 ]]; then
+    if [[ "$1" ]]; then
         EXECCMD=$@
     fi
 }
@@ -67,17 +67,17 @@ load_library_functions() {
 
 
 prepare_command() {
-    if [ -z "$1" ]; then
+    if [[ -z "$1" ]]; then
         cmd=$EXECCMD
     else
         cmd=$@
     fi
-    docker_exec="docker exec $interactive_opt $tty $useropt $CONTAINERNAME $cmd"
+    docker_exec="docker exec $interactive_opt $useropt $CONTAINERNAME $cmd"
 }
 
 
 run_command() {
-    if [ "$print" = 'True' ]; then
+    if [[ "$print" == 'True' ]]; then
         echo $docker_exec
     fi
     ${sudo} $docker_exec
