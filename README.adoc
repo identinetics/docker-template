@@ -35,8 +35,7 @@ Requirements:
     git add dscripts
     git commit -m 'add submodule dscripts'
     # later, when you clone your project, you need to execute:    
-    git submodule update --init   # or do a `git clone --recurse-submodules --shallow-submodules`
-    cd dscripts && git checkout master && cd ..
+    git submodule update --init --checkout
     
 2. From the dscript project copy template files into your project root:
 

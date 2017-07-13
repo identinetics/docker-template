@@ -33,7 +33,7 @@ RUN yum -y groups install "GNOME Desktop" \
 RUN yum -y install python34-devel \
  && curl https://bootstrap.pypa.io/get-pip.py | python3.4 \
  && yum clean all
-# PYTHON="/usr/bin/python3.4" PIP="/usr/bin/python3.4 -m pip"
+# PYTHON3="/usr/bin/python3.4" PIP="/usr/bin/python3.4 -m pip"
 
 # Install Python3 interpreter
 # while the SCL version of python 3.4 has the advantage of redhat's blessing, it is more
@@ -47,7 +47,7 @@ RUN yum -y install python34-devel \
      && echo "source /opt/rh/rh-python34/enable" > /etc/profile.d/setpython \
      && echo "export PYTHON=python" >> /etc/profile.d/setpython
     ENV PIP3='source /opt/rh/rh-python34/enable && /opt/rh/rh-python34/root/usr/bin/pip'
-    ENV PYTHON='scl enable rh-python34 -- python'
+    ENV PYTHON3='scl enable rh-python34 -- python'
 # EPEL: 
     #RUN yum -y install python34-devel \
     # && curl https://bootstrap.pypa.io/get-pip.py | python3.4 \
@@ -59,7 +59,7 @@ RUN yum -y install python34-devel \
     #RUN yum -y install https://centos7.iuscommunity.org/ius-release.rpm \
     # && yum -y install python35u python35u-setuptools python35u-devel python35u-pip python35u-tkinter \
     # && yum clean all
-    #ENV PYTHON='python3.5'
+    #ENV PYTHON3='python3.5'
     #ENV PIP='pip3.5'
     #RUN echo "export PYTHON=$PYTHON" >> /etc/profile
 

@@ -146,7 +146,7 @@ enable_x11_client() {
 
 
 init_sudo() {
-    if (( $(id -u) != 0 )); then
+    if (( $(id -u) != 0 && $(id -un) != 'jenkins')); then
         sudo="sudo"
     fi
 }
