@@ -14,7 +14,7 @@ main() {
         lsvol)     $sudo docker inspect -f '{{ .Mounts }}' $CONTAINERNAME | perl -pe 's/\}\s*\{/}\n{/g';;
         multitail) call_multitail;;
         pull)      exec_docker_cmd "docker pull ${DOCKER_REGISTRY_PREFIX}${IMAGENAME}";;
-        push)      exec_docker_cmd "docker push ${DOCKER_REGISTRY_PREFIX}${IMAGENAME}";;
+        push)      call_push;;
         rm)        exec_docker_cmd "docker rm -f ${CONTAINERNAME}";;
         rmvol)     exec_docker_cmd "docker volume rm ${VOLLIST}";;
         status)    call_container_status;;
@@ -88,13 +88,24 @@ load_library_functions() {
 }
 
 
-call_multitail(){
+call_multitail() {
     [[ -z "$LOGFILES" ]] && echo 'No LOGFILES set on conf.sh' && exit 1
     cmd='multitail'
     for logfile in $LOGFILES; do
         cmd="${cmd} -i ${logfile}"
     done
     $cmd
+}
+
+
+call_push() {
+    if [[ ${DOCKER_REGISTRY_PREFIX} ]]; then
+        exec_docker_cmd "docker tag ${IMAGENAME} ${DOCKER_REGISTRY_PREFIX}${IMAGENAME}"
+        exec_docker_cmd "docker push ${DOCKER_REGISTRY_PREFIX}${IMAGENAME}"
+
+    else
+        exec_docker_cmd "docker push ${DOCKER_REGISTRY_PREFIX}${IMAGENAME}"
+    fi
 }
 
 
