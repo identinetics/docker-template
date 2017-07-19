@@ -176,7 +176,7 @@ map_docker_volume() {
         fs_access="--symlink --prefix $SHORTCUT_DIR $symlink $GW"
     fi
     [[ $sudo ]] && sudoopt='-S'
-    $sudo $CONFLIBDIR/docker_vol_mount.py $sudoopt $fs_access $chcon_opt --volume $VOL_NAME
+    $CONFLIBDIR/docker_vol_mount.py $sudoopt $fs_access $chcon_opt --volume $VOL_NAME
 }
 
 
