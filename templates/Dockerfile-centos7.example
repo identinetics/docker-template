@@ -1,6 +1,9 @@
 FROM centos:centos7
 LABEL maintainer="Rainer Hörbe <r2h2@hoerbe.at>" \
       version="0.0.0" \
+      #UID_TYPE: select one of root, non-root or random to announce container behavior wrt USER
+      UID_TYPE="non-root" \
+      # remove didi_dir if image siganture are not supported
       didi_dir="https://raw.githubusercontent.com/repoowner/project/master/didi" \
       # by default, remove all capabilities. You may need to add particular ones, such as:
       #   --cap-add=setuid --cap-add=setgid --cap-add=chown --cap-add=net_bind_service

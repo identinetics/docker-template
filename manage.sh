@@ -13,6 +13,7 @@ main() {
         logs)      exec_docker_cmd "docker logs -f ${CONTAINERNAME}";;
         lsvol)     $sudo docker inspect -f '{{ .Mounts }}' $CONTAINERNAME | perl -pe 's/\}\s*\{/}\n{/g';;
         multitail) call_multitail;;
+        mt)        call_multitail;;
         pull)      exec_docker_cmd "docker pull ${DOCKER_REGISTRY_PREFIX}${IMAGENAME}";;
         push)      call_push;;
         rm)        exec_docker_cmd "docker rm -f ${CONTAINERNAME}";;

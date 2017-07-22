@@ -7,6 +7,8 @@ main() {
     load_config
     verify_signature
     remove_existing_container
+    create_intercontainer_network
+    setup_vol_mapping
     prepare_run_command
     run_command
 }

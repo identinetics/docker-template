@@ -2,20 +2,31 @@
 
 # Common functions
 # In most cases there is no need to replace these functions.
-# However, if needed, then overwrite them in conf.sh
+# However, if needed, then override them in conf.sh!
+
 PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
 
-CONFLIBDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+conflibdir=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+
+
+conflib_version='2'
+check_version() {
+    # $1 passes conflib version supported by conf.sh
+    if [[ -z $1 ]] || (( $1 < $conflib_version )); then
+        echo "conf_lib.sh V${conflib_version} is not compatible - upgrade conf.sh"
+    fi
+}
+
 
 load_config() {
     # determine config script (there may be more than one to run multiple containers)
     # if config_nr not given and there is only one file matching conf*.sh take this one
-    PROJ_HOME=$(cd $(dirname $CONFLIBDIR) && pwd)
-    cd $PROJ_HOME; confs=(conf*.sh); cd $OLDPWD
+    proj_home=$(cd $(dirname $conflibdir) && pwd)
+    cd $proj_home; confs=(conf*.sh); cd $OLDPWD
     if [ ! -z ${config_nr} ]; then
         conf_script=conf${config_nr}.sh
-        if [ ! -e "$PROJ_HOME/$conf_script" ]; then
-            echo "$PROJ_HOME/$conf_script not found"
+        if [ ! -e "$proj_home/$conf_script" ]; then
+            echo "$proj_home/$conf_script not found"
             exit 1
         fi
     elif [ ${#confs[@]} -eq 1 ]; then
@@ -25,7 +36,7 @@ load_config() {
         printf "%s\n" "${confs[@]}"
         exit 1
     fi
-    source $PROJ_HOME/$conf_script
+    source $proj_home/$conf_script
     if [[ "$DOCKER_REGISTRY" ]]; then
         export DOCKER_REGISTRY_PREFIX="$DOCKER_REGISTRY/"
     else
@@ -36,7 +47,7 @@ load_config() {
 
 # ------------------------- functions for conf*.sh --------------------------
 
-chkdir() {
+_chkdir() {
     if [[ "${1:0:1}" == / ]]; then
         dir=$1  # absolute path
     else   # deprecated
@@ -50,7 +61,7 @@ chkdir() {
 }
 
 
-create_chown_dir() {
+_create_chown_dir() {
     # args: path user [group]
     if [[ "${1:0:1}" == / ]]; then
         dir=$1  # absolute path
@@ -70,23 +81,23 @@ create_chown_dir() {
 
 
 create_user() {
-    A_USERNAME=$1;A_UID=$2
+    a_username=$1;a_uid=$2
     # first start: create user/group/host directories
-    if ! id -u $A_USERNAME &>/dev/null; then
+    if ! id -u $a_username &>/dev/null; then
         if [[ ${OSTYPE//[0-9.]/} == 'darwin' ]]; then  # OSX
-                $sudo sudo dseditgroup -o create -i $A_UID $A_USERNAME
-                $sudo dscl . create /Users/$A_USERNAME UniqueID $A_UID
-                $sudo dscl . create /Users/$A_USERNAME PrimaryGroupID $A_UID
+                $sudo sudo dseditgroup -o create -i $a_uid $a_username
+                $sudo dscl . create /Users/$a_username UniqueID $a_uid
+                $sudo dscl . create /Users/$a_username PrimaryGroupID $a_uid
         else  # Linux
           source /etc/os-release
           case $ID in
             centos|fedora|rhel)
-                $sudo groupadd --non-unique -g $A_UID $A_USERNAME || true
-                $sudo adduser --non-unique -M --gid $A_UID --comment "" --uid $A_UID $A_USERNAME
+                $sudo groupadd --non-unique -g $a_uid $a_username || true
+                $sudo adduser --non-unique -M --gid $a_uid --comment "" --uid $a_uid $a_username
                 ;;
             debian|ubuntu)
-                $sudo groupadd -g $A_UID $A_USERNAME
-                $sudo adduser --gid $A_UID --no-create-home --disabled-password --gecos "" --uid $A_UID $A_USERNAME
+                $sudo groupadd -g $a_uid $a_username
+                $sudo adduser --gid $a_uid --no-create-home --disabled-password --gecos "" --uid $a_uid $a_username
                 ;;
             *)
                 echo "do not know how to add user/group for OS ${OSTYPE} ${NAME}"
@@ -97,7 +108,7 @@ create_user() {
 }
 
 
-get_capabilities() {
+_get_capabilities() {
     # Extract capabilites for docker run defined with the label "capabilites" in the Dockerfile
     export CAPABILITIES=$($sudo docker inspect --format='{{.Config.Labels.capabilities}}' $IMAGENAME)
     if [[ $CAPABILITIES == '<no value>' ]]; then
@@ -156,38 +167,38 @@ map_docker_volume() {
     # Map container directory to Docker volume
     # - Create volume if it does not exist
     # - Append to VOLMAPPING
-    # - chmod g+w and create symlink in SHORTCUT_DIR
-    VOL_NAME=$1; CONTAINERPATH=$2; MOUNT_OPTION=$3; SHORTCUT_DIR=$4
-    if [ ! -d "${SHORTCUT_DIR}" ]; then
+    # - chmod g+w and create symlink in shortcut_dir
+    vol_name=$1; containerpath=$2; mount_option=$3; shortcut_dir=$4
+    if [ ! -d "${shortcut_dir}" ]; then
         echo "conf_lib.sh/map_docker_volume(): argument 4 must be a valid directory; args found: $@" && exit 1;
     fi
-    $sudo docker volume create --name $VOL_NAME >/dev/null
-    export VOLMAPPING="$VOLMAPPING -v $VOL_NAME:$CONTAINERPATH:$MOUNT_OPTION"
-    export VOLLIST="$VOLLIST $VOL_NAME"
-    mkdir -p $SHORTCUT_DIR
+    $sudo docker volume create --name $vol_name >/dev/null
+    export VOLMAPPING="$VOLMAPPING -v $vol_name:$containerpath:$mount_option"
+    export VOLLIST="$VOLLIST $vol_name"
+    mkdir -p $shortcut_dir
     #if [[ "$TRAVIS" == "true" ]]; then
     #    chcon_opt='--selinux-type svirt_sandbox_file_t'
     #fi
-    GW=
+    gw=
     if [ "$CONTAINER_GROUPWRITE" != 'no' ] ; then
-        GW=--groupwrite
+        gw=--groupwrite
     fi
     if [[ ! $JENKINS_HOME ]]; then
-        fs_access="--symlink --prefix $SHORTCUT_DIR $symlink $GW"
+        fs_access="--symlink --prefix $shortcut_dir $symlink $gw"
     fi
     [[ $sudo ]] && sudoopt='-S'
-    $CONFLIBDIR/docker_vol_mount.py $sudoopt $fs_access $chcon_opt --volume $VOL_NAME
+    $conflibdir/docker_vol_mount.py $sudoopt $fs_access $chcon_opt --volume $vol_name
 }
 
 
 map_host_directory() {
     # map a host to a container path
-    HOSTPATH=$1; CONTAINERPATH=$2; MOUNT_OPTION=$3
-    export VOLMAPPING="$VOLMAPPING -v $HOSTPATH:$CONTAINERPATH:$MOUNT_OPTION"
-    if [[ $MOUNT_OPTION == "ro" ]]; then
-        chkdir $HOSTPATH
+    HOSTPATH=$1; containerpath=$2; mount_option=$3
+    export VOLMAPPING="$VOLMAPPING -v $HOSTPATH:$containerpath:$mount_option"
+    if [[ $mount_option == "ro" ]]; then
+        _chkdir $HOSTPATH
     else
-        create_chown_dir $HOSTPATH $CONTAINERUID
+        _create_chown_dir $HOSTPATH $CONTAINERUID
     fi
 }
 
@@ -199,17 +210,17 @@ set_staging_env() {
     #  dev -> '-dev'
     #  any other -> ''
     if [ "$TRAVIS" == "true" ]; then
-        GIT_BRANCH=$TRAVIS_BRANCH
+        git_branch=$TRAVIS_BRANCH
     else
-        proj_home=$(cd $(dirname $CONFLIBDIR) && pwd)
-        GIT_BRANCH=$(cd $proj_home; git symbolic-ref --short -q HEAD)
+        proj_home=$(cd $(dirname $conflibdir) && pwd)
+        git_branch=$(cd $proj_home; git symbolic-ref --short -q HEAD)
     fi
     export STAGING_ENV=''
-    if [ "$GIT_BRANCH" == "master" ]; then
+    if [ "$git_branch" == "master" ]; then
         export STAGING_ENV='pr'
-    elif [ "$GIT_BRANCH" == "qa" ]; then
+    elif [ "$git_branch" == "qa" ]; then
         export STAGING_ENV='qa'
-    elif [ "$GIT_BRANCH" == "dev" ]; then
+    elif [ "$git_branch" == "dev" ]; then
         export STAGING_ENV='dev'
     fi
 }
@@ -252,23 +263,23 @@ get_from_ziparchive_with_checksum() {
     # Steps:
     # - Download zip-file from URL (1) into tmp.zip,
     # - Verify it with SHA2-Hash (2);
-    # - Extract the name of the top-level directory in the archive into INST_DIR
-    # - Extract the archive (creating INST_DIR)
-    # - Link INST_DIR to PROD_DIR
+    # - Extract the name of the top-level directory in the archive into inst_dir
+    # - Extract the archive (creating inst_dir)
+    # - Link inst_dir to prod_dir
     # - create marker file
-    #  PROD_DIR is defined in Dockerfile and should not contain a (minor) version number
-    PROD_URL=$1; PROD_SHA256=$2; PROD_DIR=$3; PROD_VERSION=$4; WGET_OPTIONS=$5
+    #  prod_dir is defined in Dockerfile and should not contain a (minor) version number
+    prod_url=$1; prod_sha256=$2; prod_dir=$3; prod_version=$4; wget_option=$5
 
-    DOWNLOAD_MARKER="$PROD_DIR-$PROD_VERSION.mark"
-    if [ ! -e "$DOWNLOAD_MARKER" ]; then
-        wget $WGET_OPTIONS -O tmp.zip $PROD_URL
-        echo "$PROD_SHA256 tmp.zip" | sha256sum -c -
-        INST_DIR=$(unzip -l tmp.zip | head -4 | tail -1 | awk '{print $4}' | cut -d "/" -f1)
-        rm -rf $INST_DIR $PROD_DIR
+    download_marker="$prod_dir-$prod_version.mark"
+    if [ ! -e "$download_marker" ]; then
+        wget $wget_option -O tmp.zip $prod_url
+        echo "$prod_sha256 tmp.zip" | sha256sum -c -
+        inst_dir=$(unzip -l tmp.zip | head -4 | tail -1 | awk '{print $4}' | cut -d "/" -f1)
+        rm -rf $inst_dir $prod_dir
         unzip tmp.zip
         rm -f tmp.zip
-        ln -sf $INST_DIR $PROD_DIR
-        touch $DOWNLOAD_MARKER
+        ln -sf $inst_dir $prod_dir
+        touch $download_marker
     fi
 }
 
@@ -284,7 +295,7 @@ do_not_build() {
 }
 
 
-echo_commit_status() {
+_echo_commit_status() {
 # output ahead/behind upstream status
     branch=`git rev-parse --abbrev-ref HEAD`
     git for-each-ref --format='%(refname:short) %(upstream:short)' refs/heads | \
@@ -321,7 +332,7 @@ show_git_branches() {
         cd $repodir
         git symbolic-ref --short -q HEAD | tr -d '\n'
         [ -e 'VERSION' ] && echo -n '::' && cat VERSION | tr -d '\n'
-        echo_commit_status
+        _echo_commit_status
         echo
         cd $OLDPWD
     done
