@@ -76,7 +76,6 @@ _set_run_args() {
         -e LOGPURGEFILES='/var/log/httpd/* /var/log/shibboleth/*'
         -e LOGLEVEL=INFO
     "
-    get_capabilities
     export STARTCMD='/start.sh'  # unset or blank to use image default
 }
 

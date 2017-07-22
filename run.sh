@@ -9,6 +9,7 @@ main() {
     remove_existing_container
     create_intercontainer_network
     setup_vol_mapping
+    get_capabilities
     prepare_run_command
     run_command
 }

@@ -108,7 +108,7 @@ create_user() {
 }
 
 
-_get_capabilities() {
+get_capabilities() {
     # Extract capabilites for docker run defined with the label "capabilites" in the Dockerfile
     export CAPABILITIES=$($sudo docker inspect --format='{{.Config.Labels.capabilities}}' $IMAGENAME)
     if [[ $CAPABILITIES == '<no value>' ]]; then
