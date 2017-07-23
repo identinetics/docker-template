@@ -80,7 +80,7 @@ verify_signature() {
 
 remove_existing_container() {
     if [[ "$remove_opt" == 'True' ]]; then
-        $sudo docker ps -a | grep $CONTAINERNAME > /dev/null && docker rm -f $CONTAINERNAME
+        $sudo docker ps -a | grep $CONTAINERNAME > /dev/null && $sudo docker rm -f $CONTAINERNAME
     fi
 }
 

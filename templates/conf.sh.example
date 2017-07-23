@@ -71,12 +71,13 @@ _set_buildargs() {
 
 
 _set_run_args() {
+    LOGPURGEFILES='/var/log/httpd/* /var/log/shibboleth/*'
     export ENVSETTINGS="
         -e LOGDIR=/var/log
-        -e LOGPURGEFILES='/var/log/httpd/* /var/log/shibboleth/*'
+        -e LOGPURGEFILES
         -e LOGLEVEL=INFO
     "
-    export STARTCMD='/start.sh'  # unset or blank to use image default
+    export STARTCMD=''  # set to override image default
 }
 
 
