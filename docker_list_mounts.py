@@ -16,6 +16,7 @@ def main():
 def get_args():
     parser = argparse.ArgumentParser(description='List mounts of a docker container')
     parser.add_argument('-b', '--bind', action="store_true", help='list Type=bind')
+    parser.add_argument('-d', '--debug', action="store_true")
     parser.add_argument('-o', '--other', action="store_true", help='list Type other than volume and bind')
     parser.add_argument('-p', '--printcontainer', action="store_true", help='print container name')
     parser.add_argument('-q', '--quiet', action="store_true", help='list only names')
@@ -37,28 +38,49 @@ def list_container_mounts():
             print('Container: ' + args.container)
     except CalledProcessError as e:
         print("cannot execute 'docker inspect '" + args.container)
-        raise
+        exit(1)
     in_json = json.loads(in_str)
+    volumes = []
+    for v in in_json[0]['Config']['Volumes']:
+        volumes.append(v.rstrip('/'))
+    if args.debug: print('Volumes:' + ', '.join(volumes))
     for mount in in_json[0]['Mounts']:
-        print_mount(mount)
+        print_mount(mount, volumes)
 
 
-def print_mount(mount):
-    if mount['Type'] == 'volume':
-        if args.volume:
-            print(mount['Name'])
-            if not args.quiet:
-                print('   ' + mount['Source'])
-                print('   ' + mount['Destination'])
-    elif mount['Type'] == 'bind':
-        if args.bind:
-            print(mount['Source'])
-            if not args.quiet:
-                print('   ' + mount['Destination'])
-    else:
-        print('Type: ' + mount['Type'])
-        print('   ' + mount['Source'])
-        print('   ' + mount['Destination'])
+def print_mount(mount, volumes):
+    # docker inspect does not output all keys for each entry - need some guessing:
+    if args.debug: print('Mount:' + json.dumps(mount, indent=4))
+    if 'Name' in mount:
+        if mount['Destination'] in volumes:
+            print_volinfo(mount)
+        else:
+            print("== Do not know how to handle entry with Name, but no Type=volume):")
+            print(json.dumps(mount, indent=4))
+    elif 'Type' in mount:
+        if mount['Type'] == 'volume':
+            print_volinfo(mount)
+        elif mount['Type'] == 'bind':
+            print_bindinfo(mount)
+        else:
+            print('Type: ' + mount['Type'])
+            print('   ' + mount['Source'])
+            print('   ' + mount['Destination'])
+
+
+def print_volinfo(mount):
+    if args.volume:
+        print(mount['Name'])
+        if not args.quiet:
+            print('   ' + mount['Source'])
+            print('   ' + mount['Destination'])
+
+
+def print_bindinfo(mount):
+    if args.bind:
+        print(mount['Source'])
+        if not args.quiet:
+            print('   ' + mount['Destination'])
 
 
 main()
