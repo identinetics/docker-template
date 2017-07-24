@@ -45,7 +45,7 @@ def print_volume_mount_path():
             cmd.insert (0, 'sudo')
         in_str = check_output(cmd)
     except CalledProcessError as e:
-        print("cannot execute 'docker volume inspect '" + args.volume)
+        print("cannot execute 'docker volume inspect ' + volume")
         raise
     container = json.loads(in_str)
     global linkto_path
