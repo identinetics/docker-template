@@ -11,8 +11,8 @@ main() {
         logfiles)  echo "$LOGFILES";;
         logrotate) call_logrotate;;
         logs)      exec_docker_cmd "docker logs -f ${CONTAINERNAME}";;
-        lsmount)   $PROJ_HOME/dscripts/docker_list_mounts.py -bov;;
-        lsvol)     $PROJ_HOME/dscripts/docker_list_mounts.py -v;;
+        lsmount)   $PROJ_HOME/dscripts/docker_list_mounts.py -bov $CONTAINERNAME;;
+        lsvol)     $PROJ_HOME/dscripts/docker_list_mounts.py -v $CONTAINERNAME;;
         multitail) do_multitail;;
         mt)        do_multitail;;
         pull)      exec_docker_cmd "docker pull ${DOCKER_REGISTRY_PREFIX}${IMAGENAME}";;
@@ -113,7 +113,7 @@ do_push() {
 
 
 do_rmvol() {
-    vollist=$($PROJ_HOME/dscripts/docker_list_mounts.py -qv)
+    vollist=$($PROJ_HOME/dscripts/docker_list_mounts.py -qv $CONTAINERNAME)
     if [[ $vollist ]]; then
         echo "removing docker volumes $vollist"
         exec_docker_cmd "docker volume rm ${vollist}"
