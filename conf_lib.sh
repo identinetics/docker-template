@@ -158,7 +158,7 @@ enable_x11_client() {
 
 init_sudo() {
     if (( $(id -u) != 0 )); then
-        sudo='sudo'
+        sudo='sudo' # ONLY used for `docker ..` commands
         sudoopt='--sudo'
     fi
 }

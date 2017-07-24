@@ -75,7 +75,7 @@ def create_shortcut_symlink():
             if args.verbose:
                 print("created symlink %s -> %s" % (linkfrom_path, linkto_path))
         except OSError as e:
-            print("error when creating symlink %s -> %s: %s" % (linkfrom_path, linkto_path, str(e)))
+            print("error when creating symlink (use symlink dir where you have rights). Link: %s -> %s: %s" % (linkfrom_path, linkto_path, str(e)))
 
 
 def do_chcon():
