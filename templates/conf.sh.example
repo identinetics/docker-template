@@ -3,9 +3,9 @@
 main() {
     SCRIPTDIR=$(cd $(dirname $BASH_SOURCE[0]) && pwd)
     source $SCRIPTDIR/dscripts/conf_lib.sh  # load library functions
-    configlib_version=2  # this conf.sh supports conf_lib.sh up to this version
+    configlib_version=2  # compatible version of conf_lib.sh
     check_version $configlib_version
-    # do_not_build $@
+    # do_not_build $@ # uncomment this line to pull/load image
     init_sudo
     _set_volume_root
     _set_image_and_container_name
@@ -28,7 +28,7 @@ _set_volume_root() {
         DOCKERLOG_SHORT='./dl';
     fi
     mkdir -p $DOCKERVOL_SHORT $DOCKERLOG_SHORT
-    #DOCKER_VOLUME_ROOT='/var/lib/docker/volumes'  # hard coded - check for your config if applicable!
+    DOCKER_VOLUME_ROOT='/var/lib/docker/volumes'  # hard coded - check for your config if applicable!
 }
 
 

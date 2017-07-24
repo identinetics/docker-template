@@ -17,7 +17,7 @@ main() {
         pull)      exec_docker_cmd "docker pull ${DOCKER_REGISTRY_PREFIX}${IMAGENAME}";;
         push)      call_push;;
         rm)        exec_docker_cmd "docker rm -f ${CONTAINERNAME}";;
-        rmvol)     exec_docker_cmd "docker volume rm ${VOLLIST}";;
+        rmvol)     call_rmvol;;
         status)    call_container_status;;
         *) echo "missing command"; usage; exit 1;;
     esac
@@ -106,6 +106,16 @@ call_push() {
 
     else
         exec_docker_cmd "docker push ${DOCKER_REGISTRY_PREFIX}${IMAGENAME}"
+    fi
+}
+
+
+call_rmvol() {
+    if [[ $VOLLIST ]]; then
+        echo "removing docker volumes ${VOLLIST}"
+        exec_docker_cmd "docker volume rm ${VOLLIST}"
+    else
+        echo "No volumes to be removed"
     fi
 }
 
