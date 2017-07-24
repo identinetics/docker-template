@@ -7,12 +7,13 @@ main() {
     load_library_functions
     load_config
     init_sudo
+    [[ $sudo ]] && sudoopt='--sudo'
     case $cmd in
         logfiles)  echo "$LOGFILES";;
         logrotate) call_logrotate;;
         logs)      exec_docker_cmd "docker logs -f ${CONTAINERNAME}";;
-        lsmount)   $PROJ_HOME/dscripts/docker_list_mounts.py -bov $CONTAINERNAME;;
-        lsvol)     $PROJ_HOME/dscripts/docker_list_mounts.py -v $CONTAINERNAME;;
+        lsmount)   $PROJ_HOME/dscripts/docker_list_mounts.py $sudoopt -bov $CONTAINERNAME;;
+        lsvol)     $PROJ_HOME/dscripts/docker_list_mounts.py $sudoopt -v $CONTAINERNAME;;
         multitail) do_multitail;;
         mt)        do_multitail;;
         pull)      exec_docker_cmd "docker pull ${DOCKER_REGISTRY_PREFIX}${IMAGENAME}";;
@@ -113,7 +114,7 @@ do_push() {
 
 
 do_rmvol() {
-    vollist=$($PROJ_HOME/dscripts/docker_list_mounts.py -qv $CONTAINERNAME)
+    vollist=$($PROJ_HOME/dscripts/docker_list_mounts.py $sudoopt -qv $CONTAINERNAME)
     if [[ $vollist ]]; then
         echo "removing docker volumes $vollist"
         exec_docker_cmd "docker volume rm ${vollist}"
