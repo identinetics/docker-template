@@ -18,7 +18,7 @@ main() {
 get_commandline_opts() {
     interactive_opt='False'
     remove_opt='True'
-    while getopts ":dhiIn:prRV" opt; do
+    while getopts ":dhiIn:prRuV" opt; do
       case $opt in
         d) dryrun='True';;
         i) interactive_opt='True'; tty='-t';;
@@ -31,6 +31,7 @@ get_commandline_opts() {
         p) print_opt='True';;
         r) user_opt='-u 0';;
         R) remove_opt='False';;
+        u) user_opt="-u $OPTARG";;
         V) no_verify='True';;
         :) echo "Option -$OPTARG requires an argument"; exit 1;;
         *) usage; exit 1;;
@@ -51,6 +52,7 @@ usage() {
        -p  print docker run command on stdout
        -r  start command as root user (default is $CONTAINERUSER)
        -R  do not remove existing container before start (default: do remove)
+       -u  start command as user with specified uid
        -V  skip image verification
        cmd shell command to be executed (default is $STARTCMD)"
 }

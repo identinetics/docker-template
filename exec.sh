@@ -13,7 +13,7 @@ main() {
 get_commandline_opts() {
     EXECCMD='/bin/bash'
     interactive_opt='-it'
-    while getopts ":hbiIln:pr" opt; do
+    while getopts ":hbiIln:pru" opt; do
       case $opt in
         b) interactive_opt='';;
         i) interactive_opt='-it';;
@@ -26,6 +26,7 @@ get_commandline_opts() {
            fi;;
         p) print='True';;
         r) useropt='-u 0';;
+        u) useropt="-u $OPTARG";;
         :) echo "Option -$OPTARG requires an argument"; exit 1;;
         *) usage; exit 1;;
       esac
@@ -54,6 +55,7 @@ usage() {
        -n  configuration number ('<NN>' in conf<NN>.sh)
        -p  print docker exec command on stdout
        -r  execute as root user
+       -u  start command as user with specified uid
        cmd shell command to be executed (default is $EXECCMD)
        "
 }
