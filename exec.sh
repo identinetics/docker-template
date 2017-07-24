@@ -13,7 +13,7 @@ main() {
 get_commandline_opts() {
     EXECCMD='/bin/bash'
     interactive_opt='-it'
-    while getopts ":hbiIln:pru" opt; do
+    while getopts ":hbiIln:pru:" opt; do
       case $opt in
         b) interactive_opt='';;
         i) interactive_opt='-it';;
