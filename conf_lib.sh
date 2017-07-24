@@ -174,7 +174,6 @@ map_docker_volume() {
     fi
     $sudo docker volume create --name $vol_name >/dev/null
     export VOLMAPPING="$VOLMAPPING -v $vol_name:$containerpath:$mount_option"
-    export VOLLIST="$VOLLIST $vol_name"
     mkdir -p $shortcut_dir
     #if [[ "$TRAVIS" == "true" ]]; then
     #    chcon_opt='--selinux-type svirt_sandbox_file_t'

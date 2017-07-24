@@ -100,10 +100,9 @@ create_intercontainer_network() {
 
 
 setup_vol_mapping() {
-    # Create docker volume (-> map_docker_volume) or map host dir (-> map_host_directory)
+    # Create docker volume (-> map_docker_volume) or map a host dir (-> map_host_directory)
     # In both cases create a shortcut in the shortcut directory (DOCKERVOL_SHORT, DOCKERLOG_SHORT)
 
-    export VOLLIST=''
     export VOLMAPPING=''
     # create container user on docker host (optional - for better process visibility with host tools)
     create_user $CONTAINERUSER $CONTAINERUID
@@ -115,9 +114,9 @@ setup_vol_mapping() {
         $sudo chown -R $CONTAINERUID:$CONTAINERUID $DOCKER_VOLUME_ROOT/$CONTAINERNAME.* 2>/dev/null || true
     fi
 
-    #export VOLROOT="${DOCKERVOL_SHORT}/$CONTAINERNAME"  # container volumes on docker host
     #map_host_directory "$DOCKERLOG_SHORT/var/log/" '/var/log/' 'Z'
 
+    # the list of logfiles is required for the manage.sh/multitail command
     export LOGFILES="
         $DOCKERLOG_SHORT/${CONTAINERNAME}.var_log/xyz.log
         $DOCKERLOG_SHORT/${CONTAINERNAME}.var_log/xyz.err

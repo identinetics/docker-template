@@ -11,13 +11,14 @@ main() {
         logfiles)  echo "$LOGFILES";;
         logrotate) call_logrotate;;
         logs)      exec_docker_cmd "docker logs -f ${CONTAINERNAME}";;
-        lsvol)     $sudo docker inspect -f '{{ .Mounts }}' $CONTAINERNAME | perl -pe 's/\}\s*\{/}\n{/g';;
-        multitail) call_multitail;;
-        mt)        call_multitail;;
+        lsmount)   $PROJ_HOME/dscripts/docker_list_mounts.py -bov;;
+        lsvol)     $PROJ_HOME/dscripts/docker_list_mounts.py -v;;
+        multitail) do_multitail;;
+        mt)        do_multitail;;
         pull)      exec_docker_cmd "docker pull ${DOCKER_REGISTRY_PREFIX}${IMAGENAME}";;
-        push)      call_push;;
+        push)      do_push;;
         rm)        exec_docker_cmd "docker rm -f ${CONTAINERNAME}";;
-        rmvol)     call_rmvol;;
+        rmvol)     do_rmvol;;
         status)    call_container_status;;
         *) echo "missing command"; usage; exit 1;;
     esac
@@ -51,6 +52,7 @@ usage() {
         logfiles   list container logfiles
         logrotate  rotate, archive and purge logs
         logs       docker logs -f
+        lsmount    list mounts of container (type: bind, volume and others)
         lsvol      list volumes of container
         multitail  multitail on all logfiles in \$VOLLIST
         pull       push to docker registry
@@ -89,7 +91,7 @@ load_library_functions() {
 }
 
 
-call_multitail() {
+do_multitail() {
     [[ -z "$LOGFILES" ]] && echo 'No LOGFILES set on conf.sh' && exit 1
     cmd='multitail'
     for logfile in $LOGFILES; do
@@ -99,7 +101,7 @@ call_multitail() {
 }
 
 
-call_push() {
+do_push() {
     if [[ ${DOCKER_REGISTRY_PREFIX} ]]; then
         exec_docker_cmd "docker tag ${IMAGENAME} ${DOCKER_REGISTRY_PREFIX}${IMAGENAME}"
         exec_docker_cmd "docker push ${DOCKER_REGISTRY_PREFIX}${IMAGENAME}"
@@ -110,10 +112,11 @@ call_push() {
 }
 
 
-call_rmvol() {
-    if [[ $VOLLIST ]]; then
-        echo "removing docker volumes ${VOLLIST}"
-        exec_docker_cmd "docker volume rm ${VOLLIST}"
+do_rmvol() {
+    vollist=$($PROJ_HOME/dscripts/docker_list_mounts.py -qv)
+    if [[ $vollist ]]; then
+        echo "removing docker volumes $vollist"
+        exec_docker_cmd "docker volume rm ${vollist}"
     else
         echo "No volumes to be removed"
     fi
