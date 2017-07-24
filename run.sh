@@ -8,7 +8,7 @@ main() {
     verify_signature
     remove_existing_container
     create_intercontainer_network
-    setup_vol_mapping
+    setup_vol_mapping 'create'
     get_capabilities
     prepare_run_command
     run_command

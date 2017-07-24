@@ -158,7 +158,8 @@ enable_x11_client() {
 
 init_sudo() {
     if (( $(id -u) != 0 )); then
-        sudo="sudo"
+        sudo='sudo'
+        sudoopt='--sudo'
     fi
 }
 
@@ -168,9 +169,13 @@ map_docker_volume() {
     # - Create volume if it does not exist
     # - Append to VOLMAPPING
     # - chmod g+w and create symlink in shortcut_dir
-    vol_name=$1; containerpath=$2; mount_option=$3; shortcut_dir=$4
+    mode=$1; vol_name=$2; containerpath=$3; mount_option=$4; shortcut_dir=$5
+    if [[ $mode == 'list' ]]; then
+        export VOLLIST="${VOLLIST} ${vol_name}"
+        return
+    fi
     if [ ! -d "${shortcut_dir}" ]; then
-        echo "conf_lib.sh/map_docker_volume(): argument 4 must be a valid directory; args found: $@" && exit 1;
+        echo "conf_lib.sh/map_docker_volume(): argument 5 must be a valid directory; args found: $@" && exit 1;
     fi
     $sudo docker volume create --name $vol_name >/dev/null
     export VOLMAPPING="$VOLMAPPING -v $vol_name:$containerpath:$mount_option"
@@ -185,7 +190,6 @@ map_docker_volume() {
     if [[ ! $JENKINS_HOME ]]; then
         fs_access="--symlink --prefix $shortcut_dir $symlink $gw"
     fi
-    [[ $sudo ]] && sudoopt='-S'
     $conflibdir/docker_vol_mount.py $sudoopt $fs_access $chcon_opt --volume $vol_name
 }
 

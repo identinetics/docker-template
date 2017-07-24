@@ -53,13 +53,13 @@ usage() {
         logfiles   list container logfiles
         logrotate  rotate, archive and purge logs
         logs       docker logs -f
-        lsmount    list mounts of container (type: bind, volume and others)
-        lsvol      list volumes of container
+        lsmount    list mounts (type: bind, volume and others)
+        lsvol      list mounted volumes
         multitail  multitail on all logfiles in \$VOLLIST
         pull       push to docker registry
         push       pull from docker registry
-        rm         remove docker image (--force)
-        rmvol      remove docker volumes defined in conf.sh
+        rm         remove docker container (--force)
+        rmvol      remove docker and volumes volumes defined in conf.sh
         status     report container status
     "
 }
@@ -114,10 +114,10 @@ do_push() {
 
 
 do_rmvol() {
-    vollist=$($PROJ_HOME/dscripts/docker_list_mounts.py $sudoopt -qv $CONTAINERNAME)
-    if [[ $vollist ]]; then
-        echo "removing docker volumes $vollist"
-        exec_docker_cmd "docker volume rm ${vollist}"
+    setup_vol_mapping 'list'
+    if [[ $VOLLIST ]]; then
+        echo "removing docker volumes $VOLLIST"
+        exec_docker_cmd "docker volume rm ${VOLLIST}"
     else
         echo "No volumes to be removed"
     fi
