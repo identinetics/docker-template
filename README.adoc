@@ -46,11 +46,14 @@ Requirements:
     cp dscript/templates/build_prepare.sh.default build_prepare.sh
     cp dscript/templates/.gitignore .
     cp -r dscript/templates/install .
-    
+
+    # to update your submodules you may excute:
+    git submodule update --remote # git 1.8.2 or above
+    cd dscripts && git chekcout master && git pull && cd -  # old version
     
 3. adapt Dockerfile, conf.sh and build_prepare.sh
 
-## Usage
+## Usage (local build + run)
 
     dscript/build.sh [-h] [-n container-nr] [-p] [-r]
     dscript/run.sh [-h] [-i] [-n container-nr] [-p] [-r] -[R] [cmd]
@@ -58,8 +61,6 @@ Requirements:
 
     # auxiliary functions:
     dscript/manage.sh [-h] [-n container-nr] cmd
-    dscript/sign.sh [-h] [-n container-nr]
-    dscript/verify.sh [-h] [-n container-nr]
 
     To run multiple XYZ containers on the same system you need to create separate
     conf.sh files and build separate images:
@@ -68,3 +69,22 @@ Requirements:
     b) build the container with the -n option, e.g. `build.sh -n 3`
     c) run the container with the -n option, e.g. `run.sh -n 3`
 
+## Usage (local build + remote run)
+
+    # build system
+    dscript/build.sh [-n container-nr]
+    dscript/manage.sh [-n container-nr] push
+    # optional image signature - see SHIVA.adoc
+    dscript/sign.sh [-h] [-n container-nr]
+
+
+
+    # run system
+    # enable "do_not_build" in conf.sh/main()
+    dscript/run.sh
+
+
+## Usage (run image from public repo )
+
+    # enable "do_not_build" in conf.sh/main()
+    dscript/run.sh

@@ -2,7 +2,7 @@
 
 main() {
     SCRIPTDIR=$(cd $(dirname $BASH_SOURCE[0]) && pwd)
-    source $SCRIPTDIR/dscripts/conf_lib.sh  # load library functions
+    source $SCRIPTDIR/dscripts/conf_lib.sh  $@         # load library functions
     configlib_version=2  # compatible version of conf_lib.sh
     check_version $configlib_version
     # do_not_build $@ # uncomment this line to pull/load image

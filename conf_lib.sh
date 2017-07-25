@@ -36,7 +36,7 @@ load_config() {
         printf "%s\n" "${confs[@]}"
         exit 1
     fi
-    source $proj_home/$conf_script
+    source $proj_home/$conf_script $@
     if [[ "$DOCKER_REGISTRY" ]]; then
         export DOCKER_REGISTRY_PREFIX="$DOCKER_REGISTRY/"
     else
@@ -292,7 +292,7 @@ get_from_ziparchive_with_checksum() {
 
 do_not_build() {
     if [ "$1" == "--build" ]; then
-         echo "Do not build this image locally - get it from repo"
+         echo "Build the image locally has been disabled - get it from repo"
          exit 1
     fi
 }
