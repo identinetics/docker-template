@@ -18,6 +18,7 @@ Features:
 - Containers have by default a fixed IP-address baed on the container number. This allows load balancer
   config without dependency on the container to have a dockerd-DNS entry (when not running).
 - Consistent image, container, user and network mapping for multiple containers
+- http(s)_proxy environemnt variables are passed to `docker build`
 - Pre-build hook: Allow script to modify the build env or Dockerfile before build. This can be used
   to:
   ** Download archives or clone github repos before `docker build` to have better control on updates, or
