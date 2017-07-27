@@ -45,15 +45,15 @@ get_commandline_opts() {
 
 
 load_library_functions() {
-    BUILDSCRIPTDIR=$(cd $(dirname $BASH_SOURCE[0]) && pwd)
-    PROJ_HOME=$(cd $(dirname $BUILDSCRIPTDIR) && pwd)
-    source $PROJ_HOME/dscripts/conf_lib.sh
+    buildscriptsdir=$(cd $(dirname $BASH_SOURCE[0]) && pwd)
+    proj_home=$(cd $(dirname $buildscriptsdir) && pwd)
+    source $proj_home/dscripts/conf_lib.sh
 }
 
 
 prepare_docker_build_env() {
-    if [ -e $PROJ_HOME/build_prepare.sh ]; then
-       $PROJ_HOME/build_prepare.sh $update_pkg
+    if [ -e $proj_home/build_prepare.sh ]; then
+       $proj_home/build_prepare.sh $update_pkg
     fi
 }
 
@@ -66,7 +66,11 @@ remove_previous_image() {
 
 
 prepare_build_command() {
-    docker_build="docker build $BUILDARGS $CACHEOPT -t=$IMAGENAME ."
+    proxyarg=''
+    [[ $http_proxy ]] && proxyarg="--build-arg http_proxy=$http_proxy"
+    [[ $https_proxy ]] && proxyarg="$proxyarg --build-arg https_proxy=$https_proxy"
+    [[ $no_proxy ]] && proxyarg="--build-arg no_proxy=$no_proxy"
+    docker_build="docker build $BUILDARGS $proxyarg $CACHEOPT -t=$IMAGENAME ."
     if [ "$print" == "True" ]; then
         echo $docker_build
     fi
@@ -88,13 +92,13 @@ exec_build_command() {
 
 list_repo_branches() {
     echo "List git repositories and their current branch"
-    $BUILDSCRIPTDIR/show_repo_branches.sh
+    $buildscriptsdir/show_repo_branches.sh
     echo
 }
 
 do_cleanup() {
-    if [ -e $PROJ_HOME/cleanup.sh ]; then
-       $PROJ_HOME/cleanup.sh $update_pkg
+    if [ -e $proj_home/cleanup.sh ]; then
+       $proj_home/cleanup.sh $update_pkg
     fi
 }
 
