@@ -70,7 +70,7 @@ prepare_build_command() {
     [[ $http_proxy ]] && proxyarg="--build-arg http_proxy=$http_proxy"
     [[ $https_proxy ]] && proxyarg="$proxyarg --build-arg https_proxy=$https_proxy"
     no_proxy=$(echo -e "${no_proxy}" | tr -d '[:space:]')
-    [[ $no_proxy ]] && proxyarg="$proxyarg --build-arg no_proxy='""$no_proxy""'"
+    [[ $no_proxy ]] && proxyarg="$proxyarg --build-arg no_proxy=$no_proxy"
     docker_build="docker build $BUILDARGS $proxyarg $CACHEOPT -t=$IMAGENAME ."
     if [ "$print" == "True" ]; then
         echo $docker_build
