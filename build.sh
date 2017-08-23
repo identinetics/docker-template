@@ -3,7 +3,7 @@
 main() {
     get_commandline_opts $@
     load_library_functions
-    load_config
+    load_config '--build'
     cd_to_Dockerfile_dir
     prepare_docker_build_env
     init_sudo
