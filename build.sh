@@ -4,6 +4,7 @@ main() {
     get_commandline_opts $@
     load_library_functions
     load_config
+    cd_to_Dockerfile_dir
     prepare_docker_build_env
     init_sudo
     remove_previous_image
@@ -61,6 +62,13 @@ prepare_docker_build_env() {
 remove_previous_image() {
     if [ "remove_img" == "True" ]; then
         ${sudo} docker rmi -f $IMAGENAME 2> /dev/null || true
+    fi
+}
+
+
+cd_to_Dockerfile_dir() {
+    if [[ $DOCKERFILE_DIR ]]; then
+        cd $DOCKERFILE_DIR
     fi
 }
 

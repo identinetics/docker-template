@@ -29,6 +29,7 @@ _set_volume_root() {
     fi
     mkdir -p $DOCKERVOL_SHORT $DOCKERLOG_SHORT
     DOCKER_VOLUME_ROOT='/var/lib/docker/volumes'  # hard coded - check for your config if applicable!
+    #export DOCKERFILE_DIR=  # set this if the Dockerfile is not in the directory containing the dscripts subproject
 }
 
 
