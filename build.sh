@@ -88,13 +88,15 @@ prepare_build_command() {
 
 exec_build_command() {
     ${sudo} $docker_build
-    if (( $? == 0 )); then
+    rc=$?
+    if (( $rc == 0 )); then
         echo "image: $IMAGENAME built."
         if [ "$push" == "True" ]; then
             ${sudo} docker push $DOCKER_REGISTRY/$IMAGENAME
         fi
     else
         echo -e '\E[33;31m'"\033[1mError\033[0m Docker build failed"
+        exit $rc
     fi
 }
 
