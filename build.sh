@@ -83,7 +83,7 @@ prepare_build_command() {
     if [ "$print" == "True" ]; then
         echo $docker_build
     fi
-    printf "$IMAGENAME build on node $HOSTNAME on $(date --iso-8601=seconds) by $LOGNAME" > LASTBUILD
+    printf "$IMAGENAME build on node $HOSTNAME on $(date --iso-8601=seconds) by $LOGNAME from:\n" > LASTBUILD
     $buildscriptsdir/show_repo_branches.sh >> LASTBUILD
 }
 
