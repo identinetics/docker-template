@@ -139,4 +139,4 @@ COPY install/profile.d/* /etc/profile.d/
 
 USER $USERNAME
 CMD ["/start.sh"]
-
+COPY LASTBUILD /opt/etc/LASTBUILD
