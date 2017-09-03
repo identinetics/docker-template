@@ -102,7 +102,7 @@ exec_build_command() {
 
 
 list_repo_branches() {
-    echo "List git repositories and their current branch"
+    echo "=== git repositories/branches and their last commit ==="
     $buildscriptsdir/show_repo_branches.sh
     echo
 }
