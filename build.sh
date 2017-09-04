@@ -73,13 +73,21 @@ cd_to_Dockerfile_dir() {
 }
 
 
+prepare_proxy_args() {
+    if [[ "${http_proxy}${https_proxy}" ]]; then
+        perl -pe 's/\#\? // if /ARG (http|https|no)_proxy/' $DOCKERFILE > Dockerfile.proxy~
+        export BUILDARGS=" $BUILDARGS -f Dockerfile.proxy~
+        no_proxy_noblanks=$(printf "${BUILD_IP},${no_proxy}" | tr -d '[:space:]')
+        BUILDARGS="$BUILDARGS --build-arg http_proxy=$http_proxy"
+        BUILDARGS="$BUILDARGS --build-arg https_proxy=$https_proxy"
+        BUILDARGS="$BUILDARGS --build-arg no_proxy=$no_proxy_noblanks"
+    fi
+}
+
+
 prepare_build_command() {
-    proxyarg=''
-    [[ $http_proxy ]] && proxyarg="--build-arg http_proxy=$http_proxy"
-    [[ $https_proxy ]] && proxyarg="$proxyarg --build-arg https_proxy=$https_proxy"
-    no_proxy=$(echo -e "${no_proxy}" | tr -d '[:space:]')
-    [[ $no_proxy ]] && proxyarg="$proxyarg --build-arg no_proxy=$no_proxy"
-    docker_build="docker build $BUILDARGS $proxyarg $CACHEOPT -t=$IMAGENAME ."
+    prepare_proxy_args
+    docker_build="docker build $BUILDARGS $CACHEOPT -t=$IMAGENAME ."
     if [ "$print" == "True" ]; then
         echo $docker_build
     fi

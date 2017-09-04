@@ -42,6 +42,7 @@ load_config() {
     else
         export DOCKER_REGISTRY_PREFIX=''
     fi
+    export DOCKERFILE='Dockerfile'  # may be superseeded in conf.sh
 }
 
 
