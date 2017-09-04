@@ -76,7 +76,7 @@ cd_to_Dockerfile_dir() {
 prepare_proxy_args() {
     if [[ "${http_proxy}${https_proxy}" ]]; then
         perl -pe 's/\#\? // if /ARG (http|https|no)_proxy/' $DOCKERFILE > Dockerfile.proxy~
-        export BUILDARGS=" $BUILDARGS -f Dockerfile.proxy~
+        export BUILDARGS=" $BUILDARGS -f Dockerfile.proxy~"
         no_proxy_noblanks=$(printf "${BUILD_IP},${no_proxy}" | tr -d '[:space:]')
         BUILDARGS="$BUILDARGS --build-arg http_proxy=$http_proxy"
         BUILDARGS="$BUILDARGS --build-arg https_proxy=$https_proxy"
