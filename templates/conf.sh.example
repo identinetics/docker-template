@@ -68,6 +68,7 @@ _set_buildargs() {
         --build-arg USERNAME=$CONTAINERUSER
         --build-arg UID=$CONTAINERUID
     "
+    #DOCKERFILE='Dockerfile.debian'  # change Dockerfile path
 }
 
 
