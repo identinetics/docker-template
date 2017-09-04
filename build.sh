@@ -75,11 +75,11 @@ cd_to_Dockerfile_dir() {
 
 prepare_proxy_args() {
     if [[ "${http_proxy}${https_proxy}" ]]; then
-        perl -pe 's/\#\? // if /ARG (http|https|no)_proxy/' $DOCKERFILE > Dockerfile.proxy~
-        export BUILDARGS=" $BUILDARGS -f Dockerfile.proxy~"
         no_proxy_noblanks=$(printf "${BUILD_IP},${no_proxy}" | tr -d '[:space:]')
+        # Docker will import following env-variables without explicit ARG statement in Dockerfile
         BUILDARGS="$BUILDARGS --build-arg http_proxy=$http_proxy"
         BUILDARGS="$BUILDARGS --build-arg https_proxy=$https_proxy"
+        BUILDARGS="$BUILDARGS --build-arg ftp_proxy=$ftp_proxy"
         BUILDARGS="$BUILDARGS --build-arg no_proxy=$no_proxy_noblanks"
     fi
 }

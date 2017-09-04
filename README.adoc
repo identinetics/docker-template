@@ -94,11 +94,6 @@ Requirements:
 
 dscripts support `docker build` behind an optional proxy. This reuqires:
 
-* http_proxy, https_proxy and no_proxy set on the docker host
-* these 3 env variables included in the Dockerfile as follows:
+* http_proxy, https_proxy ftp_proxy and no_proxy set on the docker host
+* these 4 env variables will be imported by docker without additional ARG statement in Dockerfile
 
-    #? ARG http_proxy
-    #? ARG https_proxy
-    #? ARG no_proxy
-
-`build.sh` will create and use the temporary Dockerfile.proxy~ with the arguments enabled if a proxy is detected.

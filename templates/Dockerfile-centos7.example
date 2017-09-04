@@ -9,6 +9,10 @@ LABEL maintainer="Rainer Hörbe <r2h2@hoerbe.at>" \
       #   --cap-add=setuid --cap-add=setgid --cap-add=chown --cap-add=net_bind_service
       capabilities='--cap-drop=all'
 
+# Enable proxy args if required by docker host
+#? ARG http_proxy
+#? ARG https_proxy
+#? ARG no_proxy
 
 HEALTHCHECK --interval=5m --timeout=5s CMD curl -f http://localhost:8080/ || exit 1
 

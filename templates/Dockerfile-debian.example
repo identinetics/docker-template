@@ -1,7 +1,11 @@
 FROM debian:jessie
 
 # allow build behind firewall
-ARG HTTPS_PROXY=''
+# Enable proxy args if required by docker host
+#? ARG http_proxy
+#? ARG https_proxy
+#? ARG no_proxy
+
 
 # Application will run as a non-root user/group that must map to the docker host
 ARG USERNAME
