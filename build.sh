@@ -87,6 +87,7 @@ prepare_proxy_args() {
 
 prepare_build_command() {
     prepare_proxy_args
+    [[ $DOCKERFILE ]] && BUILDARGS="$BUILDARGS -f $DOCKERFILE"
     docker_build="docker build $BUILDARGS $CACHEOPT -t=$IMAGENAME ."
     if [ "$print" == "True" ]; then
         echo $docker_build
