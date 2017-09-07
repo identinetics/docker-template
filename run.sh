@@ -18,8 +18,9 @@ main() {
 get_commandline_opts() {
     interactive_opt='False'
     remove_opt='True'
-    while getopts ":dhiIn:prRu:V" opt; do
+    while getopts ":CdhiIn:prRu:V" opt; do
       case $opt in
+        C) ignore_capabilties='True';;
         d) dryrun='True';;
         i) interactive_opt='True'; tty='-t';;
         I) interactive_opt='True'; tty='';;
@@ -43,7 +44,8 @@ get_commandline_opts() {
 
 
 usage() {
-    echo "usage: $0 [-h] [-i] [-n container-nr ] [-p] [-r] -[R] [cmd]
+    echo "usage: $0 [-h] [-C] [-i] [-n container-nr ] [-p] [-r] -[R] [cmd]
+       -C  ignore capabilties configured in Dockerfile LABEL
        -d  dry run - do not execute
        -h  print this help text
        -i  start in interactive mode and assign terminal
@@ -104,6 +106,9 @@ prepare_run_command() {
     fi
     if [[ ! -z "$SERVICEDESCRIPTION" ]]; then
         label="--label x.service=$SERVICEDESCRIPTION"
+    fi
+    if [[ $ignore_capabilties ]]; then
+        CAPABILITIES=''
     fi
     # shells do not expand variables with quotes and spaces as needed, use array instead (http://mywiki.wooledge.org/BashFAQ/050)
     run_args=($runmode $remove $user_opt --hostname=$CONTAINERNAME --name=$CONTAINERNAME
