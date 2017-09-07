@@ -36,13 +36,13 @@ load_config() {
         printf "%s\n" "${confs[@]}"
         exit 1
     fi
+    export DOCKERFILE='Dockerfile'  # may be superseeded in conf.sh
     source $proj_home/$conf_script $@
     if [[ "$DOCKER_REGISTRY" ]]; then
         export DOCKER_REGISTRY_PREFIX="$DOCKER_REGISTRY/"
     else
         export DOCKER_REGISTRY_PREFIX=''
     fi
-    export DOCKERFILE='Dockerfile'  # may be superseeded in conf.sh
 }
 
 
