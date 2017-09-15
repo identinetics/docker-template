@@ -18,7 +18,7 @@ main() {
 get_commandline_opts() {
     interactive_opt='False'
     remove_opt='True'
-    while getopts ":CdhiIn:prRu:V" opt; do
+    while getopts ":CdhiIn:pPrRu:V" opt; do
       case $opt in
         C) ignore_capabilties='True';;
         d) dryrun='True';;
@@ -30,6 +30,7 @@ get_commandline_opts() {
            fi
            config_nr=$OPTARG;;
         p) print_opt='True';;
+        P) pwd_opt='True';;
         r) user_opt='-u 0';;
         R) remove_opt='False';;
         u) user_opt='-u '$OPTARG;;
@@ -44,7 +45,7 @@ get_commandline_opts() {
 
 
 usage() {
-    echo "usage: $0 [-h] [-C] [-i] [-n container-nr ] [-p] [-r] -[R] [cmd]
+    echo "usage: $0 [-h] [-C] [-i] [-n container-nr ] [-p] [-P] [-r] -[R] [cmd]
        -C  ignore capabilties configured in Dockerfile LABEL
        -d  dry run - do not execute
        -h  print this help text
@@ -52,6 +53,7 @@ usage() {
        -I  start in interactive mode and do not assign terminal
        -n  configuration number ('<NN>' in conf<NN>.sh)
        -p  print docker run command on stdout
+       -P  add volume mapping $PWD:/pwd:Z
        -r  start command as root user (default is $CONTAINERUSER)
        -R  do not remove existing container before start (default: do remove)
        -u  start command as user with specified uid
@@ -109,6 +111,9 @@ prepare_run_command() {
     fi
     if [[ $ignore_capabilties ]]; then
         CAPABILITIES=''
+    fi
+    if [[ $pwd_opt ]]; then
+        VOLMAPPING="$VOLMAPPING -v $PWD:/pwd:Z"
     fi
     # shells do not expand variables with quotes and spaces as needed, use array instead (http://mywiki.wooledge.org/BashFAQ/050)
     run_args=($runmode $remove $user_opt --hostname=$CONTAINERNAME --name=$CONTAINERNAME

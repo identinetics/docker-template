@@ -32,7 +32,7 @@ load_config() {
     elif [ ${#confs[@]} -eq 1 ]; then
         conf_script=${confs[0]}
     else
-        echo "No or more than one (${#confs[@]}) conf*.sh: need to provide -n argument:"
+        echo "No or more than one (${#confs[@]}) conf*.sh"
         printf "%s\n" "${confs[@]}"
         exit 1
     fi
