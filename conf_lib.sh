@@ -133,7 +133,7 @@ enable_pkcs11() {
     #enable Smartcard Reader in Docker
     # --privileged mapping of usb devices allows the generic configuration without knowing the
     # USB device name. Alternatively, devices can be mapped using '--device'
-    export ENVSETTINGS="$ENVSETTINGS --privileged -v /dev/bus/usb:/dev/bus/usb"
+    export VOLMAPPING="$VOLMAPPING --privileged -v /dev/bus/usb:/dev/bus/usb"
 }
 
 
@@ -148,12 +148,13 @@ enable_sshd() {
 
 enable_x11_client() {
     # How to enable xclients in Docker containers: http://wiki.ros.org/docker/Tutorials/GUI
-    export ENVSETTINGS="$ENVSETTINGS
-        -e DISPLAY=$DISPLAY
-    "
-    export VOLMAPPING="$VOLMAPPING
-        -v /tmp/.X11-unix/:/tmp/.X11-unix:Z
-    "
+    if [[ $DISPLAY ]]; then
+        export ENVSETTINGS="$ENVSETTINGS -e DISPLAY=$DISPLAY"
+    else
+        echo "cannot enable X11 client - DISPLAY not set"
+        exit 1
+    fi
+    export VOLMAPPING="$VOLMAPPING -v /tmp/.X11-unix/:/tmp/.X11-unix:Z"
 }
 
 
