@@ -76,29 +76,29 @@ _create_chown_dir() {
     else
         group=$3
     fi
-    $sudo mkdir -p $dir
-    $sudo chown -R $user:$group $dir
+    $sudo mkdir -p $dir >/dev/null 2>&1 || true
+    $sudo chown -R $user:$group $dir >/dev/null 2>&1 || true
 }
 
 
 create_user() {
-    a_username=$1;a_uid=$2
+    a_username=$1; a_uid=$2
     # first start: create user/group/host directories
     if ! id -u $a_username &>/dev/null; then
         if [[ ${OSTYPE//[0-9.]/} == 'darwin' ]]; then  # OSX
-                $sudo sudo dseditgroup -o create -i $a_uid $a_username
-                $sudo dscl . create /Users/$a_username UniqueID $a_uid
-                $sudo dscl . create /Users/$a_username PrimaryGroupID $a_uid
+                $sudo sudo dseditgroup -o create -i $a_uid $a_username >/dev/null 2>&1 || true
+                $sudo dscl . create /Users/$a_username UniqueID $a_uid >/dev/null 2>&1 || true
+                $sudo dscl . create /Users/$a_username PrimaryGroupID $a_uid >/dev/null 2>&1 || true
         else  # Linux
           source /etc/os-release
           case $ID in
             centos|fedora|rhel)
-                $sudo groupadd --non-unique -g $a_uid $a_username || true
-                $sudo adduser --non-unique -M --gid $a_uid --comment "" --uid $a_uid $a_username
+                $sudo groupadd --non-unique -g $a_uid $a_username >/dev/null 2>&1 || true
+                $sudo adduser --non-unique -M --gid $a_uid --comment "" --uid $a_uid $a_username >/dev/null 2>&1  || true
                 ;;
             debian|ubuntu)
-                $sudo groupadd -g $a_uid $a_username
-                $sudo adduser --gid $a_uid --no-create-home --disabled-password --gecos "" --uid $a_uid $a_username
+                $sudo groupadd -g $a_uid $a_username >/dev/null 2>&1 || true
+                $sudo adduser --gid $a_uid --no-create-home --disabled-password --gecos "" --uid $a_uid $a_username >/dev/null 2>&1 || true
                 ;;
             *)
                 echo "do not know how to add user/group for OS ${OSTYPE} ${NAME}"
@@ -160,7 +160,7 @@ enable_x11_client() {
 
 init_sudo() {
     if (( $(id -u) != 0 )); then
-        sudo='sudo' # ONLY used for `docker ..` commands
+        sudo='sudo -n' # ONLY used for `docker ..` commands
         sudoopt='--sudo'
     fi
 }
@@ -181,7 +181,7 @@ map_docker_volume() {
     fi
     $sudo docker volume create --name $vol_name >/dev/null
     export VOLMAPPING="$VOLMAPPING -v $vol_name:$containerpath:$mount_option"
-    mkdir -p $shortcut_dir
+    $sudo mkdir -p $shortcut_dir >/dev/null 2>&1 || true
     #if [[ "$TRAVIS" == "true" ]]; then
     #    chcon_opt='--selinux-type svirt_sandbox_file_t'
     #fi
