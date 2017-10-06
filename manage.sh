@@ -54,12 +54,12 @@ usage() {
         logrotate  rotate, archive and purge logs
         logs       docker logs -f
         lsmount    list mounts (type: bind, volume and others)
-        lsvol      list mounted volumes
-        multitail  multitail on all logfiles in \$VOLLIST
+        lsvol      list mounted volumes (type: docker volume)
+        multitail  multitail on all logfiles in \$LOGFILES
         pull       push to docker registry
         push       pull from docker registry
         rm         remove docker container (--force)
-        rmvol      remove docker and volumes volumes defined in conf.sh
+        rmvol      remove docker volumes defined in conf.sh
         status     report container status
     "
 }
