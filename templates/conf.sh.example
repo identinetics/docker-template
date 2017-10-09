@@ -13,6 +13,7 @@ main() {
     _set_users
     _set_buildargs
     _set_run_args
+    _set_logfiles
     #enable_x11_client
     #enable_pkcs11
     #set_enable_sshd     # usually used only for debugging - requires installed sshd in image
@@ -128,6 +129,14 @@ _set_enable_sshd() {
     map_docker_volume $mode "${CONTAINERNAME}.ssh" "/etc/ssh" 'Z' $DOCKERLOG_SHORT
     export CAPABILITIES="$CAPABILITIES --cap-add=setuid --cap-add=setgid --cap-add=chown"
     enable_sshd
+}
+
+
+_set_logfiles () {  # set this for multitail + logfiles subcommands in manage.sh
+    export LOGFILES="
+        ${DOCKERLOG_SHORT}/${CONTAINERNAME}.var_log/shibboleth/shibd.log
+        ${DOCKERLOG_SHORT}/${CONTAINERNAME}.var_log/httpd/sp1TestWpvPortalverbundAt_access.log
+    "
 }
 
 
