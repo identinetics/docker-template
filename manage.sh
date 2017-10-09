@@ -9,7 +9,7 @@ main() {
     init_sudo
     [[ $sudo ]] && sudoopt='--sudo'
     case $cmd in
-        logfiles)  echo "$LOGFILES";;
+        logfiles)  get_logfiles && echo "$LOGFILES";;
         logrotate) call_logrotate;;
         logs)      exec_docker_cmd "docker logs -f ${CONTAINERNAME}";;
         lsmount)   $PROJ_HOME/dscripts/docker_list_mounts.py $sudoopt -bov $CONTAINERNAME;;
@@ -93,12 +93,27 @@ load_library_functions() {
 
 
 do_multitail() {
+    get_logfiles
     [[ -z "$LOGFILES" ]] && echo 'No LOGFILES set on conf.sh' && exit 1
     cmd='multitail'
     for logfile in $LOGFILES; do
         cmd="${cmd} -i ${logfile}"
     done
     $cmd
+}
+
+
+
+get_logfiles() {
+    LOGFILES=''
+    if [[ -n "$(type -t set_logfiles)" ]] && [[ "$(type -t rvm)" == function ]]; then
+        set_logfiles
+    fi
+    for lf in $KNOWN_LOGFILES; do
+        if [[ -e $lf ]]; then
+            export LOGFILES="$LOGFILES $lf"
+        fi
+    done
 }
 
 

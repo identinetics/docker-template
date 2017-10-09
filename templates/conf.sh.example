@@ -132,10 +132,12 @@ _set_enable_sshd() {
 }
 
 
-_set_logfiles () {  # set this for multitail + logfiles subcommands in manage.sh
-    export LOGFILES="
-        ${DOCKERLOG_SHORT}/${CONTAINERNAME}.var_log/shibboleth/shibd.log
-        ${DOCKERLOG_SHORT}/${CONTAINERNAME}.var_log/httpd/sp1TestWpvPortalverbundAt_access.log
+
+set_logfiles() {  # optional: set this for multitail + logfiles subcommands in manage.sh
+    export KNOWN_LOGFILES="
+        ${DOCKERLOG_SHORT}/${CONTAINERNAME}.var_log/pyffd.log
+        ${DOCKERLOG_SHORT}/${CONTAINERNAME}.var_log/pyffd.error
+        ${DOCKERLOG_SHORT}/${CONTAINERNAME}.var_log/pyff_mdsplit.log
     "
 }
 
