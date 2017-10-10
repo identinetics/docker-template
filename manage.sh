@@ -106,7 +106,7 @@ do_multitail() {
 
 get_logfiles() {
     LOGFILES=''
-    if [[ -n "$(type -t set_logfiles)" ]] && [[ "$(type -t rvm)" == function ]]; then
+    if [[ -n "$(type -t set_logfiles)" ]] && [[ "$(type -t set_logfiles)" == function ]]; then
         set_logfiles
     fi
     for lf in $KNOWN_LOGFILES; do
