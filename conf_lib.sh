@@ -36,7 +36,11 @@ load_config() {
         printf "%s\n" "${confs[@]}"
         exit 1
     fi
-    export DOCKERFILE='Dockerfile'  # may be superseeded in conf.sh
+    if [[ $DSCRIPTS_DOCKERFILE ]]; then
+        export DSCRIPTS_DOCKERFILE_OPT="-f $DSCRIPTS_DOCKERFILE"
+    else
+        export DSCRIPTS_DOCKERFILE_OPT=''
+    fi
     source $proj_home/$conf_script $@
     if [[ "$DOCKER_REGISTRY" ]]; then
         export DOCKER_REGISTRY_PREFIX="$DOCKER_REGISTRY/"

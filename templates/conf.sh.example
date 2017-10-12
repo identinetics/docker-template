@@ -26,7 +26,6 @@ _set_volume_root() {
     DOCKERLOG_SHORT='./dl'
     mkdir -p $DOCKERVOL_SHORT $DOCKERLOG_SHORT
     DOCKER_VOLUME_ROOT='/var/lib/docker/volumes'  # hard coded - check for your config if applicable!
-    #export DOCKERFILE_DIR=  # set this if the Dockerfile is not in the directory containing the dscripts subproject
 }
 
 
@@ -65,7 +64,8 @@ _set_buildargs() {
         --build-arg USERNAME=$CONTAINERUSER
         --build-arg UID=$CONTAINERUID
     "
-    #export DOCKERFILE='Dockerfile.debian'  # change Dockerfile path
+    #export DOCKERFILE_DIR=  # set this if the Dockerfile is not in the directory containing the dscripts submodule
+    #export DSCRIPTS_DOCKERFILE='Dockerfile.rhel'   # defaults to 'Dockerfile' if unset or empty
 }
 
 
