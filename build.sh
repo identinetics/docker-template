@@ -81,19 +81,21 @@ prepare_proxy_args() {
         BUILDARGS="$BUILDARGS --build-arg https_proxy=$https_proxy"
         BUILDARGS="$BUILDARGS --build-arg ftp_proxy=$ftp_proxy"
         BUILDARGS="$BUILDARGS --build-arg no_proxy=$no_proxy_noblanks"
+        BUILDARGS="$BUILDARGS --build-arg HTTP_PROXY=$http_proxy"
+        BUILDARGS="$BUILDARGS --build-arg HTTPS_PROXY=$https_proxy"
+        BUILDARGS="$BUILDARGS --build-arg FTP_PROXY=$ftp_proxy"
+        BUILDARGS="$BUILDARGS --build-arg NO_PROXY=$no_proxy_noblanks"
     fi
 }
 
 
 prepare_build_command() {
     prepare_proxy_args
-    docker_build="docker build $BUILDARGS $CACHEOPT -t=$IMAGENAME $DSCRIPTS_DOCKERFILE_OPT ."
+    buildinfo=$(printf "$IMAGENAME build on node $HOSTNAME on $(date --iso-8601=seconds) by $LOGNAME")
+    docker_build="docker build $BUILDARGS $CACHEOPT --label BUILDINFO='$buildinfo' $IMAGENAME $DSCRIPTS_DOCKERFILE_OPT ."
     if [ "$print" == "True" ]; then
         echo $docker_build
     fi
-    # Adding LASTBUILD to the image metadata is not feasible until docker provides a method
-    # to do this after building it;
-    #printf "$IMAGENAME build on node $HOSTNAME on $(date --iso-8601=seconds) by $LOGNAME from:\n" > LASTBUILD
     if [[ $REPO_STATUS ]]; then
         $buildscriptsdir/show_repo_branches.sh >> REPO_STATUS
     fi
