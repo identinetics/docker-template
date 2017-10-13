@@ -1,4 +1,5 @@
 **/.DS_Store
 .idea
 x.xml
-LASTBUILD
+#LASTBUILD # see build.sh
+REPO_STATUS

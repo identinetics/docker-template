@@ -66,6 +66,7 @@ _set_buildargs() {
     "
     #export DOCKERFILE_DIR=  # set this if the Dockerfile is not in the directory containing the dscripts submodule
     #export DSCRIPTS_DOCKERFILE='Dockerfile.rhel'   # defaults to 'Dockerfile' if unset or empty
+    export REPO_STATUS='True'  # if set: generate 'REPO_STATUS' file to be included in docker image
 }
 
 
