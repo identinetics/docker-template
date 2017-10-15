@@ -116,12 +116,6 @@ setup_vol_mapping() {
     fi
 
     #map_host_directory "$DOCKERLOG_SHORT/var/log/" '/var/log/' 'Z'
-
-    # the list of logfiles is required for the manage.sh/multitail command
-    export LOGFILES="
-        $DOCKERLOG_SHORT/${CONTAINERNAME}.var_log/xyz.log
-        $DOCKERLOG_SHORT/${CONTAINERNAME}.var_log/xyz.err
-    "
 }
 
 
@@ -133,12 +127,10 @@ _set_enable_sshd() {
 }
 
 
-
 set_logfiles() {  # optional: set this for multitail + logfiles subcommands in manage.sh
     export KNOWN_LOGFILES="
-        ${DOCKERLOG_SHORT}/${CONTAINERNAME}.var_log/pyffd.log
-        ${DOCKERLOG_SHORT}/${CONTAINERNAME}.var_log/pyffd.error
-        ${DOCKERLOG_SHORT}/${CONTAINERNAME}.var_log/pyff_mdsplit.log
+        ${DOCKERLOG_SHORT}/${CONTAINERNAME}.var_log/xxx.log
+        ${DOCKERLOG_SHORT}/${CONTAINERNAME}.var_log/xxx.error
     "
 }
 

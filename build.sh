@@ -92,7 +92,7 @@ prepare_proxy_args() {
 prepare_build_command() {
     prepare_proxy_args
     buildinfo=$(printf "$IMAGENAME build on node $HOSTNAME on $(date --iso-8601=seconds) by $LOGNAME")
-    docker_build="docker build $BUILDARGS $CACHEOPT --label BUILDINFO='$buildinfo' $IMAGENAME $DSCRIPTS_DOCKERFILE_OPT ."
+    docker_build="docker build $BUILDARGS $CACHEOPT --label BUILDINFO='$buildinfo' -t $IMAGENAME $DSCRIPTS_DOCKERFILE_OPT ."
     if [ "$print" == "True" ]; then
         echo $docker_build
     fi
