@@ -11,7 +11,9 @@ main() {
     case $cmd in
         logfiles)  get_logfiles && echo "$LOGFILES";;
         logrotate) call_logrotate;;
-        logs)      exec_docker_cmd "docker logs -f ${CONTAINERNAME}";;
+        follow_logs) exec_docker_cmd "docker logs -f ${CONTAINERNAME}";;
+        fl)        exec_docker_cmd "docker logs -f ${CONTAINERNAME}";;
+        logs)      exec_docker_cmd "docker logs ${CONTAINERNAME}";;
         lsmount)   $PROJ_HOME/dscripts/docker_list_mounts.py $sudoopt -bov $CONTAINERNAME;;
         lsvol)     $PROJ_HOME/dscripts/docker_list_mounts.py $sudoopt -v $CONTAINERNAME;;
         multitail) do_multitail;;
