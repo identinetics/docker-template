@@ -108,6 +108,7 @@ remove_existing_container() {
 prepare_run_command() {
     if [[ "$interactive_opt" == 'False' ]]; then
         runmode='-d --restart=unless-stopped'
+        background_msg='started in background with containerid '
     else
         runmode="-i $tty --rm"
     fi
@@ -144,7 +145,7 @@ run_command() {
     elif [[ "$is_running" == 'True' && "$runonly_if_notrunning" == 'True' ]]; then
         echo "already running"
     else
-        printf 'started with containerid '
+        printf '%s' $background_msg
         $sudo docker run "${run_args[@]}"
     fi
 }
