@@ -6,6 +6,7 @@ main() {
     init_sudo
     load_config
     verify_signature
+    test_if_already_running
     remove_existing_container
     create_intercontainer_network
     setup_vol_mapping 'create'
@@ -17,7 +18,6 @@ main() {
 
 get_commandline_opts() {
     interactive_opt='False'
-    remove_opt='True'
     while getopts ":CdhiIn:pPrRu:V" opt; do
       case $opt in
         C) ignore_capabilties='True';;
@@ -32,7 +32,7 @@ get_commandline_opts() {
         p) print_opt='True';;
         P) pwd_opt='True';;
         r) user_opt='-u 0';;
-        R) remove_opt='False';;
+        R) runonly_if_notrunning='True';;
         u) user_opt='-u '$OPTARG;;
         V) no_verify='True';;
         :) echo "Option -$OPTARG requires an argument"; exit 1;;
@@ -45,7 +45,7 @@ get_commandline_opts() {
 
 
 usage() {
-    echo "usage: $0 [-h] [-C] [-i] [-n container-nr ] [-p] [-P] [-r] -[R] [cmd]
+    echo "usage: $0 [-h] [-C] [-d] [-i] [-I] [-n container-nr ] [-p] [-P] [-r] -[R] [-u] [-V] [cmd]
        -C  ignore capabilties configured in Dockerfile LABEL
        -d  dry run - do not execute
        -h  print this help text
@@ -54,11 +54,13 @@ usage() {
        -n  configuration number ('<NN>' in conf<NN>.sh)
        -p  print docker run command on stdout
        -P  add volume mapping $PWD:/pwd:Z
-       -r  start command as root user (default is $CONTAINERUSER)
-       -R  do not remove existing container before start (default: do remove)
-       -u  start command as user with specified uid
+       -r  run as root
+       -R  do nothing if already running (i.e. keep existing container)
+       -u  run as user with specified uid
        -V  skip image verification
-       cmd shell command to be executed (default is $STARTCMD)"
+       cmd shell command to be executed (default is $STARTCMD)
+
+    Note: by default an exisitng container will be removed before a new one is started"
 }
 
 
@@ -83,10 +85,22 @@ verify_signature() {
     fi
 }
 
+test_if_already_running() {
+    if [[ $($sudo docker ps | grep -s $CONTAINERNAME) ]]; then
+        is_running='True'
+    elif [[ $($sudo docker ps -a | grep -s $CONTAINERNAME) ]]; then
+        is_stopped='True'
+    fi
+}
+
 
 remove_existing_container() {
-    if [[ "$remove_opt" == 'True' ]]; then
-        $sudo docker ps -a | grep $CONTAINERNAME > /dev/null && $sudo docker rm -f $CONTAINERNAME
+    if [[ "$dryrun" == "True" ]]; then
+        echo 'dryrun: not executing `docker rm`'
+    elif [[ "$is_stopped" == 'True' ]]; then
+        $sudo docker rm $CONTAINERNAME
+    elif [[ "$is_running" == 'True' && "$runonly_if_notrunning" != 'True' ]]; then
+        $sudo docker rm -f $CONTAINERNAME
     fi
 }
 
@@ -123,9 +137,14 @@ prepare_run_command() {
 
 run_command() {
     if [[ "$print_opt" == "True" ]]; then
-        echo docker run "${run_args[@]}"
+        echo "$sudo docker run ${run_args[@]}"
     fi
-    if [[ "$dryrun" != "True" ]]; then
+    if [[ "$dryrun" == "True" ]]; then
+        echo 'dryrun: not executing `docker run`'
+    elif [[ "$is_running" == 'True' && "$runonly_if_notrunning" == 'True' ]]; then
+        echo "already running"
+    else
+        printf 'started with containerid '
         $sudo docker run "${run_args[@]}"
     fi
 }

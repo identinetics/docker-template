@@ -13,7 +13,7 @@ main() {
     _set_users
     _set_buildargs
     _set_run_args
-    _set_logfiles
+    #_set_logfiles
     #enable_x11_client
     #enable_pkcs11
     #set_enable_sshd     # usually used only for debugging - requires installed sshd in image
@@ -127,18 +127,18 @@ _set_enable_sshd() {
 }
 
 
-set_logfiles() {  # optional: set this for multitail + logfiles subcommands in manage.sh
-    export KNOWN_LOGFILES="
-        ${DOCKERLOG_SHORT}/${CONTAINERNAME}.var_log/xxx.log
-        ${DOCKERLOG_SHORT}/${CONTAINERNAME}.var_log/xxx.error
-    "
-}
+#_set_logfiles() {  # optional: set this for multitail + logfiles subcommands in manage.sh
+#    export KNOWN_LOGFILES="
+#        ${DOCKERLOG_SHORT}/${CONTAINERNAME}.var_log/xxx.log
+#        ${DOCKERLOG_SHORT}/${CONTAINERNAME}.var_log/xxx.error
+#    "
+#}
 
 
 container_status() {
     $sudo docker ps | head -1
     $sudo docker ps --all | egrep $CONTAINERNAME\$
-    $sudo docker exec -it $CONTAINERNAME /status.sh
+    #$sudo docker exec -it $CONTAINERNAME /scripts/status.sh
 }
 
 
