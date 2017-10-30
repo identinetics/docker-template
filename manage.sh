@@ -9,10 +9,10 @@ main() {
     init_sudo
     [[ $sudo ]] && sudoopt='--sudo'
     case $cmd in
-        logfiles)  get_logfiles && echo "$LOGFILES";;
-        logrotate) call_logrotate;;
         follow_logs) exec_docker_cmd "docker logs -f ${CONTAINERNAME}";;
         fl)        exec_docker_cmd "docker logs -f ${CONTAINERNAME}";;
+        logfiles)  get_logfiles && echo "$LOGFILES";;
+        logrotate) call_logrotate;;
         logs)      exec_docker_cmd "docker logs ${CONTAINERNAME}";;
         lsmount)   $PROJ_HOME/dscripts/docker_list_mounts.py $sudoopt -bov $CONTAINERNAME;;
         lsvol)     $PROJ_HOME/dscripts/docker_list_mounts.py $sudoopt -v $CONTAINERNAME;;
@@ -23,6 +23,7 @@ main() {
         rm)        exec_docker_cmd "docker rm -f ${CONTAINERNAME}";;
         rmvol)     do_rmvol;;
         status)    call_container_status;;
+        statcode)  _container_status_code;;
         *) echo "missing command"; usage; exit 1;;
     esac
 }
@@ -47,22 +48,27 @@ get_options() {
 
 
 usage() {
-    echo "usage: $0 [-h] [-p] listlog|logrotate|pull|push|rm|rmvol|status
-        more dscripts docker utilities
+    echo "usage: $0 [-h] [-p] <command>
+        more docker utilities.
+
         -d  dry run - do not execute (except logrotate, status)
         -n  configuration number ('<NN>' in conf<NN>.sh) if using multiple configurations
         -p  print docker command on stdout
-        logfiles   list container logfiles
-        logrotate  rotate, archive and purge logs
-        logs       docker logs -f
-        lsmount    list mounts (type: bind, volume and others)
-        lsvol      list mounted volumes (type: docker volume)
-        multitail  multitail on all logfiles in \$LOGFILES
-        pull       push to docker registry
-        push       pull from docker registry
-        rm         remove docker container (--force)
-        rmvol      remove docker volumes defined in conf.sh
-        status     report container status
+
+        Commands:
+        fl, follow_logs docker logs -f <container>
+        logfiles    list container logfiles
+        logrotate   rotate, archive and purge logs
+        logs        docker logs -f
+        lsmount     list mounts (type: bind, volume and others)
+        lsvol       list mounted volumes (type: docker volume)
+        mt, multitail multitail on all logfiles in \$LOGFILES
+        pull        push to docker registry
+        push        pull from docker registry
+        rm          remove docker container (--force)
+        rmvol       remove docker volumes defined in conf.sh
+        status      report container status (verbose)
+        statcode    return: 0=running, 1=stopped, 2=not found
     "
 }
 
@@ -74,6 +80,17 @@ call_container_status() {
         $sudo docker ps | head -1
         $sudo docker ps --all | egrep $CONTAINERNAME\$
         echo "no specific status reporting configured for ${CONTAINERNAME} in conf.sh"
+    fi
+}
+
+
+_container_status_code() {
+    if [[ $($sudo docker ps | grep -s $CONTAINERNAME) ]]; then
+        exit 0   # running
+    elif [[ $($sudo docker ps -a | grep -s $CONTAINERNAME) ]]; then
+        exit 1   # stopped
+    else
+        exit 2   # not found
     fi
 }
 
