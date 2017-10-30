@@ -145,7 +145,7 @@ run_command() {
     elif [[ "$is_running" == 'True' && "$runonly_if_notrunning" == 'True' ]]; then
         echo "already running"
     else
-        printf '%s' $background_msg
+        printf '%s' "$background_msg"
         $sudo docker run "${run_args[@]}"
     fi
 }
