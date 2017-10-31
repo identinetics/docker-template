@@ -86,7 +86,8 @@ _verify_signature() {
 }
 
 _test_if_already_running() {
-    cont_stat=get_container_status
+    get_container_status
+    cont_stat=$?
     if (( $cont_stat == 0 )); then
         is_running='True'
     elif (( $cont_stat == 1 )); then
