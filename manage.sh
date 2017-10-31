@@ -3,33 +3,33 @@
 
 
 main() {
-    get_options $@
-    load_library_functions
+    _get_options $@
+    _load_library_functions
     load_config
     init_sudo
     [[ $sudo ]] && sudoopt='--sudo'
     case $cmd in
-        follow_logs) exec_docker_cmd "docker logs -f ${CONTAINERNAME}";;
-        fl)        exec_docker_cmd "docker logs -f ${CONTAINERNAME}";;
-        logfiles)  get_logfiles && echo "$LOGFILES";;
-        logrotate) call_logrotate;;
-        logs)      exec_docker_cmd "docker logs ${CONTAINERNAME}";;
+        follow_logs) _exec_docker_cmd "docker logs -f ${CONTAINERNAME}";;
+        fl)        _exec_docker_cmd "docker logs -f ${CONTAINERNAME}";;
+        logfiles)  _get_logfiles && echo "$LOGFILES";;
+        logrotate) _call_logrotate;;
+        logs)      _exec_docker_cmd "docker logs ${CONTAINERNAME}";;
         lsmount)   $PROJ_HOME/dscripts/docker_list_mounts.py $sudoopt -bov $CONTAINERNAME;;
         lsvol)     $PROJ_HOME/dscripts/docker_list_mounts.py $sudoopt -v $CONTAINERNAME;;
-        multitail) do_multitail;;
-        mt)        do_multitail;;
-        pull)      exec_docker_cmd "docker pull ${DOCKER_REGISTRY_PREFIX}${IMAGENAME}";;
-        push)      do_push;;
-        rm)        exec_docker_cmd "docker rm -f ${CONTAINERNAME}";;
-        rmvol)     do_rmvol;;
-        status)    call_container_status;;
-        statcode)  _container_status_code;;
-        *) echo "missing command"; usage; exit 1;;
+        multitail) _do_multitail;;
+        mt)        _do_multitail;;
+        pull)      _exec_docker_cmd "docker pull ${DOCKER_REGISTRY_PREFIX}${IMAGENAME}";;
+        push)      _do_push;;
+        rm)        _exec_docker_cmd "docker rm -f ${CONTAINERNAME}";;
+        rmvol)     _do_rmvol;;
+        status)    _call_container_status;;
+        statcode)  get_container_status;;
+        *) echo "missing command"; _usage; exit 1;;
     esac
 }
 
 
-get_options() {
+_get_options() {
     while getopts ":dn:p" opt; do
       case $opt in
         d) dryrun='True';;
@@ -39,7 +39,7 @@ get_options() {
            fi
            config_nr=$OPTARG;;
         p) print="True";;
-        *) usage; exit 1;;
+        *) _usage; exit 1;;
       esac
     done
     shift $((OPTIND-1))
@@ -47,7 +47,7 @@ get_options() {
 }
 
 
-usage() {
+_usage() {
     echo "usage: $0 [-h] [-p] <command>
         more docker utilities.
 
@@ -73,9 +73,9 @@ usage() {
 }
 
 
-call_container_status() {
+_call_container_status() {
     if [[ $(declare -F container_status) ]]; then
-        container_status
+        container_status  # in conf*.sh
     else
         $sudo docker ps | head -1
         $sudo docker ps --all | egrep $CONTAINERNAME\$
@@ -84,35 +84,24 @@ call_container_status() {
 }
 
 
-_container_status_code() {
-    if [[ $($sudo docker ps | grep -s $CONTAINERNAME) ]]; then
-        exit 0   # running
-    elif [[ $($sudo docker ps -a | grep -s $CONTAINERNAME) ]]; then
-        exit 1   # stopped
-    else
-        exit 2   # not found
-    fi
-}
-
-
-call_logrotate() {
+_call_logrotate() {
     if [[ $(declare -F logrotate) ]]; then
-        logrotate
+        logrotate    # in conf*.sh
     else
         echo "no logrotation configured for ${CONTAINERNAME} in conf.sh"
     fi
 }
 
 
-load_library_functions() {
+_load_library_functions() {
     SCRIPTDIR=$(cd $(dirname $BASH_SOURCE[0]) && pwd)
     PROJ_HOME=$(cd $(dirname $SCRIPTDIR) && pwd)
     source $PROJ_HOME/dscripts/conf_lib.sh
 }
 
 
-do_multitail() {
-    get_logfiles
+_do_multitail() {
+    _get_logfiles
     [[ -z "$LOGFILES" ]] && echo 'No LOGFILES set on conf.sh' && exit 1
     cmd='multitail'
     for logfile in $LOGFILES; do
@@ -123,7 +112,7 @@ do_multitail() {
 
 
 
-get_logfiles() {
+_get_logfiles() {
     LOGFILES=''
     if [[ -n "$(type -t set_logfiles)" ]] && [[ "$(type -t set_logfiles)" == function ]]; then
         set_logfiles
@@ -136,29 +125,29 @@ get_logfiles() {
 }
 
 
-do_push() {
+_do_push() {
     if [[ ${DOCKER_REGISTRY_PREFIX} ]]; then
-        exec_docker_cmd "docker tag ${IMAGENAME} ${DOCKER_REGISTRY_PREFIX}${IMAGENAME}"
-        exec_docker_cmd "docker push ${DOCKER_REGISTRY_PREFIX}${IMAGENAME}"
+        _exec_docker_cmd "docker tag ${IMAGENAME} ${DOCKER_REGISTRY_PREFIX}${IMAGENAME}"
+        _exec_docker_cmd "docker push ${DOCKER_REGISTRY_PREFIX}${IMAGENAME}"
 
     else
-        exec_docker_cmd "docker push ${DOCKER_REGISTRY_PREFIX}${IMAGENAME}"
+        _exec_docker_cmd "docker push ${DOCKER_REGISTRY_PREFIX}${IMAGENAME}"
     fi
 }
 
 
-do_rmvol() {
+_do_rmvol() {
     setup_vol_mapping 'list'
     if [[ $VOLLIST ]]; then
         echo "removing docker volumes $VOLLIST"
-        exec_docker_cmd "docker volume rm ${VOLLIST}"
+        _exec_docker_cmd "docker volume rm ${VOLLIST}"
     else
         echo "No volumes to be removed"
     fi
 }
 
 
-exec_docker_cmd() {
+_exec_docker_cmd() {
     [ "$print" = "True" ] && echo $1
     if [[ "$dryrun" != "True" ]]; then
         ${sudo} $1

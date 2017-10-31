@@ -1,22 +1,22 @@
 #!/usr/bin/env bash
 
 main() {
-    get_commandline_opts $@
-    load_library_functions
+    _get_commandline_opts $@
+    _load_library_functions
     init_sudo
     load_config
-    verify_signature
-    test_if_already_running
-    remove_existing_container
+    _verify_signature
+    _test_if_already_running
+    _remove_existing_container
     create_intercontainer_network
     setup_vol_mapping 'create'
     get_capabilities
-    prepare_run_command
-    run_command
+    _prepare_run_command
+    _run_command
 }
 
 
-get_commandline_opts() {
+_get_commandline_opts() {
     interactive_opt='False'
     while getopts ":CdhiIn:pPrRu:V" opt; do
       case $opt in
@@ -36,7 +36,7 @@ get_commandline_opts() {
         u) user_opt='-u '$OPTARG;;
         V) no_verify='True';;
         :) echo "Option -$OPTARG requires an argument"; exit 1;;
-        *) usage; exit 1;;
+        *) _usage; exit 1;;
       esac
     done
     shift $((OPTIND-1))
@@ -44,7 +44,7 @@ get_commandline_opts() {
 }
 
 
-usage() {
+_usage() {
     echo "usage: $0 [-h] [-C] [-d] [-i] [-I] [-n container-nr ] [-p] [-P] [-r] -[R] [-u] [-V] [cmd]
        -C  ignore capabilties configured in Dockerfile LABEL
        -d  dry run - do not execute
@@ -64,14 +64,14 @@ usage() {
 }
 
 
-load_library_functions() {
+_load_library_functions() {
     SCRIPTDIR=$(cd $(dirname $BASH_SOURCE[0]) && pwd)
     PROJ_HOME=$(cd $(dirname $SCRIPTDIR) && pwd)
     source $PROJ_HOME/dscripts/conf_lib.sh
 }
 
 
-verify_signature() {
+_verify_signature() {
     if [[ ! -z "$DIDI_SIGNER" && "$no_verify" != 'True' ]]; then
         if [[ ! -z "$config_nr" ]]; then
             verifyconf="-n $config_nr"
@@ -85,16 +85,17 @@ verify_signature() {
     fi
 }
 
-test_if_already_running() {
-    if [[ $($sudo docker ps | grep -s $CONTAINERNAME) ]]; then
+_test_if_already_running() {
+    cont_stat=get_container_status
+    if (( $cont_stat == 0 )); then
         is_running='True'
-    elif [[ $($sudo docker ps -a | grep -s $CONTAINERNAME) ]]; then
+    elif (( $cont_stat == 1 )); then
         is_stopped='True'
     fi
 }
 
 
-remove_existing_container() {
+_remove_existing_container() {
     if [[ "$dryrun" == "True" ]]; then
         echo 'dryrun: not executing `docker rm`'
     elif [[ "$is_stopped" == 'True' ]]; then
@@ -105,7 +106,7 @@ remove_existing_container() {
 }
 
 
-prepare_run_command() {
+_prepare_run_command() {
     if [[ "$interactive_opt" == 'False' ]]; then
         runmode='-d --restart=unless-stopped'
         background_msg='started in background with containerid '
@@ -136,7 +137,7 @@ prepare_run_command() {
 }
 
 
-run_command() {
+_run_command() {
     if [[ "$print_opt" == "True" ]]; then
         echo "$sudo docker run ${run_args[@]}"
     fi

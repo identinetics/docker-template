@@ -123,6 +123,17 @@ get_capabilities() {
 }
 
 
+get_container_status() {
+    if [[ $($sudo docker ps | grep -s $CONTAINERNAME) ]]; then
+        return 0   # running
+    elif [[ $($sudo docker ps -a | grep -s $CONTAINERNAME) ]]; then
+        return 1   # stopped
+    else
+        return 2   # not found
+    fi
+}
+
+
 get_metadata() {
     # Extract metadata for docker run defined with 'LABEL' in the Dockerfile
     key=$1
