@@ -16,8 +16,9 @@ main() {
 
 
 _get_commandline_opts() {
-    while getopts ":chn:pPrt:u" opt; do
+    while getopts ":bchn:pPrt:u" opt; do
       case $opt in
+        b) SET_BUILDINFO='True';;
         c) CACHEOPT="--no-cache";;
         n) config_nr=$OPTARG
            re='^[0-9][0-9]$'
@@ -31,7 +32,8 @@ _get_commandline_opts() {
         t) image_tag=":$OPTARG";;
         u) update_pkg="-u";;
         :) echo "Option -$OPTARG requires an argument"; exit 1;;
-        *) echo "usage: $0 [-h] [-i] [-n <NN>] [-p] [-P] [-r] [cmd]
+        *) echo "usage: $0 [-b] [-c] [-h] [-n <NN>] [-p] [-P] [-r] [-t] [-u] [cmd]
+             -b  include label BUILDINFO
              -c  do not use cache (build --no-cache)
              -h  print this help text
              -n  configuration number ('<NN>' in conf<NN>.sh)
@@ -39,7 +41,7 @@ _get_commandline_opts() {
              -P  push after build
              -r  remove existing image (-f)
              -t  tag image name
-             -u  update packages in docker build context
+             -u  run build_prepare.sh (update packages in docker build context)
            "; exit 0;;
       esac
     done
@@ -93,8 +95,11 @@ _prepare_proxy_args() {
 
 _prepare_build_command() {
     _prepare_proxy_args
-    [[ $SET_BUILDINFO ]] && buildinfo=$(printf "$IMAGENAME build on node $HOSTNAME on $(date --iso-8601=seconds) by $LOGNAME" | sed -e "s/'//g")
-    docker_build="docker build $BUILDARGS $CACHEOPT --label 'BUILDINFO=$buildinfo' -t $IMAGENAME$image_tag $DSCRIPTS_DOCKERFILE_OPT ."
+    if [[ $SET_BUILDINFO ]]; then
+        buildinfo=$(printf "$IMAGENAME build on node $HOSTNAME on $(date --iso-8601=seconds) by $LOGNAME" | sed -e "s/'//g")
+        buildinfo_opt="--label 'BUILDINFO=${buildinfo}'"
+    fi
+    docker_build="docker build $BUILDARGS $CACHEOPT $buildinfo_opt -t $IMAGENAME$image_tag $DSCRIPTS_DOCKERFILE_OPT ."
     if [ "$print" == "True" ]; then
         echo $docker_build
     fi
