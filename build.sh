@@ -9,8 +9,8 @@ main() {
     init_sudo
     _remove_previous_image
     _prepare_build_command
-    _exec_build_command
     _list_repo_branches
+    _exec_build_command
     _do_cleanup
 }
 
@@ -125,8 +125,9 @@ _exec_build_command() {
 
 
 _list_repo_branches() {
-    echo "=== git repositories/branches and their last commit ==="
-    $buildscriptsdir/show_repo_branches.sh
+    echo "=== git repositories/branches and their last commit ===" > REPO_STATUS
+    $buildscriptsdir/show_repo_branches.sh >> REPO_STATUS
+    cat REPO_STATUS
     echo
 }
 
