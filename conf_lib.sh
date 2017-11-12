@@ -23,13 +23,13 @@ load_config() {
     # if config_nr not given and there is only one file matching conf*.sh take this one
     proj_home=$(cd $(dirname $conflibdir) && pwd)
     cd $proj_home; confs=(conf*.sh); cd $OLDPWD
-    if [ ! -z ${config_nr} ]; then
+    if [[ ! -z ${config_nr} ]]; then
         conf_script=conf${config_nr}.sh
-        if [ ! -e "$proj_home/$conf_script" ]; then
+        if [[ ! -e "$proj_home/$conf_script" ]]; then
             echo "$proj_home/$conf_script not found"
             exit 1
         fi
-    elif [ ${#confs[@]} -eq 1 ]; then
+    elif [[ ${#confs[@]} -eq 1 ]]; then
         conf_script=${confs[0]}
     else
         echo "No or more than one (${#confs[@]}) conf*.sh"
@@ -57,10 +57,10 @@ _chkdir() {
     if [[ "${1:0:1}" == / ]]; then
         dir=$1  # absolute path
     else   # deprecated
-        [ -z $DOCKERVOL_SHORT ] && echo 'DOCKERVOL_SHORT not defined' && exit 1
+        [[ -z $DOCKERVOL_SHORT ]] && echo 'DOCKERVOL_SHORT not defined' && exit 1
         dir=$DOCKERVOL_SHORT/$1
     fi
-    if [ ! -e "$dir" ]; then
+    if [[ ! -e "$dir" ]]; then
         echo "$0: Missing directory: $dir"
         exit 1
     fi
@@ -72,11 +72,11 @@ _create_chown_dir() {
     if [[ "${1:0:1}" == / ]]; then
         dir=$1  # absolute path
     else  # deprecated
-        [ -z $DOCKERVOL_SHORT ] && echo 'DOCKERVOL_SHORT not defined' && exit 1
+        [[ -z $DOCKERVOL_SHORT ]] && echo 'DOCKERVOL_SHORT not defined' && exit 1
         dir=$DOCKERVOL_SHORT/$1
     fi
     user=$2
-    if [ -z $3 ]; then
+    if [[ -z $3 ]]; then
         group=$user
     else
         group=$3
@@ -138,7 +138,7 @@ get_metadata() {
     # Extract metadata for docker run defined with 'LABEL' in the Dockerfile
     key=$1
     value=$(docker inspect --format='{{.Config.Labels.${key}}}' $IMAGENAME)
-    if [ -z "$value" ]; then
+    if [[ -z "$value" ]]; then
         echo "key $key not found in metadata of $IMAGENAME"
         exit 1
     fi
@@ -192,7 +192,7 @@ map_docker_volume() {
         export VOLLIST="${VOLLIST} ${vol_name}"
         return
     fi
-    if [ ! -d "${shortcut_dir}" ]; then
+    if [[ ! -d "${shortcut_dir}" ]]; then
         echo "conf_lib.sh/map_docker_volume(): argument 5 must be a valid directory; args found: $@" && exit 1;
     fi
     $sudo docker volume create --name $vol_name >/dev/null
@@ -202,10 +202,10 @@ map_docker_volume() {
     #    chcon_opt='--selinux-type svirt_sandbox_file_t'
     #fi
     gw=
-    if [ "$CONTAINER_GROUPWRITE" != 'no' ] ; then
+    if [[ "$CONTAINER_GROUPWRITE" != 'no' ]] ; then
         gw=--groupwrite
     fi
-    if [[ ! $JENKINS_HOME ]]; then
+    if [[ ! $JENKINS_HOME && ! $DOCKER_VOL_LOG_SYMLINKS_DISABLE ]]; then
         fs_access="--symlink --prefix $shortcut_dir $symlink $gw"
     fi
     $conflibdir/docker_vol_mount.py $sudoopt $fs_access $chcon_opt --volume $vol_name
@@ -230,18 +230,18 @@ set_staging_env() {
     #  qa -> '-qa'
     #  dev -> '-dev'
     #  any other -> ''
-    if [ "$TRAVIS" == "true" ]; then
+    if [[ "$TRAVIS" == "true" ]]; then
         git_branch=$TRAVIS_BRANCH
     else
         proj_home=$(cd $(dirname $conflibdir) && pwd)
         git_branch=$(cd $proj_home; git symbolic-ref --short -q HEAD)
     fi
     export STAGING_ENV=''
-    if [ "$git_branch" == "master" ]; then
+    if [[ "$git_branch" == "master" ]]; then
         export STAGING_ENV='pr'
-    elif [ "$git_branch" == "qa" ]; then
+    elif [[ "$git_branch" == "qa" ]]; then
         export STAGING_ENV='qa'
-    elif [ "$git_branch" == "dev" ]; then
+    elif [[ "$git_branch" == "dev" ]]; then
         export STAGING_ENV='dev'
     fi
 }
@@ -250,11 +250,11 @@ set_staging_env() {
 # ------------------------- functions for build_prepare.sh --------------------------
 
 get_or_update_repo() {
-    if [ ! -e $repodir ]; then
+    if [[ ! -e $repodir ]]; then
         echo "cloning $repodir" \
         mkdir -p $repodir
         git clone $repourl $repodir
-    elif [ "$update_pkg" == "True" ]; then
+    elif [[ "$update_pkg" == "True" ]]; then
         echo "updating $repodir"
         cd $repodir && git pull && cd $OLDPWD
     fi
@@ -262,7 +262,7 @@ get_or_update_repo() {
 
 
 get_from_tarball() {
-    if [ ! -e $pkgroot/$pkgdir ] || [ "$update_pkg" == "True" ]; then
+    if [[ ! -e $pkgroot/$pkgdir ]] || [[ "$update_pkg" == "True" ]]; then
         echo "downloading $pkgdir into $pkgroot"
         mkdir -p $pkgroot/$pkgdir && rm -rf $pkgroot/$pkgdir/*
         curl -L $pkgurl | tar -xz -C $pkgroot
@@ -271,7 +271,7 @@ get_from_tarball() {
 
 
 get_from_ziparchive() {
-    if [ ! -e $pkgroot/$pkgdir ] || [ "$update_pkg" == "True" ]; then
+    if [[ ! -e $pkgroot/$pkgdir ]] || [[ "$update_pkg" == "True" ]]; then
         echo "downloading $pkgdir into $pkgroot"
         mkdir -p $pkgroot && rm -rf $pkgroot/$pkgdir/*
         wget -O tmp.zip $pkgurl && unzip -d "$pkgroot" tmp.zip && rm tmp.zip
@@ -292,7 +292,7 @@ get_from_ziparchive_with_checksum() {
     prod_url=$1; prod_sha256=$2; prod_dir=$3; prod_version=$4; wget_option=$5
 
     download_marker="$prod_dir-$prod_version.mark"
-    if [ ! -e "$download_marker" ]; then
+    if [[ ! -e "$download_marker" ]]; then
         wget $wget_option -O tmp.zip $prod_url
         echo "$prod_sha256 tmp.zip" | sha256sum -c -
         inst_dir=$(unzip -l tmp.zip | head -4 | tail -1 | awk '{print $4}' | cut -d "/" -f1)
@@ -309,7 +309,7 @@ get_from_ziparchive_with_checksum() {
 
 
 do_not_build() {
-    if [ "$1" == "--build" ]; then
+    if [[ "$1" == "--build" ]]; then
          echo "Build the image locally has been disabled - get it from repo"
          exit 1
     fi
@@ -322,7 +322,7 @@ _echo_commit_status() {
     git for-each-ref --format='%(refname:short) %(upstream:short)' refs/heads | \
     while read local upstream; do
         # Use master if upstream branch is empty
-        [ -z $upstream ] && upstream=master
+        [[ -z $upstream ]] && upstream=master
 
         ahead=`git rev-list ${upstream}..${local} --count`
         behind=`git rev-list ${local}..${upstream} --count`
@@ -367,7 +367,7 @@ show_git_branches() {
         repodir=$(dirname $file)
         cd $repodir
         _echo_repo_owner_name_branch
-        [ -e 'VERSION' ] && echo -n '::' && cat VERSION | tr -d '\n'
+        [[ -e 'VERSION' ]] && echo -n '::' && cat VERSION | tr -d '\n'
         _echo_commit_status
         _echo_last_commit
         cd $OLDPWD

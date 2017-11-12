@@ -21,11 +21,14 @@ main() {
 
 
 _set_volume_root() {
-    # container volumes mounted to host paths, or symlinks to docker volumes
+    # DOCKERVOL_SHORT and DOCKERLOG_SHORT are used as
+    #  (1) root dirs for volume mappings to the file system, and
+    #  (2) as dirs to contain symlinks to docker volumes
     DOCKERVOL_SHORT='./dv'
     DOCKERLOG_SHORT='./dl'
     mkdir -p $DOCKERVOL_SHORT $DOCKERLOG_SHORT
     DOCKER_VOLUME_ROOT='/var/lib/docker/volumes'  # hard coded - check for your config if applicable!
+    #DOCKER_VOL_LOG_SYMLINKS_DISABLE='True'  # unset or empty to skip symlink creation
 }
 
 
@@ -35,7 +38,6 @@ _set_image_and_container_name() {
     IMGID='99'  # range from 02 .. 99; must be unique per node (registered in github.com/identinetics/dscripts/templates/assigned-uids.adoc)
     PROJSHORT='template'
     SERVICEDESCRIPTION=service_name  # e.g. www.example.org or ldap://10.1.1.${IMGID}:8389"  (no blanks!)
-    set_staging_env
     export IMAGENAME="r2h2/${PROJSHORT}"  # you may or may not want to have an image id and/or staging tag
     #export IMAGENAME="r2h2/${PROJSHORT}${IMGID}:${STAGING_ENV}"  # [a-z_0-9]
     export CONTAINERNAME="${IMGID}${PROJSHORT}"
