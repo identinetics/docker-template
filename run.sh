@@ -18,7 +18,7 @@ main() {
 
 _get_commandline_opts() {
     interactive_opt='False'
-    while getopts ":CdhiIn:pPrRu:V" opt; do
+    while getopts ":CdhiIn:o:pPrRu:V" opt; do
       case $opt in
         C) ignore_capabilties='True';;
         d) dryrun='True';;
@@ -29,6 +29,7 @@ _get_commandline_opts() {
              echo "error: -n argument ($OPTARG) is not a number in the range frmom 02 .. 99" 1>&2; exit 1
            fi
            config_nr=$OPTARG;;
+        o) extra_run_opt=$OPTARG;;
         p) print_opt='True';;
         P) pwd_opt='True';;
         r) user_opt='-u 0';;
@@ -52,6 +53,7 @@ _usage() {
        -i  start in interactive mode and assign terminal
        -I  start in interactive mode and do not assign terminal
        -n  configuration number ('<NN>' in conf<NN>.sh)
+       -o  add extra `docker run` options
        -p  print docker run command on stdout
        -P  add volume mapping $PWD:/pwd:Z
        -r  run as root
@@ -134,7 +136,7 @@ _prepare_run_command() {
     fi
     # shells do not expand variables with quotes and spaces as needed, use array instead (http://mywiki.wooledge.org/BashFAQ/050)
     run_args=($runmode $remove $user_opt --hostname=$CONTAINERNAME --name=$CONTAINERNAME
-        $label $CAPABILITIES $ENVSETTINGS $NETWORKSETTINGS $VOLMAPPING $USBMAPPING $IMAGENAME $cmd)
+        $label $CAPABILITIES $ENVSETTINGS $NETWORKSETTINGS $VOLMAPPING $USBMAPPING $extra_run_opt $IMAGENAME $cmd)
 }
 
 

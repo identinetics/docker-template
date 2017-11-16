@@ -126,6 +126,8 @@ _get_logfiles() {
 
 
 _do_push() {
+    # requires docker login --username=<username> [non-default registry host]
+    # (on a REHL instance docker.io is not default)
     if [[ ${DOCKER_REGISTRY_PREFIX} ]]; then
         _exec_docker_cmd "docker tag ${IMAGENAME} ${DOCKER_REGISTRY_PREFIX}${IMAGENAME}"
         _exec_docker_cmd "docker push ${DOCKER_REGISTRY_PREFIX}${IMAGENAME}"
