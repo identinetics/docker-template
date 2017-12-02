@@ -119,7 +119,7 @@ _prepare_run_command() {
     if [[ -z "$user_opt" ]] && [[ ! -z $CONTAINERUID ]]; then
         user_opt="-u $CONTAINERUID"
     fi
-    if [[ -n "$START_AS_ROOT" ]]; then
+    if [[ -n "$START_AS_ROOT" && ! $user_opt ]]; then
         user_opt='-u 0'
     fi
     if [[ -z "$cmd" ]]; then
