@@ -48,6 +48,8 @@ Default
 |343046|php-ldap test
 |343047|xmldsigcver
 |343048|gitlist
+|343049|sshproxy
+
 
 
 
@@ -64,4 +66,4 @@ Netcup8
 |343045 |shipsp|sp1.test.portalverbund.gv.at
 |343046 |shipsp|sp4.test.edu.pv.at (pwchange)
 |343047 |shipsp|testsp.wpv.portalverbund.at
-|3430 ||
+|343049 |shibsp|mdreg.test.portalverbund.gv.at
