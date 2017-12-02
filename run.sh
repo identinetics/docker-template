@@ -46,7 +46,7 @@ _get_commandline_opts() {
 
 
 _usage() {
-    echo "usage: $0 [-h] [-C] [-d] [-i] [-I] [-n container-nr ] [-p] [-P] [-r] -[R] [-u] [-V] [cmd]
+    echo "usage: $0 [-h] [-C] [-d] [-i] [-I] [-n container-nr ] [-p] [-P] [-R] [-r | -u] [-V] [cmd]
        -C  ignore capabilties configured in Dockerfile LABEL
        -d  dry run - do not execute
        -h  print this help text
@@ -116,10 +116,7 @@ _prepare_run_command() {
     else
         runmode="-i $tty --rm"
     fi
-    if [[ -z "$user_opt" ]] && [[ ! -z $CONTAINERUID ]]; then
-        user_opt="-u $CONTAINERUID"
-    fi
-    if [[ -n "$START_AS_ROOT" && ! $user_opt ]]; then
+    if [[ -n "$START_AS_ROOT" && ! $user_opt ]]; then   # options override conf.sh
         user_opt='-u 0'
     fi
     if [[ -z "$cmd" ]]; then
