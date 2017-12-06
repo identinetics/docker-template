@@ -18,12 +18,13 @@ main() {
 
 _get_commandline_opts() {
     interactive_opt='False'
+    tty=''
     while getopts ":CdhiIn:o:pPrRu:V" opt; do
       case $opt in
         C) ignore_capabilties='True';;
         d) dryrun='True';;
-        i) interactive_opt='True'; tty='-t';;
-        I) interactive_opt='True'; tty='';;
+        i) interactive_opt='True'; [[ -t 0 ]] && tty='-t';;
+        I) interactive_opt='True'; [[ -t 0 ]] && tty='-t';;
         n) re='^[0-9][0-9]$'
            if ! [[ $OPTARG =~ $re ]] ; then
              echo "error: -n argument ($OPTARG) is not a number in the range frmom 02 .. 99" 1>&2; exit 1
@@ -50,8 +51,8 @@ _usage() {
        -C  ignore capabilties configured in Dockerfile LABEL
        -d  dry run - do not execute
        -h  print this help text
-       -i  start in interactive mode and assign terminal
-       -I  start in interactive mode and do not assign terminal
+       -i  start in interactive mode
+       -I  start in interactive mode (samle as -i, deprecated)
        -n  configuration number ('<NN>' in conf<NN>.sh)
        -o  add extra `docker run` options
        -p  print docker run command on stdout
