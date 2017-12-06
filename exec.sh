@@ -12,11 +12,11 @@ main() {
 
 get_commandline_opts() {
     EXECCMD='/bin/bash'
-    interactive_opt='-it'
+    interactive_opt='-i'
     while getopts ":hbiIln:pru:" opt; do
       case $opt in
         b) interactive_opt='';;
-        i) interactive_opt='-it';;
+        i) interactive_opt='-i';;
         I) interactive_opt='-i';;
         l) logpurge='True';;
         n) config_nr=$OPTARG
@@ -49,8 +49,8 @@ usage() {
     echo "usage: $0 [-h] [-i] [-I] [-n <containernr>] [-p] [-r] [cmd]
        -b  non-interactive (no '-i' for docker exec)
        -h  print this help text
-       -i  start in interactive mode and assign terminal (default)
-       -I  start in interactive mode and do not assign terminal
+       -i  start in interactive mode
+       -I  start in interactive mode (deprecated, same as -i)
        -l  logpurge (execute /logpurge.sh in container) - mutual exclusive with cmd
        -n  configuration number ('<NN>' in conf<NN>.sh)
        -p  print docker exec command on stdout
@@ -74,7 +74,9 @@ prepare_command() {
     else
         cmd=$@
     fi
-    docker_exec="docker exec $interactive_opt $useropt $CONTAINERNAME $cmd"
+    tty=''
+    [[ -t 0 ]] && tty='-t'
+    docker_exec="docker exec $interactive_opt $tty $useropt $CONTAINERNAME $cmd"
 }
 
 
