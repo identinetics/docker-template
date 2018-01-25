@@ -205,7 +205,7 @@ map_docker_volume() {
     if [[ "$CONTAINER_GROUPWRITE" != 'no' ]] ; then
         gw=--groupwrite
     fi
-    if [[ ! $JENKINS_HOME && ! $DOCKER_VOL_LOG_SYMLINKS_DISABLE ]]; then
+    if [[ $JENKINS_HOME=='' && $DOCKER_VOL_LOG_SYMLINKS_DISABLE!='' ]]; then
         fs_access="--symlink --prefix $shortcut_dir $symlink $gw"
     fi
     $conflibdir/docker_vol_mount.py $sudoopt $fs_access $chcon_opt --volume $vol_name
