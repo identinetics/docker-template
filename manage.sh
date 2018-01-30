@@ -59,7 +59,7 @@ _usage() {
         fl, follow_logs docker logs -f <container>
         logfiles    list container logfiles
         logrotate   rotate, archive and purge logs
-        logs        docker logs -f
+        logs        docker logs <container>
         lsmount     list mounts (type: bind, volume and others)
         lsvol       list mounted volumes (type: docker volume)
         mt, multitail multitail on all logfiles in \$LOGFILES
