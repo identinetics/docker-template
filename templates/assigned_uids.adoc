@@ -49,6 +49,8 @@ Default
 |343047|xmldsigcver
 |343048|gitlist
 |343049|sshproxy
+|343050|httpd_oidc
+|343051|tnadmin
 
 
 
