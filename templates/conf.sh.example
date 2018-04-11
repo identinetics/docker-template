@@ -28,7 +28,7 @@ _set_volume_root() {
     DOCKERLOG_SHORT='./dl'
     mkdir -p $DOCKERVOL_SHORT $DOCKERLOG_SHORT
     DOCKER_VOLUME_ROOT='/var/lib/docker/volumes'  # hard coded - check for your config if applicable!
-    #DOCKER_VOL_LOG_SYMLINKS_DISABLE='True'  # unset or empty to skip symlink creation
+    #DOCKER_VOL_LOG_SYMLINKS_DISABLE='True'  # unset or empty to enable symlink creation
 }
 
 

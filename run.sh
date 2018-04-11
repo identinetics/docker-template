@@ -19,7 +19,7 @@ main() {
 _get_commandline_opts() {
     interactive_opt='False'
     tty=''
-    while getopts ":CdhiIn:o:pPrRu:V" opt; do
+    while getopts ":CdhiIn:o:pPrRu:Vw" opt; do
       case $opt in
         C) ignore_capabilties='True';;
         d) dryrun='True';;
@@ -37,6 +37,7 @@ _get_commandline_opts() {
         R) runonly_if_notrunning='True';;
         u) user_opt='-u '$OPTARG;;
         V) no_verify='True';;
+        w) write_script='True';;
         :) echo "Option -$OPTARG requires an argument"; exit 1;;
         *) _usage; exit 1;;
       esac
@@ -61,6 +62,7 @@ _usage() {
        -R  do nothing if already running (i.e. keep existing container)
        -u  run as user with specified uid
        -V  skip image verification
+       -w  write Docker command to bash script
        cmd shell command to be executed (default is $STARTCMD)
 
     Note: by default an exisitng container will be removed before a new one is started"
@@ -91,7 +93,7 @@ _verify_signature() {
 _test_if_already_running() {
     get_container_status
     cont_stat=$?
-    if (( $cont_stat == 0 )); then
+    if (( ""$cont_stat == 0 )); then
         is_running='True'
     elif (( $cont_stat == 1 )); then
         is_stopped='True'
@@ -99,13 +101,67 @@ _test_if_already_running() {
 }
 
 
+_write_bash_script_part1() {
+    read -r -d '' bash_script << EOF
+#!/bin/bash
+
+    _get_container_status() {
+        if [[ "$(docker ps | grep -s $CONTAINERNAME)" ]]; then
+            return 0   # running
+        elif [[ "$(docker ps -a | grep -s $CONTAINERNAME) ]]; then
+            return 1   # stopped
+        else
+            return 2   # not found
+        fi
+    }
+
+    _test_if_already_running() {
+        _get_container_status
+        cont_stat=$?
+        if (( $cont_stat == 0 )); then
+            is_running='True'
+        elif (( $cont_stat == 1 )); then
+            is_stopped='True'
+        fi
+    }
+
+    _remove_container_if_stopped_or_forced() {
+        if [[ "\$is_stopped" == 'True' ]]; then
+            docker rm $CONTAINERNAME
+        elif [[ "\$is_running" == 'True' && "$runonly_if_notrunning" != 'True' ]]; then
+            docker rm -f $CONTAINERNAME
+        fi
+    }
+
+    _test_if_already_running
+    _remove_container_if_stopped_or_forced
+EOF
+    if [[ "$write_script" == "True" ]]; then
+        printf "$bash_script\n\n" | sed 's/^    //' > "${SCRIPTDIR}/${CONTAINERNAME}_run.sh"
+    fi
+}
+
 _remove_existing_container() {
     if [[ "$dryrun" == "True" ]]; then
         echo 'dryrun: not executing `docker rm`'
+        docker_rm="$sudo docker rm $CONTAINERNAME"
     elif [[ "$is_stopped" == 'True' ]]; then
-        $sudo docker rm $CONTAINERNAME
+        docker_rm="$sudo docker rm $CONTAINERNAME"
+        $docker_rm
     elif [[ "$is_running" == 'True' && "$runonly_if_notrunning" != 'True' ]]; then
-        $sudo docker rm -f $CONTAINERNAME
+        docker_rm="$sudo docker rm -f $CONTAINERNAME"
+        $docker_rm
+    fi
+    _write_bash_script_part1
+}
+
+
+_write_bash_script_part2() {
+    if [[ "$write_script" == "True" ]]; then
+        cat << EOF | sed 's/^\s*//' >> "${SCRIPTDIR}/${CONTAINERNAME}_run.sh"
+            \$sudo docker run ${run_args[@]}
+EOF
+        chmod +x ${SCRIPTDIR}/${CONTAINERNAME}_run.sh
     fi
 }
 
@@ -135,6 +191,7 @@ _prepare_run_command() {
     # shells do not expand variables with quotes and spaces as needed, use array instead (http://mywiki.wooledge.org/BashFAQ/050)
     run_args=($runmode $remove $user_opt --hostname=$CONTAINERNAME --name=$CONTAINERNAME
         $label $CAPABILITIES $ENVSETTINGS $NETWORKSETTINGS $VOLMAPPING $USBMAPPING $extra_run_opt $IMAGENAME $cmd)
+    _write_bash_script_part2
 }
 
 
