@@ -1,5 +1,7 @@
 **/.DS_Store
 .idea
+.pytest_cache/
+__pycache__/
 x.xml
 REPO_STATUS
 manifest/local
