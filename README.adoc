@@ -2,9 +2,7 @@
 
 A git subproject for docker projects. Provides scripts for docker build, exec and run commands that
 are becoming unwiedly when one needs many arguments. Tries to be a thin wrapper around the
-docker CLI similar to docker-compose, with a focus to control the mapping of uids to the docker host.
-With the --userns-remap feature of dockerd (>= 1.10) the need for this feature will go away for
-containers running processes under a single uid.
+docker CLI similar to docker-compose.
 
 Features:
 
@@ -19,12 +17,16 @@ Features:
   config without dependency on the container to have a dockerd-DNS entry (when not running).
 - Consistent image, container, user and network mapping for multiple containers
 - http(s)_proxy environemnt variables are passed to `docker build`
-- Pre-build hook: Allow script to modify the build env or Dockerfile before build. This can be used
-  to:
+- Create a stand-alone bash script for a target system without dscripts (run.sh -w option)
+- Capability defaults configured in Dockerfile
+- Consistent docker interface for both CI and dev environments with single set of commands
+- Pre-build hook: Allow script to modify the build env or Dockerfile before build. This can be used fir tasks like:
   ** Download archives or clone github repos before `docker build` to have better control on updates, or
   ** add staging support for images: e.g., it allows an image to reference myimage-qa or
      myimage-prod in FROM.
   It is implemented by adding a build_prepare.sh script to in the same directory as conf.sh
+- Control the mapping of uids to the docker host.
+  With the --userns-remap feature of dockerd (>= 1.10) the need for this feature will go away for containers running processes under a single uid.
 
 Requirements:
 - SELinux must be enabled (permissive or enforcing)

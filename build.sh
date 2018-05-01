@@ -4,7 +4,7 @@ main() {
     _get_commandline_opts $@
     _load_library_functions
     load_config '--build'
-    image_name_tagged="$IMAGENAME:$image_tag"
+    image_name_tagged="${IMAGENAME}${image_tag}"
     _cd_to_Dockerfile_dir
     _prepare_docker_build_env
     init_sudo
@@ -21,12 +21,12 @@ main() {
 
 _get_commandline_opts() {
     while getopts ":bchmMn:pPrt:u" opt; do
-      manifest="True"
+      manifest='True'
       unset image_tag
       case $opt in
         b) SET_BUILDINFO='True';;
         c) CACHEOPT="--no-cache";;
-        m) manifest="True";;
+        m) manifest='True';;
         M) unset manifest;;
         n) config_nr=$OPTARG
            re='^[0-9][0-9]$'
@@ -34,10 +34,10 @@ _get_commandline_opts() {
               echo "error: -n argument is not a number in the range frmom 02 .. 99" >&2; exit 1
            fi
            config_opt="-n ${config_nr}";;
-        p) print="True";;
-        P) push="True";;
-        r) remove_img="True";;
-        t) image_tag=":$OPTARG";;
+        p) print='True';;
+        P) push='True';;
+        r) remove_img='True';;
+        t) image_tag=":${OPTARG}";;
         u) update_pkg="-u";;
         :) echo "Option -$OPTARG requires an argument"; exit 1;;
         *) echo "usage: $0 [-b] [-c] [-h] [-m] [-M] [-n <NN>] [-p] [-P] [-r] [-t tag] [-u] [cmd]
@@ -74,10 +74,10 @@ _prepare_docker_build_env() {
 
 
 _remove_previous_image() {
-    if [[ "remove_img" ]]; then
-        cmd="${sudo} docker rmi -f $image_name_tagged 2> /dev/null || true"
-        [[ "$print" ]] && echo $cmd
-        $cmd
+    if [[ "$remove_img" ]]; then
+        cmd="${sudo} docker rmi -f ${image_name_tagged}"
+        [[ "$print" ]] && "echo $cmd 2> /dev/null"
+        $cmd 2> /dev/null || true
     fi
 }
 
@@ -150,7 +150,7 @@ _generate_manifest_and_image_build_number() {
     if [[ "$manifest" ]]; then
         get_container_status
         is_running=$?
-        if (( $is_running = 0 )); then
+        if (( $is_running == 0 )); then
             echo "Container already running. Cannot generate manifest, image not tagged"
             exit 1
         elif [[ ! -e "$proj_home/manifest.sh"  ]]; then
@@ -160,7 +160,7 @@ _generate_manifest_and_image_build_number() {
         mkdir -p $proj_home/manifest
         manifest_temp="$proj_home/manifest/manifest.tmp"
         $proj_home/manifest.sh > $manifest_temp
-        $buildscriptsdir/run.sh -i /opt/bin/manifest.sh >> $manifest_temp
+        $buildscriptsdir/run.sh -i /opt/bin/manifest2.sh >> $manifest_temp
         build_number_file=$(mktemp)
         $buildscriptsdir/tag_build.py $manifest_temp $MANIFEST_SCOPE $image_name_tagged $build_number_file
         build_number=$(cat $build_number_file)
@@ -194,3 +194,4 @@ _push_image() {
 
 
 main $@
+
