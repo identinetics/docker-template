@@ -2,3 +2,5 @@
 .idea
 x.xml
 REPO_STATUS
+manifest/local
+testdata/

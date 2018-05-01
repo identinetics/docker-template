@@ -1,3 +1,0 @@
-= Test scripts
-
-Testing is performed in the separate dscripts-test project.

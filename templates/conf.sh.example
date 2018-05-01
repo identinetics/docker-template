@@ -66,10 +66,12 @@ _set_buildargs() {
         --build-arg USERNAME=$CONTAINERUSER
         --build-arg UID=$CONTAINERUID
     "
-    #export DOCKERFILE_DIR=  # set this if the Dockerfile is not in the directory containing the dscripts submodule
+    #export DOCKERFILE_DIR=  # set this if the Docker environment is not in the dscripts submodule's parent directory (-> build will cd there)
     #export DSCRIPTS_DOCKERFILE='Dockerfile.rhel'   # defaults to 'Dockerfile' if unset or empty
     export REPO_STATUS='True'  # if set: generate 'REPO_STATUS' file to be included in docker image at /opt/etc/
     #export SET_BUILDINFO='True'   # if set add label BUILDINFO to image (better be set in CI-pipeline)
+    export MANIFEST_SCOPE='local'  # valid values: 'global', 'local'. Extension for manifest library.
+                                   # must be local for targets. Requires write access to git for 'global'.
 }
 
 
