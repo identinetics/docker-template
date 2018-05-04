@@ -7,7 +7,9 @@ Before you need to set:
 
 1. Edit conf.sh and set MANIFEST_SCOPE to 'global' or 'local'. The first is for develpoment environments with wirte access to the repo,
 the second for target environments.
-2. Add following lines to Dockerfile:
+2. Copy /template/manifest2.sh to install/opt/bin in your Docker environment,
+   and edit it include all files that should increase the build number when changed.
+3. Add following lines to Dockerfile:
 
     RUN mkdir -p $HOME/.config/pip \
      && printf "[global]\ndisable-pip-version-check = True\n" > $HOME/.config/pip/pip.conf

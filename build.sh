@@ -154,14 +154,14 @@ _generate_manifest_and_image_build_number() {
     if (( $is_running == 0 )); then
         echo "Container already running. Cannot generate manifest, image not tagged"
         exit 1
-    elif [[ ! -e "$proj_home/manifest.sh"  ]]; then
-        echo "cannot run '$proj_home/manifest.sh'; image not tagged"
+    elif [[ ! -e "$buildscriptsdir/manifest.sh"  ]]; then
+        echo "cannot run '$buildscriptsdir/manifest.sh'; image not tagged"
         exit 2
     fi
     mkdir -p $proj_home/manifest
     manifest_temp="$proj_home/manifest/manifest.tmp"
-    $proj_home/manifest.sh > $manifest_temp
-    $buildscriptsdir/run.sh -i /opt/bin/manifest2.sh >> $manifest_temp
+    $buildscriptsdir/manifest.sh > $manifest_temp
+    $buildscriptsdir/run.sh -i /opt/bin/manifest2.sh | sed -e 's/\r$//' >> $manifest_temp
     build_number_file=$(mktemp)
     python3 $buildscriptsdir/buildnbr.py $manifest_temp $MANIFEST_SCOPE $build_number_file
     build_number=$(cat $build_number_file)
