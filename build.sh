@@ -170,9 +170,9 @@ _generate_manifest_and_image_build_number() {
 
 
 _tag_with_build_number() {
-    cmd="${sudo} docker tag ${IMAGENAME} ${IMAGENAME}:${build_number}"
+    cmd="${sudo} docker tag ${IMAGENAME} ${IMAGENAME}:B${build_number}"
     [[ "$print" ]] && echo $cmd
-    $cmd && echo "Successfully tagged ${IMAGENAME}:${build_number}"
+    $cmd && echo "Successfully tagged ${IMAGENAME}:B${build_number}"
 }
 
 
