@@ -99,3 +99,7 @@ dscripts support `docker build` behind an optional proxy. This reuqires:
 * http_proxy, https_proxy ftp_proxy and no_proxy set on the docker host
 * these 4 env variables will be imported by docker without additional ARG statement in Dockerfile
 
+## Generating image build numbers
+
+Dscripts includes the plumbing to increment the build number whenever source or dependencies change.
+See docs/Buildnumbers.adoc

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 __author__ = 'r2h2'
 
@@ -25,6 +25,9 @@ def main(*cli_args):
         args.build_number_file.write(new_build_number)
         store_new_manifest(args.manifest_temp_name, new_build_number, manifest_lib, args.manifest_scope)
         write_log(diff, new_build_number, manifest_lib, args.manifest_scope)
+        return new_build_number
+    else:
+        args.build_number_file.write(last_manifest_name)
 
 
 
@@ -54,14 +57,16 @@ def get_args(testargs=None):
 def make_a_difference(manifest_temp, manifest_lib) -> list:
     manifest_dirlist_global = []
     path = os.path.join(manifest_lib, 'global')
+    os.makedirs(path, exist_ok=True)
     for file in os.listdir(path):
         if os.path.isfile(os.path.join(path, file)):
             manifest_dirlist_global.append(file)
     manifest_dirlist_local = []
     path = os.path.join(manifest_lib, 'local')
+    os.makedirs(path, exist_ok=True)
     for file in os.listdir(path):
-        if os.path.isfile(os.path.join(path, file)) and not file.startwith('.'):
-            manifest_dirlist.append(file)
+        if os.path.isfile(os.path.join(path, file)) and not file.startswith('.'):
+            manifest_dirlist_local.append(file)
     manifest_dirlist = sorted(manifest_dirlist_global + manifest_dirlist_local)
     if len(manifest_dirlist) > 0:
         _ = manifest_dirlist[-1:]
@@ -94,6 +99,7 @@ def increment_build_number(last_manifest_name, manifest_scope) -> str:
         target_buildno = int(m.group(2))
         if manifest_scope == 'global':
             source_buildno += 1
+            target_buildno = 0
         else:
             target_buildno += 1
         buildno = "{}.{}".format(source_buildno, target_buildno)

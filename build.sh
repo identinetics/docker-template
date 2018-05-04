@@ -13,16 +13,18 @@ main() {
     _list_repo_branches
     _exec_build_command
     _do_cleanup
-    _generate_manifest_and_image_build_number
-    _tag_with_build_number
+    if [[ "$manifest" ]]; then
+        _generate_manifest_and_image_build_number
+        _tag_with_build_number
+    fi
     _push_image
 }
 
 
 _get_commandline_opts() {
+    manifest='True'
+    unset image_tag
     while getopts ":bchmMn:pPrt:u" opt; do
-      manifest='True'
-      unset image_tag
       case $opt in
         b) SET_BUILDINFO='True';;
         c) CACHEOPT="--no-cache";;
@@ -147,44 +149,41 @@ _do_cleanup() {
 
 
 _generate_manifest_and_image_build_number() {
-    if [[ "$manifest" ]]; then
-        get_container_status
-        is_running=$?
-        if (( $is_running == 0 )); then
-            echo "Container already running. Cannot generate manifest, image not tagged"
-            exit 1
-        elif [[ ! -e "$proj_home/manifest.sh"  ]]; then
-            echo "cannot run '$proj_home/manifest.sh'; image not tagged"
-            exit 2
-        fi
-        mkdir -p $proj_home/manifest
-        manifest_temp="$proj_home/manifest/manifest.tmp"
-        $proj_home/manifest.sh > $manifest_temp
-        $buildscriptsdir/run.sh -i /opt/bin/manifest2.sh >> $manifest_temp
-        build_number_file=$(mktemp)
-        $buildscriptsdir/tag_build.py $manifest_temp $MANIFEST_SCOPE $image_name_tagged $build_number_file
-        build_number=$(cat $build_number_file)
-        rm $build_number_file
+    get_container_status
+    is_running=$?
+    if (( $is_running == 0 )); then
+        echo "Container already running. Cannot generate manifest, image not tagged"
+        exit 1
+    elif [[ ! -e "$proj_home/manifest.sh"  ]]; then
+        echo "cannot run '$proj_home/manifest.sh'; image not tagged"
+        exit 2
     fi
+    mkdir -p $proj_home/manifest
+    manifest_temp="$proj_home/manifest/manifest.tmp"
+    $proj_home/manifest.sh > $manifest_temp
+    $buildscriptsdir/run.sh -i /opt/bin/manifest2.sh >> $manifest_temp
+    build_number_file=$(mktemp)
+    python3 $buildscriptsdir/buildnbr.py $manifest_temp $MANIFEST_SCOPE $build_number_file
+    build_number=$(cat $build_number_file)
+    rm $build_number_file
 }
 
 
 _tag_with_build_number() {
-    if [[ "$manifest" ]]; then
-        cmd="${sudo} docker tag ${DOCKER_REGISTRY}/${image_name_tagged} ${IMAGENAME}:${build_number}"
-        [[ "$print" ]] && echo $cmd
-        $cmd
-    fi
+    cmd="${sudo} docker tag ${IMAGENAME} ${IMAGENAME}:${build_number}"
+    [[ "$print" ]] && echo $cmd
+    $cmd && echo "Successfully tagged ${IMAGENAME}:${build_number}"
 }
 
 
 _push_image() {
+    # push both build image name with :latest or -t tag and (optionally) with build_number tag
     if [[ "$push" ]]; then
-        cmd="${sudo} docker push $DOCKER_REGISTRY/$image_name_tagged"
+        cmd="${sudo} docker push ${DOCKER_REGISTRY_PREFIX}$image_name_tagged"
         [[ "$print" ]] && echo $cmd
         $cmd
         if [[ "$manifest" ]]; then
-            cmd="${sudo} docker push $DOCKER_REGISTRY/${IMAGENAME}:${build_number}"
+            cmd="${sudo} docker push ${DOCKER_REGISTRY_PREFIX}${IMAGENAME}:${build_number}"
             [[ "$print" ]] && echo $cmd
             $cmd
         fi

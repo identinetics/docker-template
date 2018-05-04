@@ -38,9 +38,9 @@ _inspect_git_repos() {
 
 _inspect_from_image() {
     dockerfile_path="${DOCKERFILE_DIR}${DSCRIPTS_DOCKERFILE:-Dockerfile}"
-    from_image=$(egrep "^FROM" $dockerfile_path | awk '{ print $2}')
-    printf "FROM::${from_image}=="
-    docker image ls --filter 'reference=$from_image' -q
+    from_image=$(egrep "^FROM" ${dockerfile_path} | awk '{ print $2}')
+    image_id=$(docker image ls --filter "reference=${from_image}" -q)
+    printf "FROM::${from_image}==${image_id}\n"
 }
 
 
@@ -51,7 +51,7 @@ _inspect_docker_build_env() {
 
 
 _inspect_container() {
-    cmd="$sudo docker run -i --rm -u 0 --name=${CONTAINERNAME}_manifest $IMAGENAME /opt/bin/manifest2.sh"
+    cmd="$sudo docker run -i --rm -u 0 --name=${CONTAINERNAME}_manifest ${IMAGENAME} /opt/bin/manifest2.sh"
 }
 
 

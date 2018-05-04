@@ -1,5 +1,18 @@
 # Docker Build Number Generation
 
+## Quickstart
+
+Running build.sh will automatically set buildnumbers in ./manifest and docker image tags.
+Before you need to set:
+
+1. Edit conf.sh and set MANIFEST_SCOPE to 'global' or 'local'. The first is for develpoment environments with wirte access to the repo,
+the second for target environments.
+2. Add following lines to Dockerfile:
+
+    RUN mkdir -p $HOME/.config/pip \
+     && printf "[global]\ndisable-pip-version-check = True\n" > $HOME/.config/pip/pip.conf
+    COPY install/opt/bin/manifest2.sh /opt/bin/manifest2.sh
+
 ## Use Case
 
 To deliver a docker image the project is contained in a git repository with the dscripts submodule and with optional submodules.
@@ -86,5 +99,4 @@ dscripts/build.sh will automatically generate manifest files und less invoked wi
 To generate a manifest the project need to contain script "manifest.sh" in the project root.
 
 The entry "MANIFEST_SCOPE" controls whether manifests are written to manifest/global/ or manifest/local/.
-
 
