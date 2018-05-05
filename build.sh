@@ -51,7 +51,7 @@ _get_commandline_opts() {
              -n  configuration number ('<NN>' in conf<NN>.sh)
              -p  print docker build command on stdout
              -P  push after build
-             -r  remove existing image (-f)
+             -r  remove existing image (all tags: docker rmi -f imageid)
              -t  add this tag to the build target name
              -u  run build_prepare.sh (update packages in docker build context)
            "; exit 0;;
@@ -77,7 +77,8 @@ _prepare_docker_build_env() {
 
 _remove_previous_image() {
     if [[ "$remove_img" ]]; then
-        cmd="${sudo} docker rmi -f ${image_name_tagged}"
+        image_id=$(docker image ls --filter "reference=${image_name_tagged}" -q)
+        cmd="${sudo} docker rmi -f ${image_id}"
         [[ "$print" ]] && "echo $cmd 2> /dev/null"
         $cmd 2> /dev/null || true
     fi
