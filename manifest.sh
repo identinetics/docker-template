@@ -39,7 +39,7 @@ _inspect_git_repos() {
 _inspect_from_image() {
     dockerfile_path="${DOCKERFILE_DIR}${DSCRIPTS_DOCKERFILE:-Dockerfile}"
     from_image=$(egrep "^FROM" ${dockerfile_path} | awk '{ print $2}')
-    image_id=$(docker image ls --filter "reference=${from_image}" -q)
+    image_id=$(${sudo} docker image ls --filter "reference=${from_image}" -q)
     printf "FROM::${from_image}==${image_id}\n"
 }
 

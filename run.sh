@@ -106,9 +106,9 @@ _write_bash_script_part1() {
 #!/bin/bash
 
     _get_container_status() {
-        if [[ "$(docker ps | grep -s $CONTAINERNAME)" ]]; then
+        if [[ "$(${sudo} docker ps | grep -s $CONTAINERNAME)" ]]; then
             return 0   # running
-        elif [[ "$(docker ps -a | grep -s $CONTAINERNAME) ]]; then
+        elif [[ "$(${sudo} docker ps -a | grep -s $CONTAINERNAME) ]]; then
             return 1   # stopped
         else
             return 2   # not found

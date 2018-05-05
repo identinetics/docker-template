@@ -77,9 +77,9 @@ _prepare_docker_build_env() {
 
 _remove_previous_image() {
     if [[ "$remove_img" ]]; then
-        image_id=$(docker image ls --filter "reference=${image_name_tagged}" -q)
+        image_id=$(${sudo} docker images ls --filter "reference=${image_name_tagged}" -q)
         cmd="${sudo} docker rmi -f ${image_id}"
-        [[ "$print" ]] && "echo $cmd 2> /dev/null"
+        [[ "$print" ]] && echo $cmd
         $cmd 2> /dev/null || true
     fi
 }
@@ -126,7 +126,7 @@ _exec_build_command() {
     ${sudo} $docker_build
     rc=$?
     if (( $rc == 0 )); then
-        echo "image: $image_name_tagged built."
+        echo "image: ${image_name_tagged} built."
     else
         echo -e '\E[33;31m'"\033[1mError\033[0m Docker build failed"
         exit $rc
@@ -162,7 +162,7 @@ _generate_manifest_and_image_build_number() {
     mkdir -p $proj_home/manifest
     manifest_temp="$proj_home/manifest/manifest.tmp"
     $buildscriptsdir/manifest.sh > $manifest_temp
-    $buildscriptsdir/run.sh -i /opt/bin/manifest2.sh | sed -e 's/\r$//' >> $manifest_temp
+    $buildscriptsdir/run.sh -ip /opt/bin/manifest2.sh | sed -e 's/\r$//' >> $manifest_temp
     build_number_file=$(mktemp)
     python3 $buildscriptsdir/buildnbr.py $manifest_temp $MANIFEST_SCOPE $build_number_file
     build_number=$(cat $build_number_file)

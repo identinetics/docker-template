@@ -3,7 +3,7 @@
 ## Quickstart
 
 Running build.sh will automatically set buildnumbers in ./manifest and docker image tags.
-Before you need to set:
+Before you need to prepare:
 
 1. Edit conf.sh and set MANIFEST_SCOPE to 'global' or 'local'. The first is for develpoment environments with wirte access to the repo,
 the second for target environments.
@@ -14,6 +14,7 @@ the second for target environments.
     RUN mkdir -p $HOME/.config/pip \
      && printf "[global]\ndisable-pip-version-check = True\n" > $HOME/.config/pip/pip.conf
     COPY install/opt/bin/manifest2.sh /opt/bin/manifest2.sh
+4. Make sure that python3 is in the path of the default user in the docker image
 
 ## Use Case
 
