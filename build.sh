@@ -171,7 +171,13 @@ _generate_manifest_and_image_build_number() {
 
 
 _tag_with_build_number() {
-    cmd="${sudo} docker tag ${IMAGENAME} ${IMAGENAME}:B${build_number}"
+    newname="${IMAGENAME}:B${build_number}"
+    _exec_tag
+}
+
+
+_exec_tag() {
+    cmd="${sudo} docker tag ${IMAGENAME} ${newname}"
     [[ "$print" ]] && echo $cmd
     $cmd && echo "Successfully tagged ${IMAGENAME}:B${build_number}"
 }
@@ -180,11 +186,15 @@ _tag_with_build_number() {
 _push_image() {
     # push both build image name with :latest or -t tag and (optionally) with build_number tag
     if [[ "$push" ]]; then
-        cmd="${sudo} docker push ${DOCKER_REGISTRY_PREFIX}$image_name_tagged"
+        newname="${DOCKER_REGISTRY_PREFIX}${image_name_tagged}"
+        _exec_tag
+        cmd="${sudo} docker push ${newname}"
         [[ "$print" ]] && echo $cmd
         $cmd
         if [[ "$manifest" ]]; then
-            cmd="${sudo} docker push ${DOCKER_REGISTRY_PREFIX}${IMAGENAME}:${build_number}"
+            newname="${DOCKER_REGISTRY_PREFIX}${IMAGENAME}:B${build_number}"
+            _exec_tag
+            cmd="${sudo} docker push ${newname}"
             [[ "$print" ]] && echo $cmd
             $cmd
         fi
