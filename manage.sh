@@ -128,13 +128,23 @@ _get_logfiles() {
 _do_push() {
     # requires docker login --username=<username> [non-default registry host]
     # (on a REHL instance docker.io is not default)
+    #
+    # push with :lastest
     if [[ ${DOCKER_REGISTRY_PREFIX} ]]; then
         _exec_docker_cmd "docker tag ${IMAGENAME} ${DOCKER_REGISTRY_PREFIX}${IMAGENAME}"
-        _exec_docker_cmd "docker push ${DOCKER_REGISTRY_PREFIX}${IMAGENAME}"
-
-    else
-        _exec_docker_cmd "docker push ${DOCKER_REGISTRY_PREFIX}${IMAGENAME}"
     fi
+    _exec_docker_cmd "docker push ${DOCKER_REGISTRY_PREFIX}${IMAGENAME}"
+    #
+    # push with :build#
+    build_number=$(python3 $buildscriptsdir/buildnbr.py read)
+    if [[ "$build_number" ]]; then
+        newname="${DOCKER_REGISTRY_PREFIX}${IMAGENAME}:B${build_number}"
+        if [[ ${DOCKER_REGISTRY_PREFIX} ]]; then
+            _exec_docker_cmd "docker tag ${newname}"
+        fi
+        _exec_docker_cmd "docker push ${newname}"
+    fi
+
 }
 
 

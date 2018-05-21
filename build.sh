@@ -164,7 +164,7 @@ _generate_manifest_and_image_build_number() {
     $buildscriptsdir/manifest.sh > $manifest_temp
     $buildscriptsdir/run.sh -ip /opt/bin/manifest2.sh | sed -e 's/\r$//' >> $manifest_temp
     build_number_file=$(mktemp)
-    python3 $buildscriptsdir/buildnbr.py $manifest_temp $MANIFEST_SCOPE $build_number_file
+    python3 $buildscriptsdir/buildnbr.py generate $manifest_temp $MANIFEST_SCOPE $build_number_file
     build_number=$(cat $build_number_file)
     rm $build_number_file
 }
