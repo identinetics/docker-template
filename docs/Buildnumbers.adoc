@@ -15,6 +15,7 @@ the second for target environments.
      && printf "[global]\ndisable-pip-version-check = True\n" > $HOME/.config/pip/pip.conf
     COPY install/opt/bin/manifest2.sh /opt/bin/manifest2.sh
 4. Make sure that python3 is in the path of the default user in the docker image
+5. If you need to push the image after the build, do this with the -P option of build.sh, e.g. in a Jenkinspipeline
 
 ## Use Case
 
