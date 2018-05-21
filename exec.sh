@@ -4,7 +4,6 @@ main() {
     get_commandline_opts $@
     load_library_functions
     load_config
-    prepare_command
     init_sudo
     perform_command
 }
@@ -70,9 +69,9 @@ get_run_status() {
 }
 
 
-prepare_command() {
-    tty=''
-    [[ -t 0 ]] && tty='-t'
+perform_command() {
+    ttyopt=''
+    [[ -t 0 ]] && ttyopt='-t'  # autodetect tty
     if [[ -z "$1" ]]; then
         cmd=$execcmd
     else
@@ -82,22 +81,16 @@ prepare_command() {
     if [[ $run_if_not_running ]] && (( $is_running > 0 )); then
         if [[ "$interactive_opt" ]]; then
             [[ "$print" == 'True' ]] && print_opt='-p'
-            $exec_scriptdir/dscripts/run.sh $interactive_opt $print_opt $tty $useropt $config_opt $cmd
+            $exec_scriptdir/dscripts/run.sh $interactive_opt $print_opt $ttyopt $useropt $config_opt $execcmd
         else
             echo "option -R only supported in interactive mode (-i)"
             exit 1
         fi
     else
-        $exec_scriptdir/run.sh -V $interactive_opt $useropt $CONTAINERNAME $execcmd
+        docker_cli="docker exec ${interactive_opt} ${ttyopt} ${useropt} ${CONTAINERNAME} ${execcmd}"
+        [[ "$print" == 'True' ]] && echo $docker_cli
+        ${sudo} $docker_cli
     fi
-}
-
-
-perform_command() {
-    if [[ "$print" == 'True' ]]; then
-        echo $docker_cli
-    fi
-    ${sudo} $docker_cli
 }
 
 
