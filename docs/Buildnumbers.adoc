@@ -46,6 +46,7 @@ Therefore, running a build in the target environment will increment the second p
 * 2 months later the regular update build in the target environment will hit a changed upstream docker image.
   Therefore the build number will increase to 123.2.
   Of course, the local manifest history must not be deleted.
+* The most recent build is always tagged as :latest to reference to the same image in Dockerfile and manifest.
 
 ## Implementation
 

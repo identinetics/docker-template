@@ -36,11 +36,16 @@ _inspect_git_repos() {
     done
 }
 
+
 _inspect_from_image() {
     dockerfile_path="${DOCKERFILE_DIR}${DSCRIPTS_DOCKERFILE:-Dockerfile}"
-    from_image=$(egrep "^FROM" ${dockerfile_path} | awk '{ print $2}')
-    image_id=$(${sudo} docker image ls --filter "reference=${from_image}" -q)
-    printf "FROM::${from_image}==${image_id}\n"
+    from_image_spec=$(egrep "^FROM" ${dockerfile_path} | awk '{ print $2}')
+    if [[ "$from_image_spec" == *:* ]]; then
+        image_id=$(${sudo} docker image ls --filter "reference=${from_image_spec}" -q | head -1)
+    else  # if no tag is given, docker will assume :latest
+        image_id=$(${sudo} docker image ls --filter "reference=${from_image_spec:latest}" -q | head -1)
+    fi
+    printf "FROM::${from_image_spec}==${image_id}\n"
 }
 
 
