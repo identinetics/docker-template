@@ -142,7 +142,7 @@ _set_enable_sshd() {
 
 container_status() {
     $sudo docker ps | head -1
-    $sudo docker ps --all | egrep $CONTAINERNAME\$
+    $sudo docker ps --all -f name=$CONTAINERNAME | egrep -v ^CONTAINER
     #$sudo docker exec -it $CONTAINERNAME /scripts/status.sh
 }
 

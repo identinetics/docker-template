@@ -124,9 +124,9 @@ get_capabilities() {
 
 
 get_container_status() {
-    if [[ "$($sudo docker ps | grep -s $CONTAINERNAME)" ]]; then
+    if [[ "$($sudo docker ps -f name=$CONTAINERNAME |egrep -v ^CONTAINER)" ]]; then
         return 0   # running
-    elif [[ "$($sudo docker ps -a | grep -s $CONTAINERNAME)" ]]; then
+    elif [[ "$($sudo docker ps -a -f name=$CONTAINERNAME|egrep -v ^CONTAINER)" ]]; then
         return 1   # stopped
     else
         return 2   # not found

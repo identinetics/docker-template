@@ -97,6 +97,8 @@ _test_if_already_running() {
         is_running='True'
     elif (( $cont_stat == 1 )); then
         is_stopped='True'
+    elif (( $cont_stat == 2 )); then
+        not_found='True'
     fi
 }
 
@@ -106,9 +108,9 @@ _write_bash_script_part1() {
 #!/bin/bash
 
     _get_container_status() {
-        if [[ "$(${sudo} docker ps | grep -s $CONTAINERNAME)" ]]; then
+        if [[ "$(${sudo} docker ps -f name=$CONTAINERNAME  |egrep -v ^CONTAINER)" ]]; then
             return 0   # running
-        elif [[ "$(${sudo} docker ps -a | grep -s $CONTAINERNAME) ]]; then
+        elif [[ "$(${sudo} docker ps -a -f name=$CONTAINERNAME |egrep -v ^CONTAINER) ]]; then
             return 1   # stopped
         else
             return 2   # not found
@@ -142,14 +144,19 @@ EOF
 }
 
 _remove_existing_container() {
+    if [[ "$not_found" ]]; then
+        return  # nothing to remove
+    fi
+    if [[ "$is_running" == 'True' && "$runonly_if_notrunning" != 'True' ]]; then
+        forceopt='-f'
+    fi
+    docker_rm="$sudo docker rm ${forceopt} $CONTAINERNAME"
+    if [[ "$print_opt" == "True" ]]; then
+        echo ${docker_rm}
+    fi
     if [[ "$dryrun" == "True" ]]; then
         echo 'dryrun: not executing `docker rm`'
-        docker_rm="$sudo docker rm $CONTAINERNAME"
-    elif [[ "$is_stopped" == 'True' ]]; then
-        docker_rm="$sudo docker rm $CONTAINERNAME"
-        $docker_rm
-    elif [[ "$is_running" == 'True' && "$runonly_if_notrunning" != 'True' ]]; then
-        docker_rm="$sudo docker rm -f $CONTAINERNAME"
+    else
         $docker_rm
     fi
     _write_bash_script_part1
