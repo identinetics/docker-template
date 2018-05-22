@@ -149,15 +149,25 @@ _do_cleanup() {
 }
 
 
+_check_python3() {
+    python3 -c exit >/dev/null 2>&1
+}
+
+
 _generate_manifest_and_image_build_number() {
+    _check_python3
+    if (( $? > 0 )); then
+        echo "python3 not found in path. Cannot generate manifest."
+        exit 1
+    fi
     get_container_status
     is_running=$?
     if (( $is_running == 0 )); then
         echo "Container already running. Cannot generate manifest, image not tagged"
-        exit 1
+        exit 2
     elif [[ ! -e "$buildscriptsdir/manifest.sh"  ]]; then
         echo "cannot run '$buildscriptsdir/manifest.sh'; image not tagged"
-        exit 2
+        exit 3
     fi
     mkdir -p $proj_home/manifest
     manifest_temp="$proj_home/manifest/manifest.tmp"
