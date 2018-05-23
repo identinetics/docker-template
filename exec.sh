@@ -64,7 +64,7 @@ get_run_status() {
     if [[ $config_nr ]]; then
         config_opt="-n $config_nr"
     fi
-    ./dscripts/manage.sh $config_opt statcode
+    $exec_scriptdir/manage.sh $config_opt statcode
     is_running=$?
 }
 
