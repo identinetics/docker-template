@@ -3,10 +3,10 @@
 ## Quickstart
 
 Running build.sh will automatically set buildnumbers in ./manifest and docker image tags.
-Before you need to prepare:
+Before you build you need to prepare:
 
-1. Edit conf.sh and set MANIFEST_SCOPE to 'global' or 'local'. The first is for develpoment environments with wirte access to the repo,
-the second for target environments.
+1. Edit conf.sh and set MANIFEST_SCOPE to 'global' or 'local'.
+   'global' is for develpoment environments with write access to the repo, 'local' for the target environments.
 2. Copy /template/manifest2.sh to install/opt/bin in your Docker environment,
    and edit it include all files that should increase the build number when changed.
 3. Add following lines to Dockerfile:
