@@ -81,7 +81,7 @@ perform_command() {
     if [[ $run_if_not_running ]] && (( $is_running > 0 )); then
         if [[ "$interactive_opt" ]]; then
             [[ "$print" == 'True' ]] && print_opt='-p'
-            $exec_scriptdir/dscripts/run.sh $interactive_opt $print_opt $ttyopt $useropt $config_opt $execcmd
+            $exec_scriptdir/run.sh $interactive_opt $print_opt $ttyopt $useropt $config_opt $execcmd
         else
             echo "option -R only supported in interactive mode (-i)"
             exit 1
