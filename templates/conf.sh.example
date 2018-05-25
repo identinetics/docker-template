@@ -38,10 +38,8 @@ _set_image_and_container_name() {
     IMGID='99'  # range from 02 .. 99; must be unique per node (registered in github.com/identinetics/dscripts/templates/assigned-uids.adoc)
     PROJSHORT='template'
     SERVICEDESCRIPTION=service_name  # e.g. www.example.org or ldap://10.1.1.${IMGID}:8389"  (no blanks!)
-    export IMAGENAME="r2h2/${PROJSHORT}"  # you may or may not want to have an image id and/or staging tag
-    #export IMAGENAME="r2h2/${PROJSHORT}${IMGID}:${STAGING_ENV}"  # [a-z_0-9]
+    export IMAGENAME="r2h2/${PROJSHORT}"
     export CONTAINERNAME="${IMGID}${PROJSHORT}"
-    #export CONTAINERNAME="${IMGID}${PROJSHORT}-${STAGING_ENV}"
     export DOCKER_REGISTRY=''  # blank for index.docker.io
 }
 

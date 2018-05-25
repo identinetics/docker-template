@@ -8,7 +8,6 @@ Features:
 
 - Consistently tag image, container, user and network IP-addresses with a 2-digit number (on a single host)
 - Tag image with build number (generate build number from docker environment and build dependencies)
-- Tag image with git branch name (alternative to build number)
 - Signed and verify images using link:docs/SHIVA.adoc[SHIVA] (Simple Hack for Image Verification and Admission)
 - Configuration from a config file, building and running containers with the same script in different projects
 - Containers have by default a fixed IP-address based on the container number. This allows load balancer
@@ -19,9 +18,7 @@ Features:
 - Consistent docker interface for both CI and dev environments with single set of commands
 - Pre-build hook: Allow script to modify the build env or Dockerfile before build. This can be used fir tasks like:
   ** Download archives or clone github repos before `docker build` to have better control on updates, or
-  ** download archives that require manual license confirmation, like Oracle Java, or
-  ** add staging support for images: e.g., it allows an image to reference myimage-qa or
-     myimage-prod in FROM.
+  ** download archives that require manual license confirmation, like Oracle Java
 
 Requirements:
 - SELinux must be enabled (permissive or enforcing)

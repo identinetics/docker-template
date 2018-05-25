@@ -224,29 +224,6 @@ map_host_directory() {
 }
 
 
-set_staging_env() {
-    # get current git branch and export STAGING_ENV to following values:
-    #  master -> '-pr'
-    #  qa -> '-qa'
-    #  dev -> '-dev'
-    #  any other -> ''
-    if [[ "$TRAVIS" == "true" ]]; then
-        git_branch=$TRAVIS_BRANCH
-    else
-        proj_home=$(cd $(dirname $conflibdir) && pwd)
-        git_branch=$(cd $proj_home; git symbolic-ref --short -q HEAD)
-    fi
-    export STAGING_ENV=''
-    if [[ "$git_branch" == "master" ]]; then
-        export STAGING_ENV='pr'
-    elif [[ "$git_branch" == "qa" ]]; then
-        export STAGING_ENV='qa'
-    elif [[ "$git_branch" == "dev" ]]; then
-        export STAGING_ENV='dev'
-    fi
-}
-
-
 # ------------------------- functions for build_prepare.sh --------------------------
 
 get_or_update_repo() {
