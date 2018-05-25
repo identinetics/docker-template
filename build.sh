@@ -11,8 +11,9 @@ main() {
     _remove_previous_image
     _prepare_build_command
     _list_repo_branches
+    _remove_buildnumber_tags
     _exec_build_command
-    _do_cleanup
+    _cleanup_docker_env
     if [[ "$manifest" ]]; then
         _generate_manifest_and_image_build_number
         _tag_with_build_number
@@ -24,10 +25,11 @@ main() {
 _get_commandline_opts() {
     manifest='True'
     unset image_tag
-    while getopts ":bchmMn:pPrt:u" opt; do
+    while getopts ":bchkmMn:pPrt:u" opt; do
       case $opt in
         b) SET_BUILDINFO='True';;
         c) CACHEOPT="--no-cache";;
+        k) keep_opt='True';;
         m) manifest='True';;
         M) unset manifest;;
         n) config_nr=$OPTARG
@@ -46,6 +48,7 @@ _get_commandline_opts() {
              -b  include label BUILDINFO
              -c  do not use cache (build --no-cache)
              -h  print this help text
+             -k  keep previous build tags (default: remove all 'B*' tags)
              -m  generate manifest for build number generation (default)
              -M  do not generate manifest for build number generation
              -n  configuration number ('<NN>' in conf<NN>.sh)
@@ -108,6 +111,16 @@ _prepare_proxy_args() {
 }
 
 
+_remove_all_buildnumber_tags() {
+    tmpfile=$(mktemp /tmp/build_sh.tmp)
+    $sudo docker image ls --filter reference=${IMAGENAME} --format "{{.Tag}} {{.Repository}}" |\
+        perl -ne 'if (/^(B\d+\.\d+)\s+(.+)$/) {print "\$sudo docker rmi $2:$1\n"}' > $tmpfile
+    [[ "$print" ]] && cat $tmpfile
+    bash $tmpfile
+    rm $tmpfile
+}
+
+
 _prepare_build_command() {
     _prepare_proxy_args
     if [[ $SET_BUILDINFO ]]; then
@@ -142,7 +155,12 @@ _list_repo_branches() {
 }
 
 
-_do_cleanup() {
+_remove_buildnumber_tags() {
+    docker image ls --filter "reference=" --format "{{.Tag}} {{.Repository}}"
+}
+
+
+_cleanup_docker_env() {
     if [[ -e $proj_home/cleanup.sh ]]; then
        $proj_home/cleanup.sh $update_pkg
     fi
@@ -182,14 +200,27 @@ _generate_manifest_and_image_build_number() {
 
 _tag_with_build_number() {
     newname="${IMAGENAME}:B${build_number}"
-    _exec_tag
+    _tag_image
 }
 
 
-_exec_tag() {
+_tag_image() {
     cmd="${sudo} docker tag ${IMAGENAME} ${newname}"
     [[ "$print" ]] && echo $cmd
-    $cmd && echo "Successfully tagged ${IMAGENAME}:B${build_number}"
+    $cmd
+    if (( $? == 0 )); then
+        echo "Successfully tagged ${IMAGENAME}:B${build_number}"
+    else
+        echo "Failed to create tag ${IMAGENAME}:B${build_number}"
+        exit 1
+    fi
+}
+
+
+_untag_image() {
+    cmd="${sudo} docker rmi ${newname}"
+    [[ "$print" ]] && echo $cmd
+    $cmd
 }
 
 
@@ -197,19 +228,19 @@ _push_image() {
     # push both build image name with :latest or -t tag and (optionally) with build_number tag
     if [[ "$push" ]]; then
         newname="${DOCKER_REGISTRY_PREFIX}${image_name_tagged}"
-        _exec_tag
+        _tag_image
         cmd="${sudo} docker push ${newname}"
         [[ "$print" ]] && echo $cmd
         $cmd
         if [[ "$manifest" ]]; then
             newname="${DOCKER_REGISTRY_PREFIX}${IMAGENAME}:B${build_number}"
-            _exec_tag
+            _tag_image
             cmd="${sudo} docker push ${newname}"
             [[ "$print" ]] && echo $cmd
             $cmd
+            _untag_image
         fi
     fi
-
 }
 
 
