@@ -33,15 +33,15 @@ _set_volume_root() {
 
 
 _set_image_and_container_name() {
-    # IMGID qualifies image, container, user and IP adddress; this is helpful for managing
+    # imgid qualifies image, container, user and IP adddress; this is helpful for managing
     # processes on the docker host etc.
-    IMGID='99'  # range from 02 .. 99; must be unique per node (registered in github.com/identinetics/dscripts/templates/assigned-uids.adoc)
-    PROJSHORT='template'
-    SERVICEDESCRIPTION=service_name  # e.g. www.example.org or ldap://10.1.1.${IMGID}:8389"  (no blanks!)
+    imgid='99'  # range from 02 .. 99; must be unique per node (registered in github.com/identinetics/dscripts/templates/assigned-uids.adoc)
+    projshort='template'
+    export SERVICEDESCRIPTION=service_name  # e.g. www.example.org or ldap://10.1.1.${imgid}:8389"  (no blanks!)
     [[ "$DOCKER_REGISTRY_USER" ]] || export DOCKER_REGISTRY_USER='local'
-    export IMAGENAME="${DOCKER_REGISTRY_USER}/${PROJSHORT}"
-    export CONTAINERNAME="${IMGID}${PROJSHORT}"
-    export DOCKER_REGISTRY=''  # blank for index.docker.io
+    export IMAGENAME="${DOCKER_REGISTRY_USER}/${projshort}"
+    export CONTAINERNAME="${imgid}${projshort}"
+    [[ "$DOCKER_REGISTRY" ]] || export DOCKER_REGISTRY=''  # blank for default registry
 }
 
 
@@ -52,8 +52,8 @@ _set_image_signature_args() {
 
 
 _set_users() {
-    export CONTAINERUSER="$PROJSHORT${IMGID}"   # group and user to run container
-    export CONTAINERUID="3430${IMGID}"     # gid and uid for CONTAINERUSER
+    export CONTAINERUSER="$projshort${imgid}"   # group and user to run container
+    export CONTAINERUID="3430${imgid}"     # gid and uid for CONTAINERUSER
     #export CONTAINERUSER=$(get_metadata uid)      # user/group defined in Dockerfile
     #export CONTAINERUID=$(get_metadata username)  # uid(gid defined in Dockerfile
     export START_AS_ROOT=      # 'True' (e.g. for apache to fall back to www user)
@@ -97,7 +97,7 @@ create_intercontainer_network() {
     fi
     export NETWORKSETTINGS="
         --net $network
-        --ip 10.1.1.${IMGID}
+        --ip 10.1.1.${imgid}
         -p 8080:8080
     "
 }

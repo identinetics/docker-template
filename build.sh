@@ -173,6 +173,10 @@ _check_python3() {
 
 
 _generate_manifest_and_image_build_number() {
+    if [[ ! "$MANIFEST_SCOPE" ]]; then
+        echo "MANIFEST_SCOPE not set - no build number generated."
+        return
+    fi
     _check_python3
     if (( $? > 0 )); then
         echo "python3 not found in path. Cannot generate manifest."
