@@ -15,8 +15,12 @@ main() {
     _exec_build_command
     _cleanup_docker_env
     if [[ "$manifest" ]]; then
-        _generate_manifest_and_image_build_number
-        _tag_with_build_number
+        if [[ "$MANIFEST_SCOPE" ]]; then
+            _generate_manifest_and_image_build_number
+            _tag_with_build_number
+        else
+            echo "MANIFEST_SCOPE not set - no build number generated."
+        fi
     fi
     _push_image
 }
