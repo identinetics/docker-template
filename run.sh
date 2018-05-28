@@ -70,8 +70,8 @@ _usage() {
 
 
 _load_library_functions() {
-    SCRIPTDIR=$(cd $(dirname $BASH_SOURCE[0]) && pwd)
-    PROJ_HOME=$(cd $(dirname $SCRIPTDIR) && pwd)
+    runscriptdir=$(cd $(dirname $BASH_SOURCE[0]) && pwd)
+    PROJ_HOME=$(cd $(dirname $runscriptdir) && pwd)
     source $PROJ_HOME/dscripts/conf_lib.sh
 }
 
@@ -81,8 +81,8 @@ _verify_signature() {
         if [[ ! -z "$config_nr" ]]; then
             verifyconf="-n $config_nr"
         fi
-        [[ "$PRINT" == 'True' ]] || VERIFY_VERBOSE='-V'
-        dscripts/verify.sh $VERIFY_VERBOSE $verifyconf
+        [[ "$print_opt" ]] || verify_verbose='-V'
+        dscripts/verify.sh $verify_verbose $verifyconf
         if (( $? > 0)); then
             echo "Image verfication failed, container not started."
             exit 1
@@ -103,46 +103,6 @@ _test_if_already_running() {
 }
 
 
-_write_bash_script_part1() {
-    read -r -d '' bash_script << EOF
-#!/bin/bash
-
-    _get_container_status() {
-        if [[ "$(${sudo} docker ps -f name=$CONTAINERNAME  |egrep -v ^CONTAINER)" ]]; then
-            return 0   # running
-        elif [[ "$(${sudo} docker ps -a -f name=$CONTAINERNAME |egrep -v ^CONTAINER) ]]; then
-            return 1   # stopped
-        else
-            return 2   # not found
-        fi
-    }
-
-    _test_if_already_running() {
-        _get_container_status
-        cont_stat=$?
-        if (( $cont_stat == 0 )); then
-            is_running='True'
-        elif (( $cont_stat == 1 )); then
-            is_stopped='True'
-        fi
-    }
-
-    _remove_container_if_stopped_or_forced() {
-        if [[ "\$is_stopped" == 'True' ]]; then
-            docker rm $CONTAINERNAME
-        elif [[ "\$is_running" == 'True' && "$runonly_if_notrunning" != 'True' ]]; then
-            docker rm -f $CONTAINERNAME
-        fi
-    }
-
-    _test_if_already_running
-    _remove_container_if_stopped_or_forced
-EOF
-    if [[ "$write_script" == "True" ]]; then
-        printf "$bash_script\n\n" | sed 's/^    //' > "${SCRIPTDIR}/${CONTAINERNAME}_run.sh"
-    fi
-}
-
 _remove_existing_container() {
     if [[ "$not_found" ]]; then
         return  # nothing to remove
@@ -159,16 +119,21 @@ _remove_existing_container() {
     else
         $docker_rm
     fi
-    _write_bash_script_part1
 }
 
 
-_write_bash_script_part2() {
-    if [[ "$write_script" == "True" ]]; then
-        cat << EOF | sed 's/^\s*//' >> "${SCRIPTDIR}/${CONTAINERNAME}_run.sh"
-            \$sudo docker run ${run_args[@]}
-EOF
-        chmod +x ${SCRIPTDIR}/${CONTAINERNAME}_run.sh
+_write_standalone_run_script() {
+    if [[ "$write_script" ]]; then
+        outdir="$PROJ_HOME/out"
+        mkdir -p $outdir
+        envsubst '$CONTAINERNAME' < $runscriptdir/templates/standalone_run.sh \
+                                                    > "${outdir}/${CONTAINERNAME}_run.sh"
+        echo "    $sudo docker run ${run_args[@]}" >> "${outdir}/${CONTAINERNAME}_run.sh"
+        printf "}\n\n\n"                           >> "${outdir}/${CONTAINERNAME}_run.sh"
+        printf "main\n"                            >> "${outdir}/${CONTAINERNAME}_run.sh"
+
+        chmod +x ${outdir}/${CONTAINERNAME}_run.sh
+        echo "created ${outdir}/${CONTAINERNAME}_run.sh"
     fi
 }
 
@@ -198,7 +163,7 @@ _prepare_run_command() {
     # shells do not expand variables with quotes and spaces as needed, use array instead (http://mywiki.wooledge.org/BashFAQ/050)
     run_args=($runmode $remove $user_opt --hostname=$CONTAINERNAME --name=$CONTAINERNAME
         $label $CAPABILITIES $ENVSETTINGS $NETWORKSETTINGS $VOLMAPPING $USBMAPPING $extra_run_opt $IMAGENAME $cmd)
-    _write_bash_script_part2
+    _write_standalone_run_script
 }
 
 
