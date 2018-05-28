@@ -229,7 +229,7 @@ _untag_image() {
     cmd="${sudo} docker rmi ${newname}"
     [[ "$print" ]] && echo $cmd
     $cmd
-    (( $? > 0 )) && echo 'untag failed' && exit 5
+    (( $? > 0 )) && echo 'untag failed' # && exit 5
 }
 
 
