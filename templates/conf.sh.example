@@ -17,7 +17,7 @@ main() {
     #enable_x11_client
     #enable_pkcs11
     #set_enable_sshd     # usually used only for debugging - requires installed sshd in image
-    [[ -e "$SCRIPTDIR/conf_local.sh" ]] && source $SCRIPTDIR/conf_local.sh
+    [[ -e "$SCRIPTDIR/conf_local.sh" ]] && source $SCRIPTDIR/local_conf.sh  # overwrite defaults, e.g. for CI-testing
 }
 
 

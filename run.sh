@@ -37,7 +37,7 @@ _get_commandline_opts() {
         R) runonly_if_notrunning='True';;
         u) user_opt='-u '$OPTARG;;
         V) no_verify='True';;
-        w) write_script='True';;
+        w) write_script='True' && dryrun='True';;
         :) echo "Option -$OPTARG requires an argument"; exit 1;;
         *) _usage; exit 1;;
       esac
@@ -62,7 +62,7 @@ _usage() {
        -R  do nothing if already running (i.e. keep existing container)
        -u  run as user with specified uid
        -V  skip image verification
-       -w  write Docker command to bash script
+       -w  write Docker command to bash script (implies dry run)
        cmd shell command to be executed (default is $STARTCMD)
 
     Note: by default an exisitng container will be removed before a new one is started"

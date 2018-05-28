@@ -13,7 +13,7 @@ pipeline {
         stage('Build') {
             steps {
                 sh '''
-                    echo 'Build image'
+                    echo '=== Build image'
                     rm conf.sh 2> /dev/null || true
                     ln -sf conf.sh.default conf.sh
                     if [[ $nocache ]]; then
@@ -21,13 +21,14 @@ pipeline {
                     else
                         ./dscripts/build.sh  -p
                     fi
+                    echo "=== build completed with rc $?"
                 '''
             }
         }
         stage('Test: Setup persistent volumes') {
             steps {
                 sh '''#!/bin/bash
-                    echo "test if already setup"
+                    echo "=== test if already setup"
                     ./dscripts/manage.sh statcode
                     is_running=$?
                     if (( $is_running > 0 )); then
@@ -46,7 +47,7 @@ pipeline {
                             ./dscripts/manage.sh  logs
                         fi
                     else
-                        echo 'skipping  - already setup'
+                        echo '"=== skipping  - already setup'
                     fi
                 '''
             }
