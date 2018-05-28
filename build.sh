@@ -173,6 +173,10 @@ _cleanup_docker_env() {
 
 _check_python3() {
     python3 -c exit >/dev/null 2>&1
+    if (( $? > 0 )); then
+        echo "python3 not found in path. Cannot generate manifest."
+        exit 5
+    fi
 }
 
 
@@ -182,10 +186,6 @@ _generate_manifest_and_image_build_number() {
         return
     fi
     _check_python3
-    if (( $? > 0 )); then
-        echo "python3 not found in path. Cannot generate manifest."
-        exit 1
-    fi
     get_container_status
     is_running=$?
     if (( $is_running == 0 )); then
@@ -220,7 +220,7 @@ _tag_image() {
         echo "Successfully tagged ${IMAGENAME}:B${build_number}"
     else
         echo "Failed to create tag ${IMAGENAME}:B${build_number}"
-        exit 1
+        exit 4
     fi
 }
 
@@ -229,6 +229,7 @@ _untag_image() {
     cmd="${sudo} docker rmi ${newname}"
     [[ "$print" ]] && echo $cmd
     $cmd
+    (( $? > 0 )) && echo 'untag failed' && exit 5
 }
 
 
@@ -240,12 +241,14 @@ _push_image() {
         cmd="${sudo} docker push ${newname}"
         [[ "$print" ]] && echo $cmd
         $cmd
+        (( $? > 0 )) && echo 'push failed' && exit 6
         if [[ "$manifest" ]]; then
             newname="${DOCKER_REGISTRY_PREFIX}${IMAGENAME}:B${build_number}"
             _tag_image
             cmd="${sudo} docker push ${newname}"
             [[ "$print" ]] && echo $cmd
             $cmd
+            (( $? > 0 )) && echo 'push failed' && exit 6
             _untag_image
         fi
     fi
