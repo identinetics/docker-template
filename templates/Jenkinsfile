@@ -1,6 +1,14 @@
 // Build-Setup-Test (no prior cleanup; leave container running after test)
 pipeline {
     agent any
+    options { disableConcurrentBuilds() }
+    parameters {
+        string(defaultValue: 'True', description: 'initial cleanup: remove container and volumes', name: 'start_clean')
+        string(defaultValue: '', description: 'Force "docker build --nocache"', name: 'nocache')
+        string(defaultValue: '', description: 'push docker image after build', name: 'pushimage')
+        string(defaultValue: '', description: 'keep running: remove container and volumes', name: 'keep_running')
+    }
+
     stages {
         stage('Build') {
             steps {
