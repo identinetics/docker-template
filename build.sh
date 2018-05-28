@@ -160,7 +160,9 @@ _list_repo_branches() {
 
 
 _remove_buildnumber_tags() {
-    docker image ls --filter "reference=" --format "{{.Tag}} {{.Repository}}"
+    eval $(echo "$sudo docker rmi "; \
+           $sudo docker image ls --filter "reference=$IMAGENAME" --format "{{.Tag}} {{.Repository}}" \
+                | perl -ne 'if (/(^B\d+\.\d+)\s+(\S+)$/) { print "$2:$1 " }')
 }
 
 
