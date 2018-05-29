@@ -245,6 +245,7 @@ _push_image() {
         [[ "$print" ]] && echo $cmd
         $cmd
         (( $? > 0 )) && echo 'push failed' && exit 6
+        _untag_image
         if [[ "$manifest" ]]; then
             newname="${DOCKER_REGISTRY_PREFIX}${IMAGENAME}:B${build_number}"
             _tag_image
