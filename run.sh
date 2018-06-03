@@ -48,7 +48,7 @@ _get_commandline_opts() {
 
 
 _usage() {
-    echo "usage: $0 [-h] [-C] [-d] [-i] [-I] [-n container-nr ] [-p] [-P] [-R] [-r | -u] [-V] [cmd]
+    echo "usage: $0 [-h] [-C] [-d] [-i] [-I] [-n container-nr ] [-p] [-P] [-R] [-r | -u] [-V] [-w] [cmd]
        -C  ignore capabilties configured in Dockerfile LABEL
        -d  dry run - do not execute
        -h  print this help text
@@ -124,11 +124,17 @@ _remove_existing_container() {
 
 _write_standalone_run_script() {
     if [[ "$write_script" ]]; then
+        if [[ "$IMAGE_TAG_PRODENV" ]]; then
+            local img="${DOCKER_REGISTRY_PREFIX}${IMAGENAME}:${IMAGE_TAG_PRODENV}"
+        else
+            echo "missing IMAGE_TAG_PRODENV in conf.sh"
+            exit 1
+        fi
         outdir="$PROJ_HOME/out"
         mkdir -p $outdir
         envsubst '$CONTAINERNAME' < $runscriptdir/templates/standalone_run.sh \
                                                     > "${outdir}/${CONTAINERNAME}_run.sh"
-        echo "    $sudo docker run ${run_args[@]}" >> "${outdir}/${CONTAINERNAME}_run.sh"
+        echo "    $sudo docker run ${run_args[@]} ${img} ${cmd}" >> "${outdir}/${CONTAINERNAME}_run.sh"
         printf "}\n\n\n"                           >> "${outdir}/${CONTAINERNAME}_run.sh"
         printf "main\n"                            >> "${outdir}/${CONTAINERNAME}_run.sh"
 
@@ -162,14 +168,15 @@ _prepare_run_command() {
     fi
     # shells do not expand variables with quotes and spaces as needed, use array instead (http://mywiki.wooledge.org/BashFAQ/050)
     run_args=($runmode $remove $user_opt --hostname=$CONTAINERNAME --name=$CONTAINERNAME
-        $label $CAPABILITIES $ENVSETTINGS $NETWORKSETTINGS $VOLMAPPING $USBMAPPING $extra_run_opt $IMAGENAME $cmd)
+        $label $CAPABILITIES $ENVSETTINGS $NETWORKSETTINGS $VOLMAPPING $USBMAPPING $extra_run_opt)
     _write_standalone_run_script
 }
 
 
 _run_command() {
+    run_cmd="$sudo docker run ${run_args[@]} $IMAGENAME $cmd"
     if [[ "$print_opt" == "True" ]]; then
-        echo "$sudo docker run ${run_args[@]}"
+        echo $run_cmd
     fi
     if [[ "$dryrun" == "True" ]]; then
         echo 'dryrun: not executing `docker run`'
@@ -177,7 +184,7 @@ _run_command() {
         echo "already running"
     else
         printf '%s' "$background_msg"
-        $sudo docker run "${run_args[@]}"
+        $run_cmd
     fi
 }
 

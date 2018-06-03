@@ -37,13 +37,14 @@ _set_image_and_container_name() {
     # imgid qualifies image, container, user and IP adddress; this is helpful for managing
     # processes on the docker host etc.
     imgid='99'  # range from 02 .. 99; must be unique per node (registered in github.com/identinetics/dscripts/templates/assigned-uids.adoc)
-    local projshort='template'
+    projshort='template'
     export SERVICEDESCRIPTION=service_name  # e.g. www.example.org or ldap://10.1.1.${imgid}:8389"  (no blanks!)
     export DOCKER_REGISTRY_USER='local' # must be non-blank even for if images are kept local
     #export DOCKER_REGISTRY='localhost:5000'  # overwrite default registry host
     set_docker_registry
     export IMAGENAME="${DOCKER_REGISTRY_USER}/${projshort}${imgid}"
     export CONTAINERNAME="${imgid}${projshort}"
+    export IMAGE_TAG_PRODENV='pr'  # required for standalone run script (-> `run.sh -w`)
 }
 
 
