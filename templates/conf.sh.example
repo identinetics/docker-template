@@ -22,12 +22,12 @@ main() {
 
 
 _set_volume_root() {
-    # DOCKERVOL_SHORT and DOCKERLOG_SHORT are used as
+    # dockervol_short and dockerlog_short are used as
     #  (1) root dirs for volume mappings to the file system, and
     #  (2) as dirs to contain symlinks to docker volumes
-    DOCKERVOL_SHORT='./dv'
-    DOCKERLOG_SHORT='./dl'
-    mkdir -p $DOCKERVOL_SHORT $DOCKERLOG_SHORT
+    dockervol_short='./dv'
+    dockerlog_short='./dl'
+    mkdir -p $dockervol_short $dockerlog_short
     DOCKER_VOLUME_ROOT='/var/lib/docker/volumes'  # hard coded - check for your config if applicable!
     #DOCKER_VOL_LOG_SYMLINKS_DISABLE='True'  # unset or empty to enable symlink creation
 }
@@ -37,12 +37,13 @@ _set_image_and_container_name() {
     # imgid qualifies image, container, user and IP adddress; this is helpful for managing
     # processes on the docker host etc.
     imgid='99'  # range from 02 .. 99; must be unique per node (registered in github.com/identinetics/dscripts/templates/assigned-uids.adoc)
-    projshort='template'
+    local projshort='template'
     export SERVICEDESCRIPTION=service_name  # e.g. www.example.org or ldap://10.1.1.${imgid}:8389"  (no blanks!)
-    [[ "$DOCKER_REGISTRY_USER" ]] || export DOCKER_REGISTRY_USER='local'
-    export IMAGENAME="${DOCKER_REGISTRY_USER}/${projshort}"
+    export DOCKER_REGISTRY_USER='local' # must be non-blank even for if images are kept local
+    #export DOCKER_REGISTRY='localhost:5000'  # overwrite default registry host
+    set_docker_registry 
+    export IMAGENAME="${DOCKER_REGISTRY_USER}/${projshort}${imgid}"
     export CONTAINERNAME="${imgid}${projshort}"
-    [[ "$DOCKER_REGISTRY" ]] || export DOCKER_REGISTRY=''  # blank for default registry
 }
 
 
@@ -107,7 +108,7 @@ create_intercontainer_network() {
 
 setup_vol_mapping() {
     # Create docker volume (-> map_docker_volume) or map a host dir (-> map_host_directory)
-    # In both cases create a shortcut in the shortcut directory (DOCKERVOL_SHORT, DOCKERLOG_SHORT)
+    # In both cases create a shortcut in the shortcut directory (dockervol_short, dockerlog_short)
     mode=$1  # create (used by run.sh)/list (used by manage.sh)
     export VOLLIST=''
     export VOLMAPPING=''
@@ -115,19 +116,19 @@ setup_vol_mapping() {
     create_user $CONTAINERUSER $CONTAINERUID
 
     # Hint: it is good practice to export each VOLUME in the Dockerfile
-    map_docker_volume $mode "${CONTAINERNAME}.var_db"  '/var/db'  'Z' $DOCKERVOL_SHORT
-    map_docker_volume $mode "${CONTAINERNAME}.var_log" '/var/log' 'Z' $DOCKERLOG_SHORT
+    map_docker_volume $mode "${CONTAINERNAME}.var_db"  '/var/db'  'Z' $dockervol_short
+    map_docker_volume $mode "${CONTAINERNAME}.var_log" '/var/log' 'Z' $dockerlog_short
     if [[ ! $JENKINS_HOME ]]; then
         $sudo chown -R $CONTAINERUID:$CONTAINERUID $DOCKER_VOLUME_ROOT/$CONTAINERNAME.* 2>/dev/null || true
     fi
 
-    #map_host_directory "$DOCKERLOG_SHORT/var/log/" '/var/log/' 'Z'
+    #map_host_directory "$dockerlog_short/var/log/" '/var/log/' 'Z'
 }
 
 
 _set_enable_sshd() {
     export SSHD_ROOTPW='changeit'
-    map_docker_volume $mode "${CONTAINERNAME}.ssh" "/etc/ssh" 'Z' $DOCKERLOG_SHORT
+    map_docker_volume $mode "${CONTAINERNAME}.ssh" "/etc/ssh" 'Z' $dockerlog_short
     export CAPABILITIES="$CAPABILITIES --cap-add=setuid --cap-add=setgid --cap-add=chown"
     enable_sshd
 }
@@ -135,8 +136,8 @@ _set_enable_sshd() {
 
 #_set_logfiles() {  # optional: set this for multitail + logfiles subcommands in manage.sh
 #    export KNOWN_LOGFILES="
-#        ${DOCKERLOG_SHORT}/${CONTAINERNAME}.var_log/xxx.log
-#        ${DOCKERLOG_SHORT}/${CONTAINERNAME}.var_log/xxx.error
+#        ${dockerlog_short}/${CONTAINERNAME}.var_log/xxx.log
+#        ${dockerlog_short}/${CONTAINERNAME}.var_log/xxx.error
 #    "
 #}
 
@@ -149,7 +150,7 @@ container_status() {
 
 
 logrotate() {
-    find $DOCKERLOG_SHORT/${CONTAINERNAME}.var_log/ -mtime +5 -exec ls -ld {} \;
+    find $dockerlog_short/${CONTAINERNAME}.var_log/ -mtime +5 -exec ls -ld {} \;
 }
 
 

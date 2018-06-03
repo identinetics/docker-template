@@ -51,6 +51,24 @@ load_config() {
 }
 
 
+set_docker_registry() {
+    # priority: conf.sh, then local.conf, then 'local'
+    local local_user=$(grep DOCKER_REGISTRY_USER local.conf | awk '{ printf $2; }')
+    if [[ -n "$DOCKER_REGISTRY_USER" ]]; then
+        if [[ "$local_user" ]]; then
+             export DOCKER_REGISTRY_USER=$local_user
+        fi
+    fi
+
+    # priority: conf.sh, then local.conf, then '' (-> default registry)
+    local local_host=$(grep DOCKER_REGISTRY_HOST local.conf | awk '{ printf $2; }')
+    if [[ -n "$DOCKER_REGISTRY" ]]; then
+        if [[ "$local_host" ]]; then
+             export DOCKER_REGISTRY=$local_host
+        fi
+    fi
+}
+
 # ------------------------- functions for conf*.sh --------------------------
 
 _chkdir() {
