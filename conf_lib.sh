@@ -51,12 +51,17 @@ load_config() {
 }
 
 
+# ------------------------- functions for conf*.sh --------------------------
+
+
 set_docker_registry() {
     # priority: conf.sh, then local.conf, then 'local'
     local local_user=$(grep DOCKER_REGISTRY_USER local.conf | awk '{ printf $2; }')
-    if [[ -n "$DOCKER_REGISTRY_USER" ]]; then
+    if [[ ! "$DOCKER_REGISTRY_USER" ]]; then
         if [[ "$local_user" ]]; then
              export DOCKER_REGISTRY_USER=$local_user
+        else
+             export DOCKER_REGISTRY_USER="local"
         fi
     fi
 
@@ -68,8 +73,6 @@ set_docker_registry() {
         fi
     fi
 }
-
-# ------------------------- functions for conf*.sh --------------------------
 
 _chkdir() {
     if [[ "${1:0:1}" == / ]]; then
