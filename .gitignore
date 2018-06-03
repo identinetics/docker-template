@@ -2,7 +2,10 @@
 .idea
 .pytest_cache/
 __pycache__/
-x.xml
-REPO_STATUS
+conf.sh
+!conf.sh.default
+local.conf
 manifest/local
+REPO_STATUS
 testdata/
+x.xml
