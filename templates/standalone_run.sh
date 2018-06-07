@@ -1,10 +1,35 @@
 #!/bin/bash
 
 main() {
+    get_options
     init_sudo
     test_if_already_running
     remove_container
     run_command
+}
+
+
+
+
+get_options() {
+    runmode='-d --restart=unless-stopped'
+    tty=''
+    while getopts ":i" opt; do
+      case $opt in
+        i) runmode='-i' && [[ -t 0 ]] && tty='-t';;
+        *) usage; exit 1;;
+      esac
+    done
+    shift $((OPTIND-1))
+    cmd=$1
+}
+
+
+usage() {
+    echo "usage: $0 [-i] [<command>]
+        run image
+        -i      interactive mode
+    "
 }
 
 

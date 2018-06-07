@@ -134,7 +134,7 @@ _write_standalone_run_script() {
         mkdir -p $outdir
         envsubst '$CONTAINERNAME' < $runscriptdir/templates/standalone_run.sh \
                                                     > "${outdir}/${CONTAINERNAME}_run.sh"
-        echo "    $sudo docker run ${run_args[@]} ${img} ${cmd} \$1" >> "${outdir}/${CONTAINERNAME}_run.sh"
+        echo "    \$sudo docker run ${run_args[@]} ${img} ${cmd} \$1" >> "${outdir}/${CONTAINERNAME}_run.sh"
         printf "}\n\n\n"                           >> "${outdir}/${CONTAINERNAME}_run.sh"
         printf "main\n"                            >> "${outdir}/${CONTAINERNAME}_run.sh"
 
@@ -167,9 +167,10 @@ _prepare_run_command() {
         VOLMAPPING="$VOLMAPPING -v $PWD:/pwd:Z"
     fi
     # shells do not expand variables with quotes and spaces as needed, use array instead (http://mywiki.wooledge.org/BashFAQ/050)
-    run_args=($runmode $remove $user_opt --hostname=$CONTAINERNAME --name=$CONTAINERNAME
+    run_args=($user_opt --hostname=$CONTAINERNAME --name=$CONTAINERNAME
         $label $CAPABILITIES $ENVSETTINGS $NETWORKSETTINGS $VOLMAPPING $USBMAPPING $extra_run_opt)
     _write_standalone_run_script
+    run_args=($runmode $run_args)
 }
 
 
