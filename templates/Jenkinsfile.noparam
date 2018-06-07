@@ -1,0 +1,18 @@
+pipeline {
+    agent any
+    stages {
+        stage('build job/default parameters') {
+            steps {
+                build job: 'd-gitlist',
+                    parameters: [
+                     [$class: 'StringParameterValue', name: 'start_clean', value: 'true'],
+                     [$class: 'StringParameterValue', name: 'nocache', value: ''],
+                     [$class: 'StringParameterValue', name: 'pushimage', value: ''],
+                     [$class: 'StringParameterValue', name: 'keep_running', value: ''],
+                     [$class: 'StringParameterValue', name: 'docker_registry_user', value: ''],
+                     [$class: 'StringParameterValue', name: 'docker_registry_host', value: '']
+                    ]
+            }
+        }
+    }
+}
