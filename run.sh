@@ -170,7 +170,8 @@ _prepare_run_command() {
     run_args=($user_opt --hostname=$CONTAINERNAME --name=$CONTAINERNAME
         $label $CAPABILITIES $ENVSETTINGS $NETWORKSETTINGS $VOLMAPPING $USBMAPPING $extra_run_opt)
     _write_standalone_run_script
-    run_args=($runmode $run_args)
+    run_args="$runmode $run_args"
+    echo "run_args: $run_args"
 }
 
 
