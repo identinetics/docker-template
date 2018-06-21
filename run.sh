@@ -134,7 +134,7 @@ _write_standalone_run_script() {
         mkdir -p $outdir
         envsubst '$CONTAINERNAME' < $runscriptdir/templates/standalone_run.sh \
                                                     > "${outdir}/${CONTAINERNAME}_run.sh"
-        echo "    \$sudo docker run ${run_args[@]} ${img} ${cmd} \$1" >> "${outdir}/${CONTAINERNAME}_run.sh"
+        echo "    \$sudo docker run \$runmode ${run_args[@]} ${img} ${cmd} \$1" >> "${outdir}/${CONTAINERNAME}_run.sh"
         printf "}\n\n\n"                           >> "${outdir}/${CONTAINERNAME}_run.sh"
         printf "main\n"                            >> "${outdir}/${CONTAINERNAME}_run.sh"
 
