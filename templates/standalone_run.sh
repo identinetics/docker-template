@@ -5,7 +5,7 @@ main() {
     init_sudo
     test_if_already_running
     remove_container
-    run_command
+    run_command $@
 }
 
 

@@ -186,7 +186,7 @@ _run_command() {
         echo "already running"
     else
         printf '%s' "$background_msg"
-        $run_cmd
+        $run_cmd $@
     fi
 }
 
