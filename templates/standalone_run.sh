@@ -1,11 +1,11 @@
 #!/bin/bash
 
 main() {
-    get_options
+    get_options "$@"
     init_sudo
     test_if_already_running
     remove_container
-    run_command $@
+    run_command "$@"
 }
 
 
@@ -14,21 +14,23 @@ main() {
 get_options() {
     runmode='-d --restart=unless-stopped'
     tty=''
-    while getopts ":i" opt; do
+    while getopts ":ir" opt; do
       case $opt in
-        i) runmode='-i' && [[ -t 0 ]] && tty='-t';;
+        i) runmode='--rm -i' && [[ -t 0 ]] && runmode="$runmode -t";;
+        r) useropt='-u 0';;
         *) usage; exit 1;;
       esac
     done
     shift $((OPTIND-1))
-    cmd=$1
+    cmd="$@"
 }
 
 
 usage() {
     echo "usage: $0 [-i] [<command>]
         run image
-        -i      interactive mode
+        -i      interactive mode (including --rm)
+        -r      start as root
     "
 }
 
