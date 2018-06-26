@@ -66,7 +66,7 @@ set_docker_registry() {
     fi
 
     # priority: conf.sh, then local.conf, then '' (-> default registry)
-    local local_host=$(grep DOCKER_REGISTRY_HOST local.conf | awk '{ printf $2; }')
+    local local_host=$(grep DOCKER_REGISTRY_HOST local.conf 2>/dev/null | awk '{ printf $2; }')
     if [[ ! "$DOCKER_REGISTRY" ]]; then
         if [[ "$local_host" ]]; then
              export DOCKER_REGISTRY=$local_host

@@ -1,0 +1,27 @@
+# template to adapt per project
+version: "2"
+services:
+  nginx:
+    image: {{ imagename }}
+    container_name: {{ containername }}
+    hostname: {{ hostname }}
+    labels:
+      x.service: {{ service.name }}
+    restart: unless-stopped
+    environment:
+      {{ environment}}
+    ports:
+      {{ ports }}
+    networks:
+      dockernet:
+        ipv4_address: 10.1.1.2
+    volumes:
+      {{ volumemappings }}
+    cap_drop:
+      - ALL
+networks:
+  dockernet:
+    external: true
+volumes:
+  {{ volumedeclarations }}
+
