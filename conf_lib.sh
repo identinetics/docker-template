@@ -29,7 +29,7 @@ load_config() {
             echo "$proj_home/$conf_script not found"
             exit 1
         fi
-    elif [[ ${#confs[@]} -eq 1 ]]; then
+    elif (( ${#confs[@]} == 1 )); then
         conf_script=${confs[0]}
     else
         echo "No or more than one (${#confs[@]}) conf*.sh"
