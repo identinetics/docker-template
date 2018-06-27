@@ -67,6 +67,7 @@ _set_buildargs() {
     export BUILDARGS="
         --build-arg USERNAME=$CONTAINERUSER
         --build-arg UID=$CONTAINERUID
+        --build-arg TIMEZONE=Europe/Vienna
     "
     #export DOCKERFILE_DIR=  # set this if the Docker environment is not in the dscripts submodule's parent directory (-> build will cd there)
     #export DSCRIPTS_DOCKERFILE='Dockerfile.rhel'   # defaults to 'Dockerfile' if unset or empty

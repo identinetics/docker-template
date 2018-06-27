@@ -6,7 +6,7 @@ services:
     container_name: {{ containername }}
     hostname: {{ hostname }}
     labels:
-      x.service: {{ service.name }}
+      x.service: {{ servicename }}
     restart: unless-stopped
     environment:
       {{ environment}}
@@ -14,7 +14,7 @@ services:
       {{ ports }}
     networks:
       dockernet:
-        ipv4_address: 10.1.1.2
+        ipv4_address: {{ ipv4_address }}
     volumes:
       {{ volumemappings }}
     cap_drop:

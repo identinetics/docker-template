@@ -8,6 +8,9 @@ LABEL maintainer="Rainer Hörbe <r2h2@hoerbe.at>" \
       #   --cap-add=setuid --cap-add=setgid --cap-add=chown --cap-add=net_bind_service
       capabilities='--cap-drop=all'
 
+ARG TIMEZONE='UTC'
+ln -sf /usr/share/zoneinfo/$TIMEZONE /etc/localtime
+
 # Enable proxy args if required by docker host
 #? ARG http_proxy
 #? ARG https_proxy

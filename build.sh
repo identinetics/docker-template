@@ -30,7 +30,7 @@ main() {
 _get_commandline_opts() {
     manifest='True'
     unset image_tag
-    while getopts ":bchkmMn:pPrt:u" opt; do
+    while getopts ":bchklmMn:pPrt:u" opt; do
       case $opt in
         b) SET_BUILDINFO='True';;
         c) CACHEOPT="--no-cache";;
@@ -49,16 +49,17 @@ _get_commandline_opts() {
         t) image_tag=":${OPTARG}";;
         u) update_pkg="-u";;
         :) echo "Option -$OPTARG requires an argument"; exit 1;;
-        *) echo "usage: $0 [-b] [-c] [-h] [-m] [-M] [-n <NN>] [-p] [-P] [-r] [-t tag] [-u] [cmd]
+        *) echo "usage: $0 [-b] [-c] [-h] [-k] [-l] [-m] [-M] [-n <NN>] [-p] [-P] [-r] [-t tag] [-u] [cmd]
              -b  include label BUILDINFO
              -c  do not use cache (build --no-cache)
              -h  print this help text
              -k  keep previous build tags (default: remove all 'B*' tags)
+             -l  do not push image:latest (only :<buildno> or tag from -t)
              -m  generate manifest for build number generation (default)
              -M  do not generate manifest for build number generation
              -n  configuration number ('<NN>' in conf<NN>.sh)
              -p  print docker build command on stdout
-             -P  push after build
+             -P  push after build (pushing :latest depends on -l)
              -r  remove existing image (all tags: docker rmi -f imageid)
              -t  add this tag to the build target name
              -u  run build_prepare.sh (update packages in docker build context)
