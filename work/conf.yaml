@@ -1,0 +1,7 @@
+DockerCompose:
+    imagename: 
+    containername: 
+    servicename: 
+    ipv4_address: 
+    shibduser: 
+    httpduser: 

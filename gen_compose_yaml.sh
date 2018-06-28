@@ -16,8 +16,10 @@ main() {
 
 
 _get_options() {
-    while getopts ":n:t:T" opt; do
+    template='docker-compose.template'
+    while getopts ":C:n:t:T" opt; do
       case $opt in
+        C) template=$OPTARG;;
         n) re='^[0-9][0-9]$'
            if ! [[ $OPTARG =~ $re ]] ; then
              echo "error: -n argument ($OPTARG) is not a number in the range frmom 02 .. 99" 1>&2; exit 1
@@ -44,11 +46,12 @@ _get_options() {
 _usage() {
     echo "usage: $0 [-h] [-n <NN>] [-t <tag> ] [-T] <command>
 
+        -C  use an alternative template
         -n  configuration number ('<NN>' in conf<NN>.sh) if using multiple configurations
         -t  specify docker image tag
         -T  use image tag defined in IMAGE_TAG_PRODENV (conf.sh)
 
-        create docker-compose.yaml from conf.sh
+        create work/docker-compose.yaml from conf.sh
     "
 }
 
@@ -62,8 +65,8 @@ _load_library_functions() {
 
 _create_args_file() {
     local tag_suffix=''
-    [[ $imgtag ]] && tag_suffix=":$IMAGE_TAG_PRODENV"
-    [[ "$IMAGE_TAG_PRODENV" ]] && tag_suffix=":$IMAGE_TAG_PRODENV"
+    [[ $imgtag ]] && tag_suffix=":$imgtag"
+    [[ "$use_imgtag_prodenv" && "$IMAGE_TAG_PRODENV" ]] && tag_suffix=":$IMAGE_TAG_PRODENV"
     conf_yaml="work/conf${config_nr}.yaml"
     mkdir -p work
 
@@ -82,7 +85,7 @@ EOT
 _create_compose_yaml() {
     compose_yaml="work/docker-compose${config_nr}.yaml"
     # require python3 with yaml & jinja2 (-> `pip3 install PyYaml jinja2`)
-    python3 dscripts/render_template.py $conf_yaml docker-compose.template DockerCompose \
+    python3 dscripts/render_template.py $conf_yaml $template DockerCompose \
         > $compose_yaml
     echo "created $compose_yaml"
 }
