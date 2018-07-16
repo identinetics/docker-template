@@ -30,11 +30,13 @@ main() {
 _get_commandline_opts() {
     manifest='True'
     unset image_tag
+    push_latest='True'
     while getopts ":bchklmMn:pPrt:u" opt; do
       case $opt in
         b) SET_BUILDINFO='True';;
         c) CACHEOPT="--no-cache";;
         k) keep_opt='True';;
+        l) unset push_latest;;
         m) manifest='True';;
         M) unset manifest;;
         n) config_nr=$OPTARG
@@ -238,15 +240,21 @@ _untag_image() {
 
 
 _push_image() {
-    # push both build image name with :latest or -t tag and (optionally) with build_number tag
+    # push image if $push is set, with following tagging rules: 
+    #   push with tag $image_tag or without tag (i.e. :latest) if $push_latest or $image_tag are set
+    #   push with build_number if $manifest is set
     if [[ "$push" ]]; then
-        newname="${DOCKER_REGISTRY_PREFIX}${image_name_tagged}"
-        _tag_image
-        cmd="${sudo} docker push ${newname}"
-        [[ "$print" ]] && echo $cmd
-        $cmd
-        (( $? > 0 )) && echo 'push failed' && exit 6
-        _untag_image
+        if [[ "$image_tag" || "$push_latest" ]]; then
+            newname="${DOCKER_REGISTRY_PREFIX}${image_name_tagged}"
+            _tag_image
+            cmd="${sudo} docker push ${newname}"
+            [[ "$print" ]] && echo $cmd
+            $cmd
+            (( $? > 0 )) && echo 'push failed' && exit 6
+            _untag_image
+        else
+            echo "skipping docker push of :latest"
+        fi
         if [[ "$manifest" ]]; then
             newname="${DOCKER_REGISTRY_PREFIX}${IMAGENAME}:B${build_number}"
             _tag_image
