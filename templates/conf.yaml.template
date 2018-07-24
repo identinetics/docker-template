@@ -1,0 +1,7 @@
+# template file to map env variables (from conf.sh) into conf.yaml
+# add those variables not set as constant values in docker-compose.template
+DockerCompose:
+    imagename: $IMAGENAME$tag_suffix
+    containername: $CONTAINERNAME
+    servicename: $SERVICEDESCRIPTION
+    ipv4_address: $IPV4_ADDRESS

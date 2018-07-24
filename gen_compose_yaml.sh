@@ -69,16 +69,12 @@ _create_args_file() {
     [[ "$use_imgtag_prodenv" && "$IMAGE_TAG_PRODENV" ]] && tag_suffix=":$IMAGE_TAG_PRODENV"
     conf_yaml="work/conf${config_nr}.yaml"
     mkdir -p work
+    # render teplate with env vars:
+    eval "cat > $conf_yaml << EOF
+        $(cat conf.yaml.template)
+EOF
+    "
 
-    cat > $conf_yaml << EOT
-DockerCompose:
-    imagename: $IMAGENAME$tag_suffix
-    containername: $CONTAINERNAME
-    servicename: $SERVICEDESCRIPTION
-    ipv4_address: $IPV4_ADDRESS
-    shibduser: $SHIBDUSER
-    httpduser: $HTTPDUSER
-EOT
 }
 
 
